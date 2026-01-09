@@ -7,8 +7,10 @@ use App\Imports\MaterialsImport;
 use App\Imports\ProductMaterialsImport;
 use App\Imports\ProductsImport;
 use App\Imports\SalesImport;
+use App\Jobs\RunGridSearchJob;
 use App\Models\SarimaConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -24,7 +26,12 @@ class SettingsController extends Controller
 
     public function forecasting() {
         $sarimaParameters = SarimaConfig::with('product')->get();
-        return view('settings.forecast', compact('sarimaParameters')); 
+
+        $isGridSearchRunning = DB::table('jobs')
+        ->where('payload', 'like', '%RunGridSearchJob%')
+        ->exists();
+
+        return view('settings.forecast', compact('sarimaParameters', 'isGridSearchRunning')); 
     }
 
 
@@ -113,5 +120,26 @@ class SettingsController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    // SettingsController.php
+
+    public function runGridSearchAll()
+    {
+        $configs = SarimaConfig::all();
+        $jobs = [];
+
+        foreach ($configs as $config) {
+            // Masukkan ke Job Baru
+            $jobs[] = new RunGridSearchJob($config->product_id);
+        }
+
+        // Dispatch Batch
+        $batch = Bus::batch($jobs)
+            ->name('Grid Search All Products')
+            ->allowFailures()
+            ->dispatch();
+
+        return redirect()->back()->with('success', "Proses Grid Search dimulai untuk " . count($jobs) . " produk. Silakan cek nanti.");
     }
 }

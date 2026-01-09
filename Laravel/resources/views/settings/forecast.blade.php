@@ -28,25 +28,11 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li>
-                <a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">
-                    Home
-                </a>
-            </li>
-            
+            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-
-            <li>
-                <a href="{{ route('settings.index') }}" class="hover:text-petronas transition-colors">
-                    Settings
-                </a>
-            </li>
-
+            <li><a href="{{ route('settings.index') }}" class="hover:text-petronas transition-colors">Settings</a></li>
             <li class="opacity-40">/</li>
-
-            <li class="text-petronas font-semibold" aria-current="page">
-                Model Configuration
-            </li>
+            <li class="text-petronas font-semibold" aria-current="page">Model Configuration</li>
         </ol>
     </nav>
 
@@ -57,16 +43,53 @@
         </div>
     @endif
 
-    <header>
-        <p class="text-xs uppercase tracking-widest text-muted">
-            System Configuration
-        </p>
-        <h1 class="text-3xl font-extrabold text-petronas">
-            Model Configuration
-        </h1>
-        <p class="text-sm text-muted mt-1">
-            Atur parameter SARIMA dan pantau akurasi model per produk
-        </p>
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <p class="text-xs uppercase tracking-widest text-muted">
+                System Configuration
+            </p>
+            <h1 class="text-3xl font-extrabold text-petronas">
+                Model Configuration
+            </h1>
+            <p class="text-sm text-muted mt-1">
+                Atur parameter SARIMA dan pantau akurasi model per produk
+            </p>
+        </div>
+
+        <div>
+            <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
+                @csrf
+                <button type="submit" id="btn-tune-all"
+                    {{-- 1. Jika proses sedang berjalan, matikan tombol dari awal --}}
+                    @if($isGridSearchRunning) disabled @endif
+                    
+                    onclick="return confirm('PERINGATAN: ...')"
+                    
+                    class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-petronas font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
+                    
+                    @if($isGridSearchRunning)
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Processing in Background...</span>
+                        </div>
+                    
+                    @else
+                        <div id="btn-text-normal" class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Auto-tune All Products</span>
+                        </div>
+
+                        <div id="btn-text-loading" class="hidden">
+                            <span>Processing...</span>
+                        </div>
+                    @endif
+                </button>
+            </form>
+        </div>
     </header>
 
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
@@ -91,7 +114,6 @@
                 <thead class="bg-carbon">
                     <tr>
                         <th class="px-3 py-3 text-left text-muted">Product Info</th>
-                        
                         <th class="px-1 py-3 text-center text-petronas font-bold">p</th>
                         <th class="px-1 py-3 text-center text-petronas font-bold">d</th>
                         <th class="px-1 py-3 text-center text-petronas font-bold">q</th>
@@ -99,7 +121,6 @@
                         <th class="px-1 py-3 text-center text-silver font-bold">D</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">Q</th>
                         <th class="px-1 py-3 text-center text-muted font-normal border-l border-carbonSoft">Season (m)</th>
-
                         <th class="px-3 py-3 text-right text-muted border-l border-carbonSoft">RMSE</th>
                         <th class="px-3 py-3 text-right text-muted">MAPE</th>
                         <th class="px-3 py-3 text-left text-muted">Last Trained</th>
@@ -206,50 +227,56 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 1. Ambil semua form parameter yang ada di halaman
+        
+        // --- LOGIC TOMBOL AUTO TUNE ---
+        const gridAllForm = document.getElementById('grid-all-form');
+        const btnTuneAll = document.getElementById('btn-tune-all');
+        const textNormal = document.getElementById('btn-text-normal');
+        const textLoading = document.getElementById('btn-text-loading');
+
+        if (gridAllForm) {
+            gridAllForm.addEventListener('submit', function() {
+                // Matikan tombol agar tidak double submit
+                btnTuneAll.disabled = true;
+                
+                // Ubah Tampilan Tombol
+                textNormal.classList.add('hidden');   // Sembunyikan "Auto-tune..."
+                textLoading.classList.remove('hidden'); // Munculkan "Processing..."
+            });
+        }
+
+        // --- LOGIC MANUAL SAVE BUTTON (Existing) ---
         const forms = document.querySelectorAll('form[id^="form-"]');
 
         forms.forEach(form => {
             const formId = form.id;
-            
-            // Karena input dan button berada DI LUAR tag <form>, kita cari berdasarkan atribut 'form'
             const inputs = document.querySelectorAll(`input[form="${formId}"]`);
             const saveBtn = document.querySelector(`button[form="${formId}"]`);
 
-            // Definisi Style Tailwind
             const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20'];
             const inactiveClasses = ['bg-carbon', 'text-muted', 'cursor-not-allowed', 'opacity-50'];
 
-            // 2. Simpan nilai awal (original value) ke data-attribute
             inputs.forEach(input => {
                 input.dataset.original = input.value;
-
-                // 3. Pasang Event Listener 'input' (mendeteksi ketikan/perubahan)
                 input.addEventListener('input', () => {
                     checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses);
                 });
             });
         });
 
-        // Fungsi untuk mengecek apakah ada perubahan
         function checkDirtyState(inputs, btn, activeClasses, inactiveClasses) {
             let isDirty = false;
-
-            // Cek satu per satu input dalam baris tersebut
             inputs.forEach(input => {
                 if (input.value !== input.dataset.original) {
                     isDirty = true;
                 }
             });
 
-            // Update status tombol
             if (isDirty) {
-                // Aktifkan Tombol
                 btn.disabled = false;
                 btn.classList.remove(...inactiveClasses);
                 btn.classList.add(...activeClasses);
             } else {
-                // Matikan Tombol (Kembali ke Original)
                 btn.disabled = true;
                 btn.classList.remove(...activeClasses);
                 btn.classList.add(...inactiveClasses);

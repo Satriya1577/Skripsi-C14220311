@@ -61,12 +61,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Settings Routes
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::get('settings/forecasting', [SettingsController::class, 'forecasting'])->name('settings.forecast');
-    Route::put('settings/forecasting/update-sarima', [SettingsController::class, 'updateSarimaParameters'])->name('settings.updateSarima');
-    Route::get('settings/imports', [SettingsController::class, 'import'])->name('settings.import');
-    Route::post('settings/import/products', [SettingsController::class, 'importProducts'])->name('products.import.excel');
-    Route::post('settings/import/materials', [SettingsController::class, 'importMaterials'])->name('materials.import.excel');
-    Route::post('settings/import/recipes', [SettingsController::class, 'importProductMaterials'])->name('product_materials.import.excel');
-    Route::post('settings/import/sales', [SettingsController::class, 'importSales'])->name('sales.import.excel');
+    Route::get('/settings/forecasting', [SettingsController::class, 'forecasting'])->name('settings.forecast');
+    Route::put('/settings/forecasting/update-sarima', [SettingsController::class, 'updateSarimaParameters'])->name('settings.updateSarima');
+    Route::post('/settings/forecasting/grid-search-all', [SettingsController::class, 'runGridSearchAll'])->name('settings.gridSearchAll');
+    Route::get('/settings/imports', [SettingsController::class, 'import'])->name('settings.import');
+    Route::post('/settings/import/products', [SettingsController::class, 'importProducts'])->name('products.import.excel');
+    Route::post('/settings/import/materials', [SettingsController::class, 'importMaterials'])->name('materials.import.excel');
+    Route::post('/settings/import/recipes', [SettingsController::class, 'importProductMaterials'])->name('product_materials.import.excel');
+    Route::post('/settings/import/sales', [SettingsController::class, 'importSales'])->name('sales.import.excel');
 
 });
