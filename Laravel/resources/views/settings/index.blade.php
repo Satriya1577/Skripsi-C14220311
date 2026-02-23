@@ -77,11 +77,26 @@
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-silver">{{ Auth::user()->name ?? 'Guest User' }}</h2>
                     <p class="text-sm text-muted">{{ Auth::user()->email ?? 'No Email' }}</p>
+                    
+                    {{-- LOGIC WARNA BADGE ROLE --}}
+                    @php
+                        $role = Auth::user()->role ?? 'none';
+                        $badgeClass = match($role) {
+                            'admin' => 'bg-petronas/10 text-petronas border-petronas/20',
+                            'production' => 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                            'sales' => 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                            'purchase' => 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+                            'inventory' => 'bg-green-500/10 text-green-400 border-green-500/20',
+                            'accounting' => 'bg-pink-500/10 text-pink-400 border-pink-500/20',
+                            default => 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+                        };
+                    @endphp
+
                     <div class="mt-2 flex gap-2">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-petronas/10 text-petronas border border-petronas/20 uppercase tracking-wide">
-                            Administrator
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wide {{ $badgeClass }}">
+                            {{ ucfirst($role) }}
                         </span>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-carbon text-muted border border-carbon uppercase tracking-wide">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-carbon uppercase tracking-wide">
                             Active
                         </span>
                     </div>
@@ -158,7 +173,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
-                            </svg>                              
+                            </svg>                             
                         </div>
                         
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
@@ -171,6 +186,42 @@
                         <h3 class="text-lg font-bold text-silver group-hover:text-petronas transition">SARIMA Config</h3>
                         <p class="text-xs text-muted mt-1">
                             Atur parameter (p,d,q)(P,D,Q)s dan monitoring akurasi (RMSE/MAPE).
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </section>
+
+        {{-- SECTION BARU: USER MANAGEMENT --}}
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <span class="w-1 h-6 bg-silver rounded-full"></span>
+                <h2 class="text-xl font-bold text-silver">Access Control</h2>
+            </div>
+
+            <a href="{{ route('settings.userManagement') }}" 
+               class="group block bg-carbonSoft rounded-xl p-6 border border-carbon hover:border-petronas transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,161,155,0.1)] relative overflow-hidden h-40">
+                
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-silver/5 rounded-full blur-2xl group-hover:bg-petronas/10 transition"></div>
+
+                <div class="flex flex-col h-full justify-between relative z-10">
+                    <div class="flex items-start justify-between">
+                        <div class="p-3 bg-carbon rounded-lg text-silver group-hover:text-petronas border border-carbon transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                            </svg>
+                        </div>
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+                             class="w-6 h-6 text-muted group-hover:text-petronas group-hover:translate-x-2 transition transform">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                        </svg>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-silver group-hover:text-petronas transition">User Management</h3>
+                        <p class="text-xs text-muted mt-1">
+                            Kelola akun pengguna, role, dan hak akses aplikasi.
                         </p>
                     </div>
                 </div>

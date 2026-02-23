@@ -4,12 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Material;
 use App\Http\Controllers\Controller;
-use App\Imports\MaterialsImport;
 use App\Models\MaterialTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Validators\ValidationException;
 
 class MaterialController extends Controller
 {
@@ -23,19 +20,11 @@ class MaterialController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Helper: Hitung Faktor Konversi
      */
-    public function create()
-    {
-        //
-    }
-
     private function calculateConversionFactor($size, $packagingUnit, $baseUnit)
     {
-        // Jika satuan beli == satuan dasar (misal beli Gram, pakai Gram), faktor = 1
-        // if ($packagingUnit == $baseUnit) {
-        //     return 1;
-        // }
+        $size = (float) $size;
 
         // Logic Konversi Berat (Target: Gram)
         if ($baseUnit == 'gram') {
@@ -43,7 +32,7 @@ class MaterialController extends Controller
                 case 'kg': return $size * 1000;
                 case 'ons': return $size * 100;
                 case 'gram': return $size;
-                default: return $size; // Asumsi user input manual dalam gram
+                default: return $size; 
             }
         }
 
@@ -60,7 +49,7 @@ class MaterialController extends Controller
         if ($baseUnit == 'pcs') {
             switch ($packagingUnit) {
                 case 'dozen': return $size * 12; 
-                case 'pcs': return $size; // <--- PERBAIKAN: Return size, bukan 1
+                case 'pcs': return $size; 
                 default: return $size; 
             }
         }
@@ -68,15 +57,22 @@ class MaterialController extends Controller
         return $size;
     }
 
+    /**
+     * Handle Create/Store Logic
+     */
     private function handleStore(Request $request)
     {
-        // 1. VALIDASI INPUT
+        // 1. VALIDASI INPUT (TIDAK BERUBAH)
         $request->validate([
             // Identitas
             'code' => 'required|string|unique:materials,code',
             'name' => 'required|string|max:255',
             'category_type' => 'required|in:mass,volume,unit',
-            'lead_time_days' => 'required|integer|min:0',
+            
+            // Lead Time (NEW SCHEMA)
+            'is_manual_lead_time' => 'required|in:manual,automatic',
+            'min_lead_time_days'  => 'nullable|integer|min:1', 
+            'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days',
 
             // Konfigurasi Satuan (VITAL)
             'unit' => 'required|string',             // Base Unit (gram, ml, pcs)
@@ -90,13 +86,23 @@ class MaterialController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        // SEBELUM CREATE / UPDATE DATA:
-        // Hitung Conversion Factor secara otomatis
+        // Hitung Conversion Factor
         $calculatedFactor = $this->calculateConversionFactor(
             $request->packaging_size, 
             $request->packaging_unit, 
-            $request->unit // Base Unit (gram/ml/pcs)
+            $request->unit
         );
+
+        // --- LOGIKA LEAD TIME ---
+        $minLead = $request->min_lead_time_days ?? 1;
+        $maxLead = $request->max_lead_time_days ?? 7;
+        
+        if ($request->is_manual_lead_time === 'manual') {
+            $avgLead = ($minLead + $maxLead) / 2;
+        } else {
+            // Jika Auto tapi baru create, set default placeholder
+            $avgLead = 0; 
+        }
 
         try {
             DB::beginTransaction();
@@ -106,56 +112,70 @@ class MaterialController extends Controller
             $initialPriceBase = 0;
             $hasInitialStock = false;
 
-            // Jika user mengisi saldo awal > 0
             if ($request->filled('initial_qty_purchase_unit') && $request->initial_qty_purchase_unit > 0) {
                 $hasInitialStock = true;
                 $faktor = $calculatedFactor;
 
                 // Konversi Qty ke Base Unit
-                // Contoh: 10 Karung * 25.000 = 250.000 Gram
                 $initialStockBase = $request->initial_qty_purchase_unit * $faktor;
 
                 // Konversi Harga ke Base Unit
-                // Contoh: Rp 200.000 (per karung) / 25.000 = Rp 8 (per gram)
-                // Jika harga kosong/0, set 0
                 $priceInput = $request->initial_price_purchase_unit ?? 0;
                 $initialPriceBase = ($faktor > 0) ? ($priceInput / $faktor) : 0;
             }
 
-            // 3. SIMPAN KE TABEL MATERIALS (Master Data)
+            // 3. SIMPAN KE TABEL MATERIALS
             $material = Material::create([
                 'code' => $request->code,
                 'name' => $request->name,
                 'category_type' => $request->category_type,
-                'lead_time_days' => $request->lead_time_days,
                 
-                // Simpan Konfigurasi Satuan
+                // Lead Time Fields (UPDATED)
+                'is_manual_lead_time' => $request->is_manual_lead_time,
+                'min_lead_time_days' => $minLead,
+                'max_lead_time_days' => $maxLead,
+                'lead_time_average' => $avgLead,
+                
+                // System Calculated Defaults
+                'safety_stock' => 0,
+                'reorder_point' => 0,
+
+                // Satuan Config
                 'unit' => $request->unit,
                 'purchase_unit' => $request->purchase_unit,
+                'packaging_size' => $request->packaging_size,
+                'packaging_unit' => $request->packaging_unit,
+                'conversion_factor' => $calculatedFactor,
 
-                // SIMPAN INPUT MENTAH USER AGAR BISA DI-EDIT
-                'packaging_size' => $request->packaging_size, // 25
-                'packaging_unit' => $request->packaging_unit, // kg
-
-                'conversion_factor' => $calculatedFactor, // <--- Hasil hitungan controller
-
-                // Simpan Saldo Awal (Dalam Base Unit)
+                // Stok & Harga
                 'current_stock' => $initialStockBase,
-                'price_per_unit' => $initialPriceBase, // Moving Average Awal
+                'price_per_unit' => $initialPriceBase,
+                'ordered_stock' => 0,
                 'is_active' => $request->is_active,
             ]);
 
-            // 4. CATAT TRANSAKSI SALDO AWAL (Jika ada)
-            // Ini penting agar kartu stok balance dari awal
+            // 4. CATAT TRANSAKSI SALDO AWAL (UPDATED SKEMA BARU)
             if ($hasInitialStock) {
                 MaterialTransaction::create([
-                    'material_id' => $material->id,
-                    'type' => 'adjustment', // Gunakan tipe 'adjustment' atau 'in' untuk saldo awal
-                    'qty' => $initialStockBase, // Simpan dalam Base Unit
-                    'price_per_unit' => $initialPriceBase,
-                    'total_price' => $initialStockBase * $initialPriceBase,
-                    'transaction_date' => now(),
-                    'description' => "Initial Stock: {$request->initial_qty_purchase_unit} {$request->purchase_unit} @ " . number_format($request->initial_price_purchase_unit),
+                    'material_id'           => $material->id,
+                    'type'                  => 'adjustment', // Gunakan 'adjustment' atau 'in' untuk saldo awal
+                    'qty'                   => $initialStockBase,
+                    
+                    // Harga
+                    'price_per_unit'        => $initialPriceBase,
+                    'total_price'           => $initialStockBase * $initialPriceBase,
+                    
+                    'transaction_date'      => now(),
+                    'description'           => "Initial Stock: {$request->initial_qty_purchase_unit} {$request->purchase_unit} @ " . number_format($request->initial_price_purchase_unit),
+
+                    // Snapshot Wajib
+                    'material_name_snapshot' => $material->name,
+                    'material_packaging_size_snapshot' => $material->packaging_size,
+                    'material_packaging_unit_snapshot' => $material->packaging_unit,
+                    'material_conversion_factor_snapshot' => $material->conversion_factor,
+                    'purchase_unit_snapshot' => $material->purchase_unit,
+                    'material_unit_snapshot' => $material->unit,
+                    'current_stock_balance'  => $initialStockBase, // Karena saldo awal, balance = qty awal
                 ]);
             }
 
@@ -171,11 +191,108 @@ class MaterialController extends Controller
                              ->with('error', 'Gagal menyimpan material: ' . $e->getMessage());
         }
     }
- 
-    /**
-     * Store a newly created resource in storage.
-     */
 
+    /**
+     * Handle Update Logic
+     */
+    public function handleUpdate(Request $request, Material $material)
+    {
+        // 1. CEK RIWAYAT TRANSAKSI
+        $hasTransaction = MaterialTransaction::where('material_id', $material->id)->exists();
+
+        // 2. VALIDASI DASAR
+        $rules = [
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|unique:materials,code,'.$material->id,
+            'category_type' => 'required|in:mass,volume,unit',
+            'is_active' => 'required|boolean',
+            
+            // Lead Time (NEW SCHEMA)
+            'is_manual_lead_time' => 'required|in:manual,automatic',
+            'min_lead_time_days'  => 'nullable|integer|min:1', 
+            'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days',
+
+            'packaging_size' => 'required|numeric|min:0.0001',
+            'packaging_unit' => 'required|string',
+        ];
+
+        // Hitung Faktor Konversi Baru
+        $baseUnitForCalc = $request->input('unit', $material->unit);
+        $calculatedNewFactor = $this->calculateConversionFactor(
+            $request->packaging_size,
+            $request->packaging_unit,
+            $baseUnitForCalc
+        );
+
+        // 3. LOGIC PENGUNCIAN (GUARD)
+        if ($hasTransaction) {
+            // Cek Unit Dasar
+            if ($request->unit != $material->unit) {
+                return back()->with('error', 'GAGAL: Satuan Dasar tidak boleh diubah karena material ini sudah memiliki riwayat transaksi.');
+            }
+
+            // Cek Faktor Konversi (Toleransi float)
+            if (abs($calculatedNewFactor - $material->conversion_factor) > 0.001) {
+                return back()->with('error', 'GAGAL: Ukuran Kemasan tidak boleh diubah drastis karena material ini sudah memiliki riwayat transaksi.');
+            }
+
+            // Cek Satuan Beli
+            if ($request->purchase_unit != $material->purchase_unit) {
+                return back()->with('error', 'GAGAL: Satuan Beli tidak boleh diubah karena sudah ada riwayat transaksi.');
+            }
+
+        } else {
+            // JIKA BELUM ADA TRANSAKSI:
+            $rules['unit'] = 'required|string';
+            $rules['purchase_unit'] = 'required|string';
+        }
+
+        $request->validate($rules);
+
+        // --- LOGIKA LEAD TIME UPDATE ---
+        $minLead = $request->min_lead_time_days ?? 1;
+        $maxLead = $request->max_lead_time_days ?? 7;
+        $avgLead = $material->lead_time_average; // Default pakai nilai lama
+
+        if ($request->is_manual_lead_time === 'manual') {
+            // Jika manual, hitung ulang rata-rata dari input
+            $avgLead = ($minLead + $maxLead) / 2;
+        } else {
+            // Jika automatic, jangan ubah average lead time (biarkan system/job yang update)
+            // Atau logic lain: biarkan nilai lama
+        }
+
+        // 4. PROSES UPDATE
+        $dataToUpdate = [
+            'name' => $request->name,
+            'code' => $request->code,
+            'category_type' => $request->category_type, 
+            'is_active' => $request->is_active,
+            
+            // Lead Time Update
+            'is_manual_lead_time' => $request->is_manual_lead_time,
+            'min_lead_time_days' => $minLead,
+            'max_lead_time_days' => $maxLead,
+            'lead_time_average' => $avgLead,
+        ];
+
+        // Hanya update detail satuan jika BELUM ada transaksi
+        if (!$hasTransaction) {
+            $dataToUpdate['unit'] = $request->unit;
+            $dataToUpdate['purchase_unit'] = $request->purchase_unit;
+            $dataToUpdate['conversion_factor'] = $calculatedNewFactor;
+            $dataToUpdate['packaging_size'] = $request->packaging_size;
+            $dataToUpdate['packaging_unit'] = $request->packaging_unit;
+        }
+
+        $material->update($dataToUpdate);
+
+        return redirect()->route('materials.index')->with('success', 'Data material berhasil diperbarui.');
+    }
+
+    /**
+     * Store Router (Create or Update)
+     */
     public function store(Request $request)
     {
         if ($request->filled('material_id')) {
@@ -186,152 +303,129 @@ class MaterialController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show Detail
      */
-    public function show(material $material)
+    public function show(Material $material)
     {
-         $transactions = $material->transactions()
-        ->orderBy('transaction_date', 'desc')
-        ->paginate(5); // 5 data per page
+        $transactions = $material->transactions()
+            ->orderBy('transaction_date', 'asc')
+            ->paginate(5);
         return view('materials.show', compact('material', 'transactions'));
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(material $material)
-    {
-        //
-    }
-
-    public function handleUpdate(Request $request, Material $material)
-    {
-        // 1. CEK RIWAYAT TRANSAKSI
-        $hasTransaction = MaterialTransaction::where('material_id', $material->id)->exists();
-
-        // 2. VALIDASI DASAR
-        $rules = [
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:materials,code,'.$material->id,
-            'lead_time_days' => 'required|integer|min:0',
-            'is_active' => 'required|boolean',
-            // Tambahkan validasi untuk input baru
-            'packaging_size' => 'required|numeric|min:0.0001',
-            'packaging_unit' => 'required|string',
-        ];
-
-        // Hitung Faktor Konversi dari Input User saat ini
-        // Kita butuh ini untuk dibandingkan dengan data lama (Logic Guard)
-        // Gunakan 'unit' dari request jika ada, jika tidak pakai dari material lama
-        $baseUnitForCalc = $request->input('unit', $material->unit);
-        
-        $calculatedNewFactor = $this->calculateConversionFactor(
-            $request->packaging_size,
-            $request->packaging_unit,
-            $baseUnitForCalc
-        );
-
-        // 3. LOGIC PENGUNCIAN (GUARD)
-        if ($hasTransaction) {
-            // JIKA SUDAH ADA TRANSAKSI:
-            
-            // Cek Unit Dasar
-            if ($request->unit != $material->unit) {
-                return back()->with('error', 'GAGAL: Satuan Dasar (Unit) tidak boleh diubah karena material ini sudah memiliki riwayat transaksi.');
-            }
-
-            // Cek Faktor Konversi (Logic Diubah sedikit untuk akomodasi input baru)
-            // Kita bandingkan hasil hitungan input user vs data di database
-            // Gunakan abs() > 0.001 untuk mengatasi masalah presisi koma float
-            if (abs($calculatedNewFactor - $material->conversion_factor) > 0.001) {
-                return back()->with('error', 'GAGAL: Ukuran Kemasan (Isi per Satuan Beli) tidak boleh diubah karena material ini sudah memiliki riwayat transaksi. Data lama: ' . number_format($material->conversion_factor) . ', Data baru: ' . number_format($calculatedNewFactor));
-            }
-
-            // Cek Satuan Beli
-            if ($request->purchase_unit != $material->purchase_unit) {
-                return back()->with('error', 'GAGAL: Satuan Beli tidak boleh diubah karena sudah ada riwayat transaksi.');
-            }
-
-        } else {
-            // JIKA BELUM ADA TRANSAKSI (Material Baru/Masih Bersih):
-            $rules['unit'] = 'required|string';
-            $rules['purchase_unit'] = 'required|string';
-            // conversion_factor tidak divalidasi manual lagi, karena dihitung otomatis
-        }
-
-        $request->validate($rules);
-
-        // 4. PROSES UPDATE
-        $dataToUpdate = [
-            'name' => $request->name,
-            'code' => $request->code,
-            'lead_time_days' => $request->lead_time_days,
-            'category_type' => $request->category_type, 
-            'is_active' => $request->is_active,
-        ];
-
-        // Hanya masukkan data satuan jika BELUM ada transaksi
-        if (!$hasTransaction) {
-            $dataToUpdate['unit'] = $request->unit;
-            $dataToUpdate['purchase_unit'] = $request->purchase_unit;
-            
-            // Simpan hasil hitungan baru
-            $dataToUpdate['conversion_factor'] = $calculatedNewFactor;
-            
-            // Saldo Awal tetap tidak bisa diubah di sini
-
-            $dataToUpdate['packaging_size'] = $request->packaging_size;
-            $dataToUpdate['packaging_unit'] = $request->packaging_unit;
-        }
-
-        $material->update($dataToUpdate);
-
-        return redirect()->route('materials.index')->with('success', 'Data material berhasil diperbarui.');
-    }
-    
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-
-    public function update(Request $request, material $material)
-    {
-        return $this->handleUpdate($request, $material);
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Remove
      */
     public function destroy(Material $material)
     {
         $material = Material::findOrFail($material->id);
 
-        // 1. CEK RIWAYAT TRANSAKSI (Kartu Stok)
-        // Jika sudah pernah ada transaksi In/Out, DILARANG HAPUS.
+        // 1. Cek Riwayat Transaksi
         if ($material->transactions()->exists()) {
-            return back()->with('error', 'GAGAL: Material tidak bisa dihapus karena sudah memiliki riwayat transaksi (Kartu Stok). Silakan non-aktifkan saja.');
+            return back()->with('error', 'GAGAL: Material tidak bisa dihapus karena sudah memiliki riwayat transaksi.');
         }
 
-        // 2. CEK PENGGUNAAN DI RESEP (BOM)
-        // Jika material ini sedang dipakai di resep produk tertentu, DILARANG HAPUS.
+        // 2. Cek Penggunaan di Resep
         if ($material->productMaterials()->exists()) {
-            // Opsional: Kasih tau user produk mana yang pakai material ini
             $productName = $material->productMaterials->first()->product->name;
-            return back()->with('error', "GAGAL: Material sedang digunakan dalam resep produk '$productName'. Hapus dulu dari resep jika ingin menghapus material ini.");
+            return back()->with('error', "GAGAL: Material sedang digunakan dalam resep produk '$productName'.");
         }
 
-        // 3. JIKA LOLOS PENGECEKAN (AMAN)
-        // Berarti ini material baru yang belum pernah diapa-apain (misal salah ketik)
         $material->delete();
 
         return redirect()->route('materials.index')->with('success', 'Data material berhasil dihapus permanen.');
     }
+
+    /**
+     * Stock Opname / Adjustment
+     */
+    public function storeAdjustment(Request $request)
+    {
+        $request->validate([
+            'material_id'  => 'required|exists:materials,id',
+            'actual_qty'   => 'required|numeric|min:0', 
+            'notes'        => 'nullable|string',
+            'manual_price' => 'nullable|numeric|min:0.01' 
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $material = Material::findOrFail($request->material_id);
+            
+            // 1. SIAPKAN KONVERSI
+            $faktor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+
+            // 2. HITUNG SELISIH (DELTA)
+            // Input User (Satuan Beli) -> Konversi ke Base Unit
+            $inputQtyPurchaseUnit = $request->actual_qty;
+            $actualQtyInBase      = $inputQtyPurchaseUnit * $faktor;
+
+            // Stok Sistem saat ini (Base Unit)
+            $systemQty = $material->current_stock; 
+            
+            // Selisih (+ berarti Surplus/Masuk, - berarti Loss/Keluar)
+            $diffQty = $actualQtyInBase - $systemQty;
+
+            if (abs($diffQty) < 0.0001) { 
+                return back()->with('info', "Stok fisik sudah sesuai dengan sistem.");
+            }
+
+            // 3. LOGIC HARGA & HPP
+            $transactionPrice = $material->price_per_unit;
+
+            if ($diffQty > 0) {
+                // SURPLUS
+                if ($transactionPrice == 0) {
+                    if ($request->filled('manual_price')) {
+                        $transactionPrice = $request->manual_price / $faktor;
+                        $material->update(['price_per_unit' => $transactionPrice]);
+                    } else {
+                        throw new \Exception("Harga sistem saat ini Rp 0. Wajib mengisi 'Harga Estimasi'.");
+                    }
+                }
+            } else {
+                // LOSS: Wajib pakai harga sistem
+                $transactionPrice = $material->price_per_unit;
+            }
+
+            // 4. EKSEKUSI UPDATE DATABASE
+            $material->update(['current_stock' => $actualQtyInBase]);
+
+            $typeLabel = $diffQty > 0 ? "Surplus (Found)" : "Loss (Usage)";
+            $desc      = "Opname: {$typeLabel}. Fisik: {$inputQtyPurchaseUnit} {$material->purchase_unit}. " . $request->notes;
+
+            // --- PERBAIKAN DI SINI: SESUAI SKEMA BARU ---
+            MaterialTransaction::create([
+                'material_id'           => $material->id,
+                'type'                  => 'adjustment', // Enum: 'in', 'out', 'adjustment'
+                'qty'                   => $diffQty, 
+                
+                // Harga
+                'price_per_unit'        => $transactionPrice,
+                'total_price'           => abs($diffQty) * $transactionPrice,
+                
+                'transaction_date'      => now(),
+                'description'           => $desc,
+
+                // Snapshot Wajib
+                'material_name_snapshot' => $material->name,
+                'material_packaging_size_snapshot' => $material->packaging_size,
+                'material_packaging_unit_snapshot' => $material->packaging_unit,
+                'material_conversion_factor_snapshot' => $material->conversion_factor,
+                'purchase_unit_snapshot' => $material->purchase_unit,
+                'material_unit_snapshot' => $material->unit,
+                'current_stock_balance'  => $actualQtyInBase, // Saldo setelah update
+            ]);
+
+            DB::commit();
+            
+            $diffInPurchUnit = $diffQty / $faktor;
+            return back()->with('success', "Stock Adjustment berhasil. Selisih: " . number_format($diffInPurchUnit, 2) . " " . $material->purchase_unit);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal: ' . $e->getMessage())->withInput();
+        }
+    }
 }
-
-
-
-
-
-
-

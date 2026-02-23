@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Models\SarimaConfig;
-use App\Models\Sales;
-use Illuminate\Bus\Batchable; // Penting untuk Batching
+use App\Models\Product;
+use App\Models\SalesOrderItem;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,6 +12,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class RunGridSearchJob implements ShouldQueue
 {
@@ -19,12 +21,8 @@ class RunGridSearchJob implements ShouldQueue
 
     protected $productId;
 
-    // --- TIMEOUT SETTING ---
-    // Kita set 3600 detik (1 jam) per produk.
-    // Jika Flask Anda lebih lambat dari ini, naikkan angkanya.
+    // Timeout 1 jam per produk
     public $timeout = 3600; 
-    
-    // Jangan retry otomatis jika timeout, karena akan membuang waktu 12 jam lagi.
     public $tries = 1;
 
     public function __construct($productId)
@@ -34,39 +32,48 @@ class RunGridSearchJob implements ShouldQueue
 
     public function handle()
     {
-        // 1. Cek Pembatalan Batch
-        // Jika user membatalkan batch di tengah jalan, job ini tidak perlu dijalankan.
         if ($this->batch() && $this->batch()->cancelled()) {
             return;
         }
 
         try {
-            // 2. Ambil Data Sales (Sama seperti RunSarimaJob)
-            // Grid Search butuh seluruh data historis untuk training.
-            $salesData = Sales::where('product_id', $this->productId)
-                ->orderBy('transaction_date', 'asc')
-                ->get()
-                ->map(function($sale) {
-                    return [
-                        'date' => $sale->transaction_date,
-                        'qty' => $sale->quantity_sold
-                    ];
-                });
-
-            if($salesData->isEmpty()) {
+        
+            $rawSales = SalesOrderItem::where('product_id', $this->productId)
+                ->whereHas('salesOrder', function($query) {
+                    $query->whereIn('status', ['confirmed', 'shipped']);
+                })
+                ->join('sales_orders', 'sales_order_items.sales_order_id', '=', 'sales_orders.id')
+                ->selectRaw('DATE_FORMAT(sales_orders.transaction_date, "%Y-%m-01") as period, SUM(sales_order_items.quantity) as total_qty')
+                ->groupBy('period')
+                ->orderBy('period', 'asc')
+                ->pluck('total_qty', 'period')
+                ->toArray();
+                
+            if (empty($rawSales)) {
                 Log::warning("Grid Search Skipped: No sales data for product ID {$this->productId}");
                 return;
             }
 
-            // 3. Panggil Flask API Endpoint Khusus Grid Search
-            // Pastikan Anda membuat endpoint '/grid-search' di Python Flask Anda
-            // Timeout HTTP diset sedikit di bawah timeout Job (misal 58 menit)
+            // 2. Gap Filling (Sampai Bulan Ini)
+            $firstDate = Carbon::parse(array_key_first($rawSales));
+            $lastDate = Carbon::now()->startOfMonth(); // Sampai Februari 2026
+
+            $periodRange = CarbonPeriod::create($firstDate, '1 month', $lastDate);
+            $formattedSalesData = [];
+
+            foreach ($periodRange as $date) {
+                $key = $date->format('Y-m-01');
+                $formattedSalesData[] = [
+                    'date' => $key,
+                    'qty'  => isset($rawSales[$key]) ? (int)$rawSales[$key] : 0 
+                ];
+            }
+
+            // 3. Kirim ke Python API
             $response = Http::timeout(3500)->post('http://127.0.0.1:5000/grid-search', [
-                'sales_data' => $salesData,
-                // Kita tidak kirim params p,d,q karena tugas Python adalah mencarinya
+                'sales_data' => $formattedSalesData,
             ]);
 
-            // 4. Cek Response Error
             if ($response->failed()) {
                 throw new \Exception("Python Grid Search Error: " . $response->body());
             }
@@ -77,13 +84,13 @@ class RunGridSearchJob implements ShouldQueue
                  throw new \Exception($output['error']);
             }
 
-            // 5. Simpan Hasil Terbaik ke Database
-            // Asumsi output Python: {'best_params': [1,1,1,1,1,1,12], 'metrics': {'rmse': 10, 'mape': 5}}
-            $bestParams = $output['best_params']; // Urutan: p, d, q, P, D, Q, s
-            
-            SarimaConfig::updateOrCreate(
-                ['product_id' => $this->productId],
-                [
+            // 4. Simpan Hasil Terbaik ke Tabel Products
+            $bestParams = $output['best_params']; // [p, d, q, P, D, Q, s]
+            $bestPreprocessing = $output['preprocessing']; // 'raw', 'ma', 'bc', etc.
+
+            $product = Product::find($this->productId);
+            if ($product) {
+                $product->update([
                     'order_p' => $bestParams[0],
                     'order_d' => $bestParams[1],
                     'order_q' => $bestParams[2],
@@ -91,20 +98,17 @@ class RunGridSearchJob implements ShouldQueue
                     'seasonal_D' => $bestParams[4],
                     'seasonal_Q' => $bestParams[5],
                     'seasonal_s' => $bestParams[6],
-                    
+                    'pre_processing' => $bestPreprocessing, // Simpan metode terbaik
                     'rmse' => $output['metrics']['rmse'] ?? 0,
                     'mape' => $output['metrics']['mape'] ?? 0,
                     'last_trained_at' => now(),
-                ]
-            );
+                ]);
+            }
 
-            Log::info("Grid Search Success for Product ID {$this->productId}");
+            Log::info("Grid Search Success for Product ID {$this->productId}. Method: {$bestPreprocessing}");
 
         } catch (\Exception $e) {
-            // Log error agar Anda bisa debug produk mana yang gagal
             Log::error("Grid Search Failed for Product ID {$this->productId}: " . $e->getMessage());
-            
-            // Re-throw agar batch menandai job ini sebagai 'failed'
             throw $e;
         }
     }

@@ -19,6 +19,8 @@ return new class extends Migration
             // --- MANAJEMEN STOK & SATUAN ---
             // Disimpan dalam satuan terkecil (Base Unit)
             $table->decimal('current_stock', 15, 2)->default(0); 
+            $table->integer('ordered_stock')->default(0)->comment('Ordered On The Way Stock');
+
             
             // Satuan Dasar (misal: 'gram', 'ml', 'pcs') -> Digunakan di Resep & Stok
             $table->string('unit')->default('gram'); 
@@ -43,8 +45,18 @@ return new class extends Migration
             // -------------------------------------
 
             $table->enum('category_type', ['mass', 'volume', 'unit']); 
-            $table->integer('lead_time_days')->default(1);
 
+            // Lead time management
+            $table->integer('min_lead_time_days')->default(1);
+            $table->integer('max_lead_time_days')->default(7);
+            $table->float('lead_time_average', 8, 2)->default(0);
+            $table->enum('is_manual_lead_time', ['manual', 'automatic'])->default('automatic');
+
+                  
+            // Dihitung sistem
+            $table->integer('reorder_point')->default(0)->comment('Level stok dimana perlu dilakukan pemesanan ulang');
+            $table->decimal('safety_stock', 15, 2)->default(0);
+            
             // --- STATUS MATERIAL ---
             // true = Aktif (Bisa dibeli/dipakai), false = Non-Aktif (Disembunyikan)
             $table->boolean('is_active')->default(true);

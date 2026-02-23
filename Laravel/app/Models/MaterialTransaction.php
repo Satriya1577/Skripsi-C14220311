@@ -12,6 +12,11 @@ class MaterialTransaction extends Model
         'transaction_date' => 'date', 
     ];
 
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+
     public function material()
     {
         return $this->belongsTo(Material::class);

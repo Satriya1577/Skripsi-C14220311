@@ -45,26 +45,17 @@
 
     <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <p class="text-xs uppercase tracking-widest text-muted">
-                System Configuration
-            </p>
-            <h1 class="text-3xl font-extrabold text-petronas">
-                Model Configuration
-            </h1>
-            <p class="text-sm text-muted mt-1">
-                Atur parameter SARIMA dan pantau akurasi model per produk
-            </p>
+            <p class="text-xs uppercase tracking-widest text-muted">System Configuration</p>
+            <h1 class="text-3xl font-extrabold text-petronas">Model Configuration</h1>
+            <p class="text-sm text-muted mt-1">Atur parameter SARIMA dan pantau akurasi model per produk</p>
         </div>
 
         <div>
             <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
                 @csrf
                 <button type="submit" id="btn-tune-all"
-                    {{-- 1. Jika proses sedang berjalan, matikan tombol dari awal --}}
                     @if($isGridSearchRunning) disabled @endif
-                    
-                    onclick="return confirm('PERINGATAN: ...')"
-                    
+                    onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama tergantung jumlah produk. Lanjutkan?')"
                     class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-petronas font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
                     
                     @if($isGridSearchRunning)
@@ -74,7 +65,6 @@
                             </svg>
                             <span>Processing in Background...</span>
                         </div>
-                    
                     @else
                         <div id="btn-text-normal" class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:animate-pulse" viewBox="0 0 20 20" fill="currentColor">
@@ -82,7 +72,6 @@
                             </svg>
                             <span>Auto-tune All Products</span>
                         </div>
-
                         <div id="btn-text-loading" class="hidden">
                             <span>Processing...</span>
                         </div>
@@ -93,23 +82,15 @@
     </header>
 
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
-        
         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
-            <h2 class="text-lg font-bold text-petronas">
-                SARIMA Parameters & Performance
-            </h2>
-            
+            <h2 class="text-lg font-bold text-petronas">SARIMA Parameters & Performance</h2>
             <div class="text-xs text-muted flex gap-4 bg-carbon px-3 py-1.5 rounded-lg border border-carbon">
-                <span class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-petronas"></span> Non-Seasonal
-                </span>
-                <span class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-silver"></span> Seasonal
-                </span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-petronas"></span> Non-Seasonal</span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-silver"></span> Seasonal</span>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto pb-4"> {{-- Added pb-4 for dropdown space --}}
             <table class="w-full text-sm">
                 <thead class="bg-carbon">
                     <tr>
@@ -120,7 +101,9 @@
                         <th class="px-1 py-3 text-center text-silver font-bold border-l border-carbonSoft">P</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">D</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">Q</th>
-                        <th class="px-1 py-3 text-center text-muted font-normal border-l border-carbonSoft">Season (m)</th>
+                        {{-- KOLOM BARU S --}}
+                        <th class="px-1 py-3 text-center text-silver font-bold">s</th> 
+                        
                         <th class="px-3 py-3 text-right text-muted border-l border-carbonSoft">RMSE</th>
                         <th class="px-3 py-3 text-right text-muted">MAPE</th>
                         <th class="px-3 py-3 text-left text-muted">Last Trained</th>
@@ -128,77 +111,65 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($sarimaParameters as $param)
-                        <form id="form-{{ $param->id }}" action="{{ route('settings.updateSarima') }}" method="POST">
+                    @foreach($products as $product)
+                        <form id="form-{{ $product->id }}" action="{{ route('settings.updateSarima') }}" method="POST">
                             @csrf
                             @method('PUT')
-                            <input type="hidden" name="product_id" value="{{ $param->product_id }}">
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
                         </form>
 
                         <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
+                            {{-- Product Info --}}
                             <td class="px-3 py-2">
                                 <div class="flex flex-col">
-                                    <span class="font-semibold text-silver">{{ $param->product->code }}</span>
-                                    <span class="text-xs text-muted truncate max-w-[150px]">{{ $param->product->name }}</span>
+                                    <span class="font-semibold text-silver">{{ $product->code }}</span>
+                                    <span class="text-xs text-muted truncate max-w-[150px]">{{ $product->name }}</span>
                                 </div>
                             </td>
 
+                            {{-- Non-Seasonal Params --}}
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_p" value="{{ $product->order_p }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_d" value="{{ $product->order_d }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_q" value="{{ $product->order_q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+
+                            {{-- Seasonal Params --}}
+                            <td class="px-1 py-2 text-center border-l border-carbon"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_P" value="{{ $product->seasonal_P }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_D" value="{{ $product->seasonal_D }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_Q" value="{{ $product->seasonal_Q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
+
+                            {{-- DROPDOWN S (SEASONALITY) --}}
                             <td class="px-1 py-2 text-center">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="order_p" value="{{ $param->order_p }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-                            <td class="px-1 py-2 text-center">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="order_d" value="{{ $param->order_d }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-                            <td class="px-1 py-2 text-center">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="order_q" value="{{ $param->order_q }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors">
+                                <select form="form-{{ $product->id }}" name="seasonal_s" 
+                                        class="w-14 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors appearance-none cursor-pointer hover:bg-carbonSoft">
+                                    @foreach([2, 3, 6, 9, 12] as $sVal)
+                                        <option value="{{ $sVal }}" {{ $product->seasonal_s == $sVal ? 'selected' : '' }}>
+                                            {{ $sVal }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </td>
 
-                            <td class="px-1 py-2 text-center border-l border-carbon">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="seasonal_P" value="{{ $param->seasonal_P }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-                            <td class="px-1 py-2 text-center">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="seasonal_D" value="{{ $param->seasonal_D }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-                            <td class="px-1 py-2 text-center">
-                                <input form="form-{{ $param->id }}" type="number" min="0" max="5" 
-                                       name="seasonal_Q" value="{{ $param->seasonal_Q }}"
-                                       class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-
-                            <td class="px-1 py-2 text-center border-l border-carbon">
-                                <input form="form-{{ $param->id }}" type="number" 
-                                       name="seasonal_s" value="{{ $param->seasonal_s }}"
-                                       class="w-12 text-center bg-blackBase border border-carbon rounded-lg py-1 text-muted focus:text-silver focus:outline-none focus:border-petronas transition-colors">
-                            </td>
-
+                            {{-- Metrics --}}
                             <td class="px-3 py-2 text-right border-l border-carbon font-mono text-xs text-silver">
-                                {{ $param->rmse !== null ? number_format($param->rmse, 2) : '-' }}
+                                {{ $product->rmse !== null ? number_format($product->rmse, 2) : '-' }}
                             </td>
                             <td class="px-3 py-2 text-right font-mono text-xs text-silver">
-                                {{ $param->mape !== null ? number_format($param->mape, 2) . '%' : '-' }}
-                            </td>
+                                {{ $product->mape !== null ? number_format($product->mape, 2) . '%' : '-' }}
+                            </td> 
 
+                            {{-- Last Trained --}}
                             <td class="px-3 py-2 text-xs text-muted">
-                                @if($param->last_trained_at)
-                                    <div>{{ \Carbon\Carbon::parse($param->last_trained_at)->format('d M Y') }}</div>
-                                    <div class="opacity-50 text-[10px]">{{ \Carbon\Carbon::parse($param->last_trained_at)->format('H:i') }}</div>
+                                @if($product->last_trained_at)
+                                    <div>{{ \Carbon\Carbon::parse($product->last_trained_at)->format('d M Y') }}</div>
+                                    <div class="opacity-50 text-[10px]">{{ \Carbon\Carbon::parse($product->last_trained_at)->format('H:i') }}</div>
                                 @else
                                     <span class="opacity-50 italic">Not trained</span>
                                 @endif
-                            </td>
+                            </td> 
 
+                            {{-- Action Button --}}
                             <td class="px-3 py-2 text-center">
-                                <button form="form-{{ $param->id }}" type="submit" disabled
+                                <button form="form-{{ $product->id }}" type="submit" disabled
                                         class="save-btn inline-flex items-center justify-center w-8 h-8 rounded 
                                             transition-all duration-200
                                             bg-carbon text-muted cursor-not-allowed opacity-50"
@@ -211,12 +182,8 @@
                         </tr>
                     @endforeach
 
-                    @if($sarimaParameters->isEmpty())
-                        <tr>
-                            <td colspan="12" class="px-3 py-6 text-center text-muted italic">
-                                Tidak ada data konfigurasi yang tersedia.
-                            </td>
-                        </tr>
+                    @if($products->isEmpty())
+                        <tr><td colspan="13" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
                     @endif
                 </tbody>
             </table>
@@ -236,31 +203,34 @@
 
         if (gridAllForm) {
             gridAllForm.addEventListener('submit', function() {
-                // Matikan tombol agar tidak double submit
                 btnTuneAll.disabled = true;
-                
-                // Ubah Tampilan Tombol
-                textNormal.classList.add('hidden');   // Sembunyikan "Auto-tune..."
-                textLoading.classList.remove('hidden'); // Munculkan "Processing..."
+                textNormal.classList.add('hidden');
+                textLoading.classList.remove('hidden');
             });
         }
 
-        // --- LOGIC MANUAL SAVE BUTTON (Existing) ---
+        // --- LOGIC MANUAL SAVE BUTTON ---
         const forms = document.querySelectorAll('form[id^="form-"]');
 
         forms.forEach(form => {
             const formId = form.id;
-            const inputs = document.querySelectorAll(`input[form="${formId}"]`);
+            
+            // Ambil semua Input dan Select dalam form tersebut
+            // Note: Selector ini mencari elemen input/select di seluruh dokumen yang punya atribut form="form-id"
+            // Karena elemennya berada di luar tag <form>, kita pakai atribut 'form'
+            const inputs = document.querySelectorAll(`input[form="${formId}"], select[form="${formId}"]`);
             const saveBtn = document.querySelector(`button[form="${formId}"]`);
 
-            const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20'];
+            const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
             const inactiveClasses = ['bg-carbon', 'text-muted', 'cursor-not-allowed', 'opacity-50'];
 
+            // Simpan nilai asli
             inputs.forEach(input => {
                 input.dataset.original = input.value;
-                input.addEventListener('input', () => {
-                    checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses);
-                });
+                
+                // Event listener untuk input (ketik) dan change (dropdown)
+                input.addEventListener('input', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
+                input.addEventListener('change', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
             });
         });
 

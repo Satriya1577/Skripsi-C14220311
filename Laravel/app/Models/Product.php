@@ -8,9 +8,9 @@ class Product extends Model
 {
     protected $guarded = [];
 
-    public function sales()
+    public function salesOrderItems()
     {
-        return $this->hasMany(Sales::class, 'product_id', 'id');
+        return $this->hasMany(SalesOrderItem::class, 'product_id', 'id');
     }
 
     public function productMaterials()
@@ -18,8 +18,9 @@ class Product extends Model
         return $this->hasMany(ProductMaterial::class);
     }
 
-    public function sarimaConfig()
+
+    public function transactions()
     {
-        return $this->hasOne(SarimaConfig::class, 'product_id', 'id');
+        return $this->hasMany(ProductTransaction::class);
     }
 }

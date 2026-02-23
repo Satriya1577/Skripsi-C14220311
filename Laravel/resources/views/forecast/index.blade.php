@@ -76,8 +76,6 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-muted font-medium uppercase text-xs tracking-wider">Product Code</th>
                         <th class="px-4 py-3 text-left text-muted font-medium uppercase text-xs tracking-wider">Product Name</th>
-                        <th class="px-4 py-3 text-center text-muted font-medium uppercase text-xs tracking-wider">Last Training</th>
-                        <th class="px-4 py-3 text-right text-muted font-medium uppercase text-xs tracking-wider">Model Accuracy (MAPE)</th>
                         <th class="px-4 py-3 text-center text-muted font-medium uppercase text-xs tracking-wider">Action</th>
                     </tr>
                 </thead>
@@ -90,28 +88,6 @@
                             
                             <td class="px-4 py-3 text-silver font-medium">
                                 {{ $product->name }}
-                            </td>
-
-                            <td class="px-4 py-3 text-center text-muted text-xs">
-                                @if($product->sarimaConfig && $product->sarimaConfig->last_trained_at)
-                                    {{ \Carbon\Carbon::parse($product->sarimaConfig->last_trained_at)->format('d M Y') }}
-                                @else
-                                    <span class="opacity-50 italic">- Untrained -</span>
-                                @endif
-                            </td>
-
-                            <td class="px-4 py-3 text-right">
-                                @if($product->sarimaConfig && $product->sarimaConfig->mape !== null)
-                                    @php $mape = $product->sarimaConfig->mape; @endphp
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold
-                                        {{ $mape < 10 ? 'bg-green-900/30 text-green-400 border border-green-500/30' : 
-                                          ($mape < 20 ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-500/30' : 
-                                          'bg-red-900/30 text-red-400 border border-red-500/30') }}">
-                                        {{ number_format($mape, 2) }}%
-                                    </span>
-                                @else
-                                    <span class="text-muted text-xs italic">No Data</span>
-                                @endif
                             </td>
 
                             <td class="px-4 py-3 text-center">

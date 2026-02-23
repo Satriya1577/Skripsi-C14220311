@@ -13,6 +13,8 @@ use App\Models\Sales;
 use App\Models\SarimaConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ForecastController extends Controller
 {
@@ -22,16 +24,18 @@ class ForecastController extends Controller
     public function index()
     {
         $products = Product::orderBy('id', 'asc')->paginate(10);
-
         return view('forecast.index', compact('products'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function show(Product $product)
     {
-        //
+        $productionPlans = ProductionPlan::where('product_id', $product->id)
+            ->orderBy('period', 'desc') // Opsional: Urutkan tanggal terbaru
+            ->paginate(10);
+        return view('forecast.show', compact('product','productionPlans'));
     }
 
     /**
@@ -42,150 +46,161 @@ class ForecastController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    // public function show(forecast $forecast)
-    // {
-    //     //
-    // }
-
-    public function show(Product $product)
+    public function showChart(ProductionPlan $productionPlan)
     {
-        // 1. Load Product Data
-        $product = Product::where('code', $product->code)->firstOrFail();
+        // 1. Ambil Product
+        $product = $productionPlan->product;
 
-        // 2. Tentukan Posisi Waktu (Based on Sales Data)
-        // Ambil transaksi terakhir untuk menentukan "Bulan Ini" dan "Bulan Depan"
-        $lastSaleDate = Sales::where('product_id', $product->id)->max('transaction_date');
-        
-        // Jika belum ada sales, default ke bulan ini
-        $currentMonthDate = $lastSaleDate ? Carbon::parse($lastSaleDate)->startOfMonth() : Carbon::now()->startOfMonth();
-        $nextMonthDate = $currentMonthDate->copy()->addMonth();
+        // 2. Ambil Validation Logs (Data Grafik)
+        // Pastikan di model ProductionPlan ada relasi: public function validationLogs() { return $this->hasMany(ValidationLog::class); }
+        $logs = $productionPlan->validationLogs()
+            ->orderBy('period', 'asc')
+            ->get();
 
-        // 3. Cek Status Job (Untuk Loading State tombol Generate)
-        $latestJob = ForecastingJob::where('product_id', $product->id)->latest()->first();
-        $jobStatus = $latestJob ? $latestJob->status : 'idle';
+        // 3. Format Data untuk Chart.js
+        $labels = [];
+        $actuals = [];
+        $forecasts = [];
 
-        // 4. Ambil Data Analitik (RMSE, MAPE, Charts)
-        $config = SarimaConfig::where('product_id', $product->id)->latest('last_trained_at')->first();
+        foreach ($logs as $log) {
+            // Format Label (Bulan Tahun)
+            $labels[] = Carbon::parse($log->period)->format('M Y');
 
-        // Default values jika belum pernah forecast
-        $metrics = [
-            'rmse' => $config ? number_format($config->rmse, 2) : '-',
-            'mape' => $config ? number_format($config->mape, 2) . '%' : '-',
-        ];
+            // Data Actual (Bisa null jika ini adalah periode masa depan murni)
+            $actuals[] = $log->actual_qty;
 
-        // 5. Siapkan Data Chart & Tabel Log
-        // Gabungkan Validation Log (Masa Lalu) dan Forecast (Masa Depan)
-        $chartData = [
-            'labels' => [],
-            'actual' => [],
-            'forecast' => []
-        ];
-        
-        $logTable = collect([]);
-
-        if ($config) {
-            // Ambil log validasi (Test Data)
-            $validationLogs = $config->validationLogs()->orderBy('period', 'asc')->get();
-
-            $startDate = $validationLogs->min('period') ?? Carbon::now()->startOfMonth();
-            
-            // Ambil hasil forecast
-            $forecasts = Forecast::where('product_id', $product->id)
-                            // ->where('forecast_period', '>=', $validationLogs->min('period')) // Sync timeline
-                            ->where('forecast_period', '>=',$startDate)
-                            ->orderBy('forecast_period', 'asc')
-                            ->get();
-
-            // Mapping untuk Chart
-            $labels = $validationLogs->pluck('period')->merge($forecasts->pluck('forecast_period'))
-                        ->unique()->sort()->values();
-            
-            foreach($labels as $date) {
-                $chartData['labels'][] = Carbon::parse($date)->format('M Y');
-                
-                // Cari data actual di log
-                $log = $validationLogs->firstWhere('period', $date);
-                $chartData['actual'][] = $log ? $log->actual_qty : null;
-
-                // Cari data forecast (bisa dari validation log atau forecast table)
-                // Prioritas: Forecast table (future) > Log (past prediction)
-                $fc = $forecasts->firstWhere('forecast_period', $date);
-                $val = $fc ? $fc->predicted_amount : ($log ? $log->predicted_qty : null);
-                $chartData['forecast'][] = $val;
-
-                // Siapkan data untuk Tabel Kiri Bawah
-                $logTable->push([
-                    'period' => Carbon::parse($date)->format('M Y'),
-                    'actual' => $log ? number_format($log->actual_qty) : '-',
-                    'predicted' => number_format($val),
-                    'type' => $fc ? 'Forecast' : 'Validation', // Jika ada di tabel forecast berarti Future/Result
-                    'is_forecast' => (bool)$fc // Helper untuk styling CSS
-                ]);
-            }
+            // Data Predicted
+            $forecasts[] = $log->predicted_qty;
         }
 
-        // 6. Ambil Production Plan (Tabel Kanan Bawah)
-        $productionPlans = ProductionPlan::where('product_id', $product->id)
-                            ->orderBy('period', 'desc')
-                            ->take(6) // Ambil 6 bulan terakhir/kedepan saja agar rapi
-                            ->get();
+        // Struktur Data untuk JavaScript
+        $chartData = [
+            'labels' => $labels,
+            'actual' => $actuals,
+            'forecast' => $forecasts,
+        ];
 
-        $sarimaConfig = SarimaConfig::where('product_id', $product->id)->first();
+        // 4. Ambil Metrics dari Production Plan
+        $metrics = [
+            'rmse' => $productionPlan->rmse,
+            'mape' => $productionPlan->mape,
+        ];
 
-        return view('forecast.show', compact(
-            'product', 'jobStatus', 'metrics', 'sarimaConfig',
-            'currentMonthDate', 'nextMonthDate', 
-            'chartData', 'logTable', 'productionPlans'
-        ));
+        // 5. Query Material Recommendations (BOM & Stock Status)
+        // Tentukan jumlah produksi yang akan jadi patokan
+        // Gunakan 'approved_production_qty' jika sudah di-approve, 
+        // jika belum gunakan 'recommended_production_qty'
+        $targetQty = $productionPlan->status === 'approved' 
+                        ? $productionPlan->approved_production_qty 
+                        : $productionPlan->recommended_production_qty;
+
+        // Query untuk mengambil list material yang dibutuhkan produk ini
+        $materialRecommendations = DB::table('product_materials')
+            ->join('materials', 'product_materials.material_id', '=', 'materials.id')
+            ->where('product_materials.product_id', $product->id)
+            ->select('materials.code','materials.name',
+            // Gunakan purchase_unit jika ada, kalau kosong gunakan base unit
+            DB::raw('COALESCE(materials.purchase_unit, materials.unit) as unit'),
+            
+            // KEBUTUHAN (Qty Need)
+            // Rumus: (Target Produksi * Amount Needed) / Conversion Factor
+            // (Agar satuannya menjadi Purchase Unit)
+            DB::raw("({$targetQty} * product_materials.amount_needed) / materials.conversion_factor as qty_need"),
+            
+            // STOK SAAT INI
+            // Rumus: Current Stock / Conversion Factor
+            DB::raw("materials.current_stock / materials.conversion_factor as current_stock"),
+            
+            // SEDANG DALAM PERJALANAN (OTW)
+            // Menggunakan kolom ordered_stock (Sudah dipesan ke Supplier)
+            DB::raw("materials.ordered_stock / materials.conversion_factor as purchase_otw")
+        )->get()->map(function ($item) {
+            return (object) [
+                'material'      => (object) [
+                    'code' => $item->code, 
+                    'name' => $item->name, 
+                    'unit' => $item->unit
+                ],
+                'qty_need'      => $item->qty_need,
+                'current_stock' => $item->current_stock,
+                'purchase_otw'  => $item->purchase_otw
+            ];
+        });
+
+    return view('forecast.chart', compact('product', 'productionPlan', 'metrics', 'chartData', 'materialRecommendations'));
+}
+
+    /**
+    * Approve a production plan with user-specified quantity
+    */
+    public function approvePlan(Request $request, ProductionPlan $productionPlan)
+    {
+        // --- 0. CEK HAK AKSES ---
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menyetujui plan produksi.')->withInput();
+        }
+
+        $validated = $request->validate([
+            'approved_production_qty' => 'required|numeric|min:0',
+        ]);
+
+        $productionPlan->update([
+            'approved_production_qty' => $validated['approved_production_qty'],
+            'status' => 'approved',
+        ]);
+
+        return back()->with('success', 'Production plan approved successfully!');
     }
 
     public function generate(Request $request, Product $product)
     {
-        $product = Product::where('code', $product->code)->firstOrFail();
-        
-        $request->validate([
-            'forecastPeriod' => 'required|in:thisPeriod,nextPeriod'
-        ]);
-
-        // 1. Tentukan Tanggal Target & Mode Cutoff
-        $lastSaleDate = Sales::where('product_id', $product->id)->max('transaction_date');
-        $baseDate = $lastSaleDate ? Carbon::parse($lastSaleDate)->startOfMonth() : Carbon::now()->startOfMonth();
-
-        if ($request->forecastPeriod == 'thisPeriod') {
-            // Mode Backtesting: Target = Bulan Terakhir Data Sales
-            $targetDate = $baseDate->copy(); 
-            $cutoffLast = true; 
-        } else {
-            // Mode Forecasting: Target = Bulan Depan
-            $targetDate = $baseDate->copy()->addMonth();
-            $cutoffLast = false; 
+        // --- 0. CEK HAK AKSES ---
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            $msg = 'Terjadi kesalahan: Anda tidak memiliki akses.';
+            
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg)->withInput();
         }
+        // Pastikan produk ada
+        $product = Product::findOrFail($product->id);
 
-        // --- [LOGIC BARU] CEK STATUS PRODUCTION PLAN ---
-        // Cek apakah Production Plan untuk periode target tersebut sudah 'approved' atau 'completed'
+        // 1. Tentukan Tanggal Target (Selalu 1 Bulan ke Depan dari Sekarang)
+        // Contoh: Sekarang Feb 2026 -> Target Mar 2026
+        $targetDate = Carbon::now()->addMonth()->startOfMonth();
+
+        // 2. CEK STATUS PRODUCTION PLAN
+        // Jangan izinkan generate ulang jika plan bulan tersebut sudah disetujui/selesai
         $isPlanLocked = ProductionPlan::where('product_id', $product->id)
-            ->where('period', $targetDate->format('Y-m-d')) // Pastikan format tanggal sama dengan DB
-            ->whereIn('status', ['approved', 'completed'])   // Status yang "mengunci" forecast
+            ->where('period', $targetDate->format('Y-m-d'))
+            ->whereIn('status', ['approved', 'completed'])
             ->exists();
 
         if ($isPlanLocked) {
-            return back()->with('error', 'Cannot regenerate forecast. Production Plan for ' . $targetDate->format('M Y') . ' has already been Approved or Completed.');
+            $msg = 'Cannot regenerate. Plan for ' . $targetDate->format('M Y') . ' is already locked.';
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422); 
+            }
+            return back()->with('error', $msg);     
         }
-        // -----------------------------------------------
 
-        // 2. Cek Antrian Job
+        // 3. Cek Antrian Job (Agar tidak double klik)
         $isBusy = ForecastingJob::where('product_id', $product->id)
-                    ->whereIn('status', ['pending', 'processing'])
-                    ->exists();
+            ->whereIn('status', ['pending', 'processing'])
+            ->exists();
 
         if ($isBusy) {
-            return back()->with('error', 'Analysis is currently running. Please wait.');
+            $msg = 'Analysis is currently running. Please wait.';
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422);
+            }
+            return back()->with('error', $msg);
         }
 
-        // 3. Buat Job Baru
+        // 4. Buat Job Baru
         $job = ForecastingJob::create([
             'product_id' => $product->id,
             'target_period' => $targetDate,
@@ -193,15 +208,15 @@ class ForecastController extends Controller
             'message' => 'Queued via Web UI'
         ]);
 
-        // 4. Dispatch ke Queue Worker
-        RunSarimaJob::dispatch($job->id, $cutoffLast);
+        // 5. Dispatch ke Queue Worker
+        // Parameter cutoffLastMonth dihapus karena logika backtest sudah tidak ada
+        RunSarimaJob::dispatch($job->id);
 
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Job started', 'job_id' => $job->id]);
         }
 
-        return redirect()->back()->with('success', 'Forecasting sedang berjalan...');
-        //return back()->with('success', 'Forecast generation started for ' . $targetDate->format('M Y'));
+        return redirect()->back()->with('success', 'Forecasting sedang berjalan untuk periode ' . $targetDate->format('F Y'));
     }
 
     public function checkStatus(Product $product)
@@ -219,30 +234,5 @@ class ForecastController extends Controller
             'status' => $job->status, // pending, processing, completed, atau failed
             'message' => $job->message
         ]);
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(forecast $forecast)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, forecast $forecast)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(forecast $forecast)
-    {
-        //
     }
 }

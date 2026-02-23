@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sales Management | Production Planning System</title>
+    <title>Sales Orders | Production Planning System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,7 +14,10 @@
                         carbonSoft: '#24272A',
                         silver: '#C8CCCE',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6'
+                        muted: '#9DA3A6',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        success: '#10B981'
                     }
                 }
             }
@@ -30,7 +33,7 @@
         <ol class="flex items-center space-x-2">
             <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Sales</li>
+            <li class="text-petronas font-semibold">Sales Orders</li>
         </ol>
     </nav>
 
@@ -38,252 +41,240 @@
 
     <header>
         <p class="text-xs uppercase tracking-widest text-muted">Transaction Data</p>
-        <h1 class="text-3xl font-extrabold text-petronas">Sales Management</h1>
-        <p class="text-sm text-muted mt-1">Rekapitulasi penjualan produk jadi</p>
+        <h1 class="text-3xl font-extrabold text-petronas">Sales Order Management</h1>
+        <p class="text-sm text-muted mt-1">Kelola data pesanan penjualan, status pengiriman, dan pembayaran.</p>
     </header>
 
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Input Sales Transaction</h2>
-        
-        <form action="{{ route('sales.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {{-- Form Section --}}
+    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 shadow-lg shadow-blackBase">
+        {{-- Header Form (Icon dihapus, style disamakan dengan Product Index) --}}
+        <h2 class="text-lg font-bold text-petronas">Create Sales Order (Draft)</h2>
+
+        <form action="{{ route('sales.store') }}" method="POST" class="space-y-6">
             @csrf
-            <input type="hidden" name="sale_id" id="sale_id">
             
-            <div>
-                <label class="text-xs text-muted uppercase tracking-wide">Tanggal Transaksi</label>
-                <input type="date" name="transaction_date" value="{{ date('Y-m-d') }}" required
-                    class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver appearance-none">
+            {{-- ROW 1: INFORMASI TRANSAKSI (3 Kolom) --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="text-xs text-muted uppercase tracking-wide block mb-1">Kode SO (Opsional)</label>
+                    <input type="text" name="so_code" placeholder="(Auto Generated)"
+                        class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-muted/30 transition">
+                </div>
+
+                <div>
+                    <label class="text-xs text-muted uppercase tracking-wide block mb-1">Tanggal Transaksi</label>
+                    <input type="date" name="transaction_date" value="{{ date('Y-m-d') }}" required
+                        class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
+                </div>
+
+                <div>
+                    <label class="text-xs text-muted uppercase tracking-wide block mb-1">Jatuh Tempo</label>
+                    <input type="date" name="due_date" required
+                        class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
+                </div>
             </div>
 
-            <div class="lg:col-span-1">
-                <label class="text-xs text-muted uppercase tracking-wide">Pilih Produk</label>
-                <select name="product_id" required 
-                        onchange="updatePriceSuggestion(this)"
-                        class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
-                    <option value="" disabled selected>-- Select Product --</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" data-price="{{ $product->price ?? 0 }}">
-                            {{ $product->name }} (Stok: {{ $product->current_stock ?? 0 }})
-                        </option>
-                    @endforeach
-                </select>
+            {{-- ROW 2: DATA DISTRIBUTOR (DALAM 1 KOTAK) --}}
+            <div class="bg-carbon/40 p-5 rounded-xl border border-carbon space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold text-petronas uppercase tracking-wider">
+                        Data Distributor
+                    </h3>
+                </div>
+
+                {{-- Partner Select --}}
+                <div>
+                    <label class="text-xs text-muted uppercase tracking-wide mb-1 block">Pilih Partner</label>
+                    <div class="relative">
+                        <select name="partner_id" id="partnerSelect" onchange="fillPartnerDetails()" required
+                            class="w-full px-4 py-2 rounded-lg bg-carbon border border-petronas/30 text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas appearance-none cursor-pointer transition">
+                            <option value="" disabled selected>-- Klik untuk memilih --</option>
+                            @foreach($partners as $partner)
+                                <option value="{{ $partner->id }}" 
+                                        data-company="{{ $partner->company_name }}"
+                                        data-person="{{ $partner->person_name }}"
+                                        data-phone="{{ $partner->phone }}"
+                                        data-email="{{ $partner->email }}"
+                                        data-address="{{ $partner->address }}">
+                                    {{ $partner->company_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-petronas">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Hidden Snapshot --}}
+                <input type="hidden" name="company_name" id="snap_company">
+
+                {{-- Readonly Details --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div>
+                        <label class="text-[10px] text-muted uppercase block mb-1">Contact Person</label>
+                        <input type="text" name="person_name" id="snap_person" readonly
+                            class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase block mb-1">Phone</label>
+                        <input type="text" name="phone" id="snap_phone" readonly
+                            class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase block mb-1">Email</label>
+                        <input type="email" name="email" id="snap_email" readonly
+                            class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="text-[10px] text-muted uppercase block mb-1">Alamat Lengkap</label>
+                        <input type="text" name="address" id="snap_address" readonly
+                            class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+                    </div>
+                </div>
             </div>
 
-            <div class="lg:col-span-2">
-                <label class="text-xs text-muted uppercase tracking-wide">Nama Distributor</label>
-                <input type="text" name="nama_distributor" id="distributor_name" required
-                       placeholder="Cth: PT. Distribusi Maju Jaya"
-                       class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver placeholder-muted/50">
-            </div>
-
-            <div>
-                <label class="text-xs text-muted uppercase tracking-wide">Quantity Sold</label>
-                <input type="number" name="quantity_sold" id="qty" min="1" required
-                       oninput="calculateTotal()"
-                       class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none">
-            </div>
-
-            <div>
-                <label class="text-xs text-muted uppercase tracking-wide">Harga Satuan (Rp)</label>
-                <input type="number" name="price_per_unit" id="price" min="0" required
-                       oninput="calculateTotal()"
-                       class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none">
-            </div>
-
-            <div class="lg:col-span-2">
-                <label class="text-xs text-muted uppercase tracking-wide">Total (Auto)</label>
-                <input type="text" id="total_display" readonly
-                       class="w-full mt-1 px-4 py-2 rounded-lg bg-blackBase border border-carbon text-petronas font-bold focus:outline-none cursor-not-allowed">
-            </div>
-
-            <div class="md:col-span-2 lg:col-span-4 flex justify-end gap-3 pt-4">
-                <button type="button" id="cancelBtn" onclick="resetSalesForm()" class="hidden px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">Cancel</button>
-                
-                <button type="submit" id="submitBtn" class="bg-petronas text-blackBase font-bold px-6 py-2 rounded-lg hover:bg-petronas/90 transition">
-                    Simpan Transaksi
+            {{-- Action Buttons (Size disamakan dengan Product Index: px-6 py-2) --}}
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="bg-petronas text-blackBase font-bold px-6 py-2 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20">
+                    Save Sales Order
                 </button>
             </div>
         </form>
     </section>
 
+    {{-- List Sales Orders --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Riwayat Penjualan</h2>
+            <h2 class="text-lg font-bold text-petronas">Order List</h2>
             
-            <form action="{{ route('sales.index') }}" method="GET" class="flex flex-wrap gap-2 items-center w-full md:w-auto">
-                
-                <select name="filter_product" 
-                        class="px-4 py-2 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas w-full md:w-auto">
-                    <option value="">All Products</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" {{ request('filter_product') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }}
-                        </option>
-                    @endforeach
-                </select>
-
-                <input type="date" name="filter_date" value="{{ request('filter_date') }}" 
-                       class="px-4 py-2 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas appearance-none">
-                
-                <button type="submit" class="px-5 py-2 bg-carbon border border-muted text-xs rounded-lg hover:text-petronas transition uppercase tracking-wider">
-                    Filter
-                </button>
-
-                @if(request('filter_date') || request('filter_product'))
-                    <a href="{{ route('sales.index') }}" class="text-xs text-red-400 hover:text-red-300 ml-2">Reset</a>
-                @endif
+            <form action="{{ route('sales.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
+                <input type="text" name="search" placeholder="Search SO No. or Distributor..." value="{{ request('search') }}"
+                    class="w-full md:w-64 px-4 py-2 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
+                <button type="submit" class="px-4 py-2 bg-carbon border border-muted text-xs rounded-lg hover:text-petronas transition">Search</button>
             </form>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm border-collapse">
-                <thead class="bg-carbon text-xs uppercase tracking-wide">
+                <thead class="bg-carbon">
                     <tr>
-                        <th class="px-4 py-3 text-left text-muted font-medium border-b border-carbonSoft">Tanggal</th>
-                        <th class="px-4 py-3 text-left text-muted font-medium border-b border-carbonSoft">Nama Produk</th>
-                        <th class="px-4 py-3 text-left text-muted font-medium border-b border-carbonSoft">Distributor</th> <th class="px-4 py-3 text-center text-muted font-medium border-b border-carbonSoft">Qty</th>
-                        <th class="px-4 py-3 text-right text-muted font-medium border-b border-carbonSoft">Harga Satuan</th>
-                        <th class="px-4 py-3 text-right text-muted font-medium border-b border-carbonSoft">Total</th>
-                        <th class="px-4 py-3 text-center text-muted font-medium border-b border-carbonSoft">Actions</th>
+                        <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Date</th>
+                        <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">SO No.</th>
+                        <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Distributor</th>
+                        <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Order Status</th>
+                        <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
+                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Total</th>
+                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Balance</th>
+                        <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-carbon/50">
-                    @forelse ($sales as $sale)
+                    @forelse ($salesOrders as $so)
                         <tr class="hover:bg-carbon transition-colors group">
                             <td class="px-4 py-3 text-silver font-mono text-xs">
-                                {{ \Carbon\Carbon::parse($sale->transaction_date)->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($so->transaction_date)->format('d/m/Y') }}
                             </td>
-                            <td class="px-4 py-3 font-semibold text-silver">
-                                {{ $sale->product->name ?? 'Unknown Product' }}
+                            
+                            <td class="px-4 py-3 font-semibold text-petronas font-mono text-xs">
+                                {{ $so->so_code }}
                             </td>
-                            <td class="px-4 py-3 text-silver"> {{ $sale->nama_distributor ?? '-' }}
+                            
+                            <td class="px-4 py-3 text-silver">
+                                {{ $so->company_name ?? '-' }}
                             </td>
-                            <td class="px-4 py-3 text-center text-silver">
-                                {{ number_format($sale->quantity_sold) }}
+                            
+                            <td class="px-4 py-3 text-center">
+                                @php
+                                    $statusColor = match($so->status) {
+                                        'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
+                                        'confirmed' => 'bg-blue-900/30 text-blue-400 border-blue-800',
+                                        'shipped' => 'bg-petronas/20 text-petronas border-petronas',
+                                        'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
+                                        default => 'bg-carbon text-muted'
+                                    };
+                                @endphp
+                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase border {{ $statusColor }}">
+                                    {{ $so->status }}
+                                </span>
                             </td>
-                            <td class="px-4 py-3 text-right text-muted">
-                                {{ number_format($sale->price_per_unit, 0, ',', '.') }}
+
+                            <td class="px-4 py-3 text-center">
+                                @php
+                                    $payColor = match($so->payment_status) {
+                                        'paid' => 'text-success bg-success/10 border-success/30',
+                                        'partial' => 'text-warning bg-warning/10 border-warning/30',
+                                        'unpaid' => 'text-danger bg-danger/10 border-danger/30',
+                                        default => 'text-muted'
+                                    };
+                                @endphp
+                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase border {{ $payColor }}">
+                                    {{ $so->payment_status }}
+                                </span>
                             </td>
-                            <td class="px-4 py-3 text-right font-bold text-petronas">
-                                {{ number_format($sale->total_price, 0, ',', '.') }}
+
+                            <td class="px-4 py-3 text-right font-bold text-silver">
+                                {{ number_format($so->grand_total, 0, ',', '.') }}
                             </td>
-                            <td class="px-4 py-3 text-center space-x-2">
-                                <button type="button" onclick='editSale(@json($sale))' 
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded border border-petronas text-petronas hover:bg-petronas/10 transition">
-                                    ✏️
-                                </button>
-                                
-                                <form action="{{ route('sales.destroy', $sale->id) }}" method="POST" class="inline">
-                                    @csrf @method('DELETE')
-                                    <button type="button" onclick="openDeleteModal(this)" 
-                                            class="inline-flex w-8 h-8 items-center justify-center border border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-blackBase transition">
-                                        🗑️
-                                    </button>
-                                </form>
+
+                            <td class="px-4 py-3 text-right font-mono text-xs {{ $so->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }}">
+                                {{ number_format($so->remaining_balance, 0, ',', '.') }}
+                            </td>
+
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex justify-center items-center gap-2">
+                                    <a href="{{ route('sales.show', $so->id) }}" 
+                                       class="w-8 h-8 flex items-center justify-center rounded bg-petronas/10 text-petronas border border-petronas/30 hover:bg-petronas hover:text-blackBase transition"
+                                       title="View Detail">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+
+                                    <a href="{{ route('sales.showPayments', $so->id) }}" 
+                                       class="w-8 h-8 flex items-center justify-center rounded bg-carbon text-silver border border-muted/30 hover:border-petronas hover:text-petronas transition"
+                                       title="Payment History">
+                                        <span class="text-sm">💰</span>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-8">
-                                Belum ada data penjualan. Silahkan input atau import excel.
+                            <td colspan="8" class="text-center text-muted py-8 italic">
+                                No sales orders found.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
-        @if ($sales->hasPages())
-            <div class="mt-6 flex justify-between text-sm text-muted">
-                <div>Showing {{ $sales->firstItem() }} to {{ $sales->lastItem() }} of {{ $sales->total() }} entries</div>
-                {{ $sales->links('pagination::tailwind') }}
-            </div>
-        @endif
+        
+        <div class="mt-4">
+            {{ $salesOrders->links('pagination::tailwind') }}
+        </div>
     </section>
 
 </main>
 
-<div id="deleteModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
-    <div class="bg-carbonSoft rounded-xl p-6 w-full max-w-md border border-red-500/50 shadow-2xl">
-        <h3 class="text-lg font-bold text-red-500 mb-2">Hapus Data Penjualan?</h3>
-        <p class="text-sm text-muted mb-6">
-            Stok produk akan dikembalikan (bertambah) jika Anda menghapus data ini. 
-            <span class="text-red-400 font-semibold">Tindakan tidak bisa dibatalkan.</span>
-        </p>
-        <div class="flex justify-end gap-3">
-            <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">Cancel</button>
-            <button onclick="confirmDelete()" class="px-5 py-2 rounded-lg bg-red-500 text-blackBase font-bold hover:bg-red-600 transition">Delete</button>
-        </div>
-    </div>
-</div>
-
 <script>
-    // --- Logic Perhitungan Form ---
-    function updatePriceSuggestion(selectElement) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const suggestedPrice = selectedOption.getAttribute('data-price');
+    function fillPartnerDetails() {
+        const select = document.getElementById('partnerSelect');
+        const selectedOption = select.options[select.selectedIndex];
         
-        const priceInput = document.getElementById('price');
-        if(suggestedPrice && suggestedPrice > 0) {
-            priceInput.value = suggestedPrice;
-            calculateTotal();
-        }
-    }
+        const company = selectedOption.getAttribute('data-company') || '';
+        const person  = selectedOption.getAttribute('data-person') || '';
+        const phone   = selectedOption.getAttribute('data-phone') || '';
+        const email   = selectedOption.getAttribute('data-email') || '';
+        const address = selectedOption.getAttribute('data-address') || '';
 
-    function calculateTotal() {
-        const qty = document.getElementById('qty').value || 0;
-        const price = document.getElementById('price').value || 0;
-        const total = qty * price;
-        
-        document.getElementById('total_display').value = "Rp " + new Intl.NumberFormat('id-ID').format(total);
-    }
-
-    // --- Logic Edit Data ---
-    function editSale(sale) {
-        document.getElementById('sale_id').value = sale.id;
-        document.querySelector('input[name="transaction_date"]').value = sale.transaction_date;
-        document.querySelector('select[name="product_id"]').value = sale.product_id;
-        document.querySelector('input[name="distributor_name"]').value = sale.distributor_name; // Load distributor name
-        document.querySelector('input[name="quantity_sold"]').value = sale.quantity_sold;
-        document.querySelector('input[name="price_per_unit"]').value = sale.price_per_unit;
-        
-        calculateTotal();
-
-        document.getElementById('submitBtn').innerText = 'Update Transaksi';
-        document.getElementById('cancelBtn').classList.remove('hidden');
-        
-        const uploadBtn = document.getElementById('uploadBtn');
-        uploadBtn.classList.add('opacity-50', 'pointer-events-none');
-        
-        document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function resetSalesForm() {
-        document.querySelector('form').reset();
-        document.getElementById('sale_id').value = '';
-        document.getElementById('total_display').value = '';
-        
-        document.getElementById('submitBtn').innerText = 'Simpan Transaksi';
-        document.getElementById('cancelBtn').classList.add('hidden');
-        
-        const uploadBtn = document.getElementById('uploadBtn');
-        uploadBtn.classList.remove('opacity-50', 'pointer-events-none');
-    }
-
-    // --- Logic Modal Delete ---
-    let deleteForm = null;
-    function openDeleteModal(button) {
-        deleteForm = button.closest('form');
-        document.getElementById('deleteModal').classList.remove('hidden');
-        document.getElementById('deleteModal').classList.add('flex');
-    }
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.add('hidden');
-        document.getElementById('deleteModal').classList.remove('flex');
-        deleteForm = null;
-    }
-    function confirmDelete() {
-        if (deleteForm) deleteForm.submit();
+        // Isi Snapshot
+        document.getElementById('snap_company').value = company;
+        document.getElementById('snap_person').value  = person;
+        document.getElementById('snap_phone').value   = phone;
+        document.getElementById('snap_email').value   = email;
+        document.getElementById('snap_address').value = address;
     }
 </script>
 

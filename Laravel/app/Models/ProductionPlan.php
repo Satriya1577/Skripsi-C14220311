@@ -12,4 +12,9 @@ class ProductionPlan extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function validationLogs()
+    {
+        return $this->hasMany(ValidationLog::class)->orderBy('period', 'asc');
+    }
 }
