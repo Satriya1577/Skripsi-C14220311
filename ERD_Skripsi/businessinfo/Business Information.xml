@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<BusinessInfoDesign class="oracle.dbtools.crest.model.businessinfo.BusinessInfoDesign" name="Business Information" id="6C058321-32E9-2A8E-C593-5A457BAD6E9A">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 03:20:35 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</BusinessInfoDesign>

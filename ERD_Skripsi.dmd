@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="ERD_Skripsi" id="9D980155-62F5-1DC5-9F18-409C230075FE" version="3.5">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 03:20:35 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>9D980155-62F5-1DC5-9F18-409C230075FE</designId>
+</OSDM_Design>
