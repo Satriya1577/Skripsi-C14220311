@@ -138,7 +138,7 @@
             </a>
 
             {{-- 6. Production --}}
-            <a href="#" 
+            <a href="{{ route('production.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
                 <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">

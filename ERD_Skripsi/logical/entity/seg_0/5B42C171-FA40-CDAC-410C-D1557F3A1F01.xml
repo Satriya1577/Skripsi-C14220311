@@ -14,4 +14,91 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="partner_id" id="179BC134-1F2B-574E-29B5-09C4387DCABB">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:14 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="company_name" id="0E4D2370-792C-279A-EB52-627CEA011865">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:23 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="person_name" id="FC747865-38A5-0E94-6091-15DBDBB8EEE2">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:36 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="phone" id="C5572C2E-0929-9B10-96BE-275803FD7290">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:41 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="address" id="02529CBF-5C1F-5BD3-A7CF-FE13A7C5C1D4">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:47 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="email" id="2EEACC2D-8991-ECEB-7CB6-95CC88A4A443">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:52 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="type" id="BF5C6BBC-CA75-E46D-0203-3CD086A65009">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:16:03 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="A1EF0B88-4453-99B5-1F2C-A4E26CFFBA89" name="Partner PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:15:22 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>179BC134-1F2B-574E-29B5-09C4387DCABB</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

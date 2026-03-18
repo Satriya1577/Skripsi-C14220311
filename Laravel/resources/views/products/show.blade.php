@@ -23,6 +23,19 @@
             }
         }
     </script>
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
 </head>
 
 <body class="bg-blackBase text-silver min-h-screen">
@@ -60,29 +73,29 @@
             {{-- Stock Info --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">On Hand Stock</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($product->current_stock) }}</p>
+                <p class="text-2xl font-bold text-silver">{{ number_format($product->current_stock, 0) }}</p>
             </div>
             
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Reserved Stock</p>
-                <p class="text-2xl font-bold text-petronas">{{ number_format($product->committed_stock) }}</p>
+                <p class="text-2xl font-bold text-petronas">{{ number_format($product->committed_stock, 0) }}</p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Available Stock</p>
                 <div class="flex items-end gap-1">
-                    <p class="text-2xl font-bold text-white">{{ number_format($product->current_stock - $product->committed_stock) }}</p>
+                    <p class="text-2xl font-bold text-white">{{ number_format($product->current_stock - $product->committed_stock, 0) }}</p>
                 </div>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-                    Safety Stock: {{ number_format($product->safety_stock) }}
+                    Safety Stock: {{ number_format($product->safety_stock, 0) }}
                 </p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Selling Price</p>
-                <p class="text-2xl font-bold text-silver">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                <p class="text-2xl font-bold text-silver">Rp {{ number_format($product->price, 2, ',', '.') }}</p>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-                    HPP: Rp {{ number_format($product->cost_price, 0, ',', '.') }}
+                    HPP: Rp {{ number_format($product->cost_price, 2, ',', '.') }}
                 </p>
             </div>
         </div>
@@ -105,7 +118,7 @@
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <span class="text-xs text-muted block">Rata-rata Aktual</span>
-                        <span class="text-lg font-bold text-petronas">{{ number_format($product->lead_time_average, 1) }} Hari</span>
+                        <span class="text-lg font-bold text-petronas">{{ number_format($product->lead_time_average, 1, ',', '.') }} Hari</span>
                     </div>
                 </div>
             </div>
@@ -115,7 +128,7 @@
                 <div class="flex gap-6 items-center">
                     <div>
                         <span class="text-xs text-muted block">Batch Size (Lot)</span>
-                        <span class="text-lg font-bold text-silver">{{ number_format($product->batch_size) }} Pcs</span>
+                        <span class="text-lg font-bold text-silver">{{ number_format($product->batch_size, 0, ',', '.') }} Pcs</span>
                     </div>
                     {{-- Placeholder untuk info lain jika ada, misal Machine Capacity --}}
                 </div>
@@ -189,10 +202,10 @@
                         <tr class="hover:bg-carbon transition-colors group">
                             <td class="px-4 py-3 font-mono text-petronas">{{ $pm->material->code }}</td>
                             <td class="px-4 py-3 text-silver">{{ $pm->material->name }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-white">{{ number_format($pm->amount_needed, 2) }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-white">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
                             <td class="px-4 py-3 text-center text-muted">{{ $pm->material->unit }}</td>
                             <td class="px-4 py-3 text-right text-muted font-mono text-xs">
-                                {{ number_format($pm->amount_needed * $pm->material->price_per_unit, 2) }}
+                                Rp {{ number_format($pm->amount_needed * $pm->material->price_per_unit, 2, ',', '.') }}
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <form action="{{ route('product_materials.destroy', $pm->id) }}" method="POST" onsubmit="return confirm('Remove ingredient?');">
@@ -242,7 +255,7 @@
                             <p class="text-sm text-yellow-500 font-bold">HPP Dasar Belum Ada</p>
                             <p class="text-xs text-muted mb-2">Mohon isi estimasi biaya produksi (HPP) per unit.</p>
                             <label class="text-xs text-muted uppercase tracking-wide">Estimasi HPP per Unit</label>
-                            <input type="number" name="manual_price" 
+                            <input type="number" step="0.01" name="manual_price" 
                                 class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-yellow-500 focus:outline-none text-silver">
                         </div>
                     </div>
@@ -327,7 +340,7 @@
 
                             <td class="px-4 py-3 text-right font-mono text-success">
                                 @if($trx->qty > 0)
-                                    +{{ number_format($trx->qty) }}
+                                    +{{ number_format($trx->qty, 0) }}
                                 @else
                                     <span class="text-carbonSoft">-</span>
                                 @endif
@@ -335,13 +348,14 @@
 
                             <td class="px-4 py-3 text-right font-mono text-danger"> 
                                 @if($trx->qty < 0)
-                                    {{ number_format($trx->qty) }} @else
+                                    {{ number_format(abs($trx->qty), 0) }} 
+                                @else
                                     <span class="text-carbonSoft">-</span>
                                 @endif
                             </td>
 
                             <td class="px-4 py-3 text-right font-mono font-bold text-white bg-carbon/20">
-                                {{ number_format($trx->current_stock_balance) }}
+                                {{ number_format($trx->current_stock_balance, 0) }}
                             </td>
                         </tr>
                     @empty

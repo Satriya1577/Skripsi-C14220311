@@ -14,4 +14,96 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="production_batch_id" id="A27781C4-66D2-19C1-3998-A5B56D2FA0FD">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:42:56 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="product_id" id="F6D3B986-CC86-802C-EF38-65C3DB5BFDA5">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:13 UTC</createdTime>
+<generatorID>F7C59DAF-0EB7-4831-3031-20B28380C5A4</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>911A9A10-09B1-3440-3128-FAFC023CB73E</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="production_plan_id" id="019760D7-1250-1675-315F-78319BA495BD">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:38:26 UTC</createdTime>
+<generatorID>CBFE6C65-E03A-DF5C-4C2E-8DC68906B05E</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>B6885C5E-35D9-147C-CCB5-150D5C2AA593</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="batch_number" id="B8385E07-C332-B793-03A6-DC0E17DE2D38">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:53:07 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="quantity_produced_per_batch" id="81AD2634-1D89-935D-10A8-F15D7C9CA912">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:53:26 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="start_date" id="6308FF86-60BD-D592-A59E-A05471C859F8">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:53:39 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="end_date" id="46101A4D-3940-E866-B2D7-03A5FC33F14D">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:54:09 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="3FE70887-D9E0-E966-D55B-752337E08B0D" name="ProductionBatch PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:43:08 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>A27781C4-66D2-19C1-3998-A5B56D2FA0FD</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

@@ -1,0 +1,31 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.3.0">
+  <diagram name="Page-1" id="K1XIuuzg2j5X9PgrJo7k">
+    <mxGraphModel dx="1578" dy="1222" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-7" edge="1" parent="1" source="b_koY3xRCSXEWcJr_4dg-1" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" target="b_koY3xRCSXEWcJr_4dg-6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacing=8;" value="&lt;div&gt;SISTEM INFORMASI&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;/div&gt;- Modul Master Data&lt;div&gt;- Modul Penjualan&lt;/div&gt;&lt;div&gt;- Modul Pembelian&lt;/div&gt;&lt;div&gt;- Modul Produksi&lt;/div&gt;&lt;div&gt;- Modul Forecasting&lt;/div&gt;&lt;div&gt;- Modul Laporan&lt;/div&gt;" vertex="1">
+          <mxGeometry height="191" width="239" x="231" y="191.5" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-3" edge="1" parent="1" source="b_koY3xRCSXEWcJr_4dg-2" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" target="b_koY3xRCSXEWcJr_4dg-1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingTop=0;spacing=8;" value="INPUT&lt;div&gt;&lt;br&gt;&lt;div style=&quot;&quot;&gt;- Data Penjualan Produk&lt;/div&gt;&lt;div&gt;- Data Master Produk&lt;/div&gt;&lt;div&gt;- Data Pembelian Material&lt;/div&gt;&lt;div&gt;- Data Master Material&lt;/div&gt;&lt;div&gt;- Data BoM (Bill of Materials/komposisi)&lt;/div&gt;&lt;div&gt;- Data Partner (Distributor &amp;amp; Supplier)&amp;nbsp;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="174" width="341" x="-196" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-5" edge="1" parent="1" source="b_koY3xRCSXEWcJr_4dg-4" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" target="b_koY3xRCSXEWcJr_4dg-1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacing=8;" value="&lt;div&gt;PENGGUNA SISTEM&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;- Div. Sales (penjualan produk jadi)&lt;/div&gt;&lt;div&gt;- Div. Purchasing (pembelian bahan baku)&lt;/div&gt;&lt;div&gt;- Div. Inventory (gudang)&lt;/div&gt;&lt;div style=&quot;&quot;&gt;- Div. Accounting&lt;/div&gt;&lt;div style=&quot;&quot;&gt;- Div. Produksi&lt;/div&gt;" vertex="1">
+          <mxGeometry height="135" width="297" x="202" y="-32" as="geometry" />
+        </mxCell>
+        <mxCell id="b_koY3xRCSXEWcJr_4dg-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacing=8;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;OUTPUT&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;- Dashboard manajemen data produk &amp;amp; material&lt;div&gt;- Dashboard manajemen sales order&lt;/div&gt;&lt;div&gt;- Dashboard manajemen purchase order&lt;/div&gt;&lt;div&gt;- Dashboard manajemen produksi&lt;/div&gt;&lt;div&gt;- Dashboard chart forecasting&lt;/div&gt;&lt;div&gt;- Dashboard laporan mutasi stok &amp;amp; laporan laba rugi sederhana&lt;/div&gt;" vertex="1">
+          <mxGeometry height="186.5" width="365" x="551" y="196" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

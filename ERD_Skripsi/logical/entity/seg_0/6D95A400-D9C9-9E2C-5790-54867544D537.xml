@@ -14,4 +14,93 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="sales_payment_id" id="885D88F3-B7BE-B5A0-6ACD-AF341BFC81FA">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:02:23 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="sales_order_id" id="BFE8A19E-E15F-63A4-3E2F-B4E62D38F9DE">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:11:53 UTC</createdTime>
+<generatorID>C0B7BA8C-6376-2751-D7F3-F24486305211</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>BD20F85D-F0A6-1845-3B33-55E7BDA8613A</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="payment_date" id="792593E4-9BBA-81BB-DF18-185437C68071">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:17:51 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="amount" id="587D42AE-9181-E2BD-7144-29FDB16594AF">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:18:00 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="payment_method" id="45165811-DB42-B1CF-119D-682764CF59AE">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:18:06 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="reference_number" id="B95D58F8-92EC-12B6-9FB7-71A0B5255AF5">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:18:17 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="notes" id="CD40A33E-A2A4-C870-F3B8-DF554987A80F">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:18:24 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="4CB8E9A6-EBD6-0738-18F0-9035B7C418FA" name="SalesPayment PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:02:29 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>885D88F3-B7BE-B5A0-6ACD-AF341BFC81FA</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

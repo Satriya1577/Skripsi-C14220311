@@ -29,10 +29,6 @@
 
 <main class="max-w-7xl mx-auto px-6 py-6 space-y-8">
 
-    {{-- ... (NAV & HEADER & SECTION 1 & 2 SAMA PERSIS SEPERTI SEBELUMNYA) ... --}}
-    
-    {{-- ... (LANGSUNG KE BAGIAN JAVASCRIPT SAJA UNTUK FOKUS PERUBAHAN) ... --}}
-    
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
             <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
@@ -71,17 +67,18 @@
             </p>
         </div>
 
-        <div>
-            <a href="{{ route('sales.print', $salesOrder->id) }}" target="_blank" 
-               class="flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-blackBase bg-silver hover:bg-white transition shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>
-                    @if($salesOrder->status == 'draft') Generate RFQ @else Generate Invoice @endif
-                </span>
-            </a>
-        </div>
+        {{-- PERBAIKAN: Tombol Print hanya tampil jika status BUKAN draft --}}
+        @if($salesOrder->status != 'draft' && $salesOrder->status != 'cancelled')
+            <div>
+                <a href="{{ route('sales.print', $salesOrder->id) }}" target="_blank" 
+                   class="flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-blackBase bg-silver hover:bg-white transition shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Generate Invoice</span>
+                </a>
+            </div>
+        @endif
     </header>
 
     <form id="mainForm" action="{{ route('sales.updateStatus', $salesOrder->id) }}" method="POST">
@@ -374,7 +371,7 @@
                 @if($salesOrder->status == 'draft')
                     <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Batalkan order?')">Cancel Order</button>
                     <button type="submit" name="status" value="draft" class="bg-carbon text-silver border border-silver font-bold px-6 py-2 rounded-lg hover:bg-silver hover:text-blackBase transition">Save Draft</button>
-                    <button type="submit" name="status" value="confirmed" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/20" onclick="return confirm('Konfirmasi order?')">Confirm & Lock</button>
+                    <button type="submit" name="status" value="confirmed" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/20" onclick="return confirm('Konfirmasi order?')">Confirm Order</button>
                 @elseif($salesOrder->status == 'confirmed')
                     <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Yakin ingin membatalkan order yang sudah dikonfirmasi? Stok reserved akan dikembalikan.')">Cancel Order</button>
                     <button type="submit" name="status" value="shipped" class="bg-petronas text-blackBase font-bold px-6 py-2 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20" onclick="return confirm('Kirim Barang?')">Ship Order</button>

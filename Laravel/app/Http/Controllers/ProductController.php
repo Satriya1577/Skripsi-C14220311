@@ -24,49 +24,149 @@ class ProductController extends Controller
         return view('products.index',compact('products'));
     }
 
+    public function create()
+    {
+        return view('products.form');
+    }
+
+    public function edit(Product $product)
+    {
+        return view('products.form', compact('product'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // 1. VALIDASI INPUT
+        // 1. VALIDASI INPUT (Khusus Create, pastikan code unik)
         $request->validate([
-            'code'                => 'required|string|max:50|unique:products,code,' . $request->product_id, 
+            'code'                => 'required|string|max:50|unique:products,code', 
             'name'                => 'required|string|max:255',
             'packaging'           => 'nullable|string|max:255',
-            
-            // Validasi Field Baru
             'is_manual_lead_time' => 'required|in:manual,automatic',
             'min_lead_time_days'  => 'nullable|integer|min:1', 
             'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days', 
             'batch_size'          => 'required|integer|min:1',
-            
             'price'               => 'nullable|numeric|min:0', 
             'current_stock'       => 'nullable|integer|min:0',
             'cost_price'          => 'nullable|numeric|min:0', 
         ]);
 
-        // --- LOGIKA PENENTUAN LEAD TIME (MANUAL VS AUTOMATIC) ---
-        $minLeadTime = 1;
-        $maxLeadTime = 3;
-        $avgLeadTime = 2; // Default (1+3)/2
+        // 2. HITUNG LEAD TIME
+        // Passing null karena produk belum memiliki ID / belum ada di database
+        $leadTime = $this->calculateLeadTime($request, null);
 
+        // 3. PROSES SIMPAN KE DATABASE
+        try {
+            DB::beginTransaction();
+
+            $product = Product::create([
+                'code'                => $request->code,
+                'name'                => $request->name,
+                'packaging'           => $request->packaging,
+                'is_manual_lead_time' => $request->is_manual_lead_time,
+                'min_lead_time_days'  => $leadTime['min'],
+                'max_lead_time_days'  => $leadTime['max'],
+                'lead_time_average'   => $leadTime['avg'],
+                'batch_size'          => $request->batch_size,
+                'price'               => $request->price ?? 0,
+                'current_stock'       => $request->current_stock ?? 0,
+                'cost_price'          => $request->cost_price ?? 0,
+                'committed_stock'     => 0,
+                'safety_stock'        => 0,
+            ]);
+
+            // Catat Transaksi Saldo Awal jika ada
+            if ($request->filled('current_stock') && $request->current_stock > 0) {
+                ProductTransaction::create([
+                    'product_id'                 => $product->id,
+                    'transaction_date'           => now(),
+                    'type'                       => 'adjustment',
+                    'qty'                        => $request->current_stock,
+                    'cost_price'                 => $request->cost_price ?? 0,
+                    'current_stock_balance'      => $request->current_stock,
+                    'product_name_snapshot'      => $product->name,
+                    'product_packaging_snapshot' => $product->packaging,
+                    'description'                => 'Initial Stock Opname (Saldo Awal)',
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('products.index')->with('success', 'Product created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create product: ' . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Product $product)
+    {
+        // 1. VALIDASI INPUT (Abaikan unique code untuk ID produk ini sendiri)
+        $request->validate([
+            'code'                => 'required|string|max:50|unique:products,code,' . $product->id, 
+            'name'                => 'required|string|max:255',
+            'packaging'           => 'nullable|string|max:255',
+            'is_manual_lead_time' => 'required|in:manual,automatic',
+            'min_lead_time_days'  => 'nullable|integer|min:1', 
+            'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days', 
+            'batch_size'          => 'required|integer|min:1',
+            'price'               => 'nullable|numeric|min:0', 
+            // Note: current_stock & cost_price dihilangkan karena Stock Opname biasanya tidak diizinkan diubah via update produk.
+        ]);
+
+        // 2. HITUNG LEAD TIME (Sertakan object product untuk mengecek history batch)
+        $leadTime = $this->calculateLeadTime($request, $product);
+
+        // 3. PROSES UPDATE
+        $product->update([
+            'code'                => $request->code,
+            'name'                => $request->name,
+            'packaging'           => $request->packaging,
+            'is_manual_lead_time' => $request->is_manual_lead_time,
+            'min_lead_time_days'  => $leadTime['min'],
+            'max_lead_time_days'  => $leadTime['max'],
+            'lead_time_average'   => $leadTime['avg'],
+            'batch_size'          => $request->batch_size,
+            'price'               => $request->price ?? 0,
+        ]);
+
+        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+    }
+
+
+    /**
+     * Helper Method untuk Menghitung Lead Time
+     */
+    private function calculateLeadTime(Request $request, ?Product $product)
+    {
         // Jika Mode MANUAL
         if ($request->is_manual_lead_time === 'manual') {
-            $minLeadTime = $request->min_lead_time_days ?? 1;
-            $maxLeadTime = $request->max_lead_time_days ?? 3;
-            // Hitung Average: (Min + Max) / 2
-            $avgLeadTime = ($minLeadTime + $maxLeadTime) / 2;
+            $min = $request->min_lead_time_days ?? 1;
+            $max = $request->max_lead_time_days ?? 3;
+            
+            return [
+                'min' => $min,
+                'max' => $max,
+                'avg' => ($min + $max) / 2
+            ];
         } 
         
         // Jika Mode AUTOMATIC
         else {
-            if ($request->filled('product_id')) {
-                // KASUS UPDATE: Hitung rata-rata dari 30 batch terakhir
-                $batches = ProductionBatch::where('product_id', $request->product_id)
+            // Jika product dikirim (Kasus Update)
+            if ($product) {
+                $batches = ProductionBatch::where('product_id', $product->id)
                     ->whereNotNull('start_date')
-                    ->whereNotNull('end_date') // Pastikan batch sudah selesai
-                    ->orderBy('end_date', 'desc') // Ambil yang terbaru
+                    ->whereNotNull('end_date')
+                    ->orderBy('end_date', 'desc')
                     ->take(30)
                     ->get();
 
@@ -75,111 +175,26 @@ class ProductController extends Controller
                     foreach ($batches as $batch) {
                         $start = Carbon::parse($batch->start_date);
                         $end   = Carbon::parse($batch->end_date);
-                        // Hitung selisih hari. Jika 0 (selesai hari sama), anggap 1 hari.
                         $days  = $start->diffInDays($end); 
                         $totalDays += ($days == 0 ? 1 : $days);
                     }
                     
-                    // Hitung Rata-rata dan bulatkan
                     $avgDays = (float) ($totalDays / $batches->count());
                     
-                    // Set Min, Max, dan Avg ke angka rata-rata tersebut
-                    // (Karena di mode auto, min/max dianggap range aktual rata-rata)
-                    $minLeadTime = (int) round($avgDays);
-                    $maxLeadTime = (int) round($avgDays);
-                    $avgLeadTime = $avgDays;
-                } else {
-                    // Jika belum ada history, default 1
-                    $minLeadTime = 1;
-                    $maxLeadTime = 1;
-                    $avgLeadTime = 1;
+                    return [
+                        'min' => (int) round($avgDays),
+                        'max' => (int) round($avgDays),
+                        'avg' => $avgDays
+                    ];
                 }
-            } else {
-                // KASUS INSERT (PRODUK BARU): Default 1
-                $minLeadTime = 1;
-                $maxLeadTime = 1;
-                $avgLeadTime = 1;
             }
-        }
-        // -----------------------------------------------------------
 
-        // Jika ini UPDATE (Ada product_id)
-        if ($request->filled('product_id')) {
-            $product = Product::findOrFail($request->product_id);
-            
-            $product->update([
-                'code'                => $request->code,
-                'name'                => $request->name,
-                'packaging'           => $request->packaging,
-                
-                // Update Field Baru
-                'is_manual_lead_time' => $request->is_manual_lead_time,
-                'min_lead_time_days'  => $minLeadTime,
-                'max_lead_time_days'  => $maxLeadTime,
-                'lead_time_average'   => $avgLeadTime, // Simpan hasil kalkulasi
-                'batch_size'          => $request->batch_size,
-                
-                'price'               => $request->price ?? 0,
-            ]);
-
-            return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-        } 
-        
-        // Jika ini CREATE (Insert Baru)
-        else {
-            try {
-                DB::beginTransaction();
-
-                $product = Product::create([
-                    'code'                => $request->code,
-                    'name'                => $request->name,
-                    'packaging'           => $request->packaging,
-                    
-                    // Simpan Field Baru
-                    'is_manual_lead_time' => $request->is_manual_lead_time,
-                    'min_lead_time_days'  => $minLeadTime,
-                    'max_lead_time_days'  => $maxLeadTime,
-                    'lead_time_average'   => $avgLeadTime, // Simpan hasil kalkulasi
-                    'batch_size'          => $request->batch_size,
-                    
-                    'price'               => $request->price ?? 0,
-                    'current_stock'       => $request->current_stock ?? 0,
-                    'cost_price'          => $request->cost_price ?? 0,
-                    'committed_stock'     => 0,
-                    'safety_stock'        => 0,
-                ]);
-
-                // Default Config SARIMA
-                $product->sarimaConfig()->create([
-                    'order_p' => 1, 'order_d' => 1, 'order_q' => 1,
-                    'seasonal_P' => 0, 'seasonal_D' => 0, 'seasonal_Q' => 0, 'seasonal_s' => 12,
-                    'last_trained_at' => now(),
-                ]);
-
-                // Catat Transaksi Saldo Awal
-                if ($request->filled('current_stock') && $request->current_stock > 0) {
-                    ProductTransaction::create([
-                        'product_id'            => $product->id,
-                        'transaction_date'      => now(),
-                        'type'                  => 'adjustment',
-                        'qty'                   => $request->current_stock,
-                        'cost_price'            => $request->cost_price ?? 0,
-                        'current_stock_balance' => $request->current_stock,
-                        'product_name_snapshot'   => $product->name,
-                        'product_packaging_snapshot' => $product->packaging,
-                        'description'           => 'Initial Stock Opname (Saldo Awal)',
-                    ]);
-                }
-
-                DB::commit();
-                return redirect()->route('products.index')->with('success', 'Product created successfully with initial stock.');
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Failed to create product: ' . $e->getMessage());
-            }
+            // Fallback: Jika insert produk baru (belum ada histori) ATAU histori 0
+            return [
+                'min' => 1,
+                'max' => 1,
+                'avg' => 1
+            ];
         }
     }
 

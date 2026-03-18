@@ -46,9 +46,9 @@
         <ol class="flex items-center space-x-2">
             <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('forecast.index') }}" class="hover:text-petronas transition-colors">Forecasting</a></li>
+            <li><a href="{{ route('production.index') }}" class="hover:text-petronas transition-colors">Production</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Show</li>
+            <li class="text-petronas font-semibold" aria-current="page">Plan-{{ $product->code }}</li>
         </ol>
     </nav>
 
@@ -60,7 +60,7 @@
     {{-- Header --}}
     <header class="flex justify-between items-end">
         <div>
-            <p class="text-xs uppercase tracking-widest text-muted">Forecast Generation</p>
+            <p class="text-xs uppercase tracking-widest text-muted">Produciton Plans</p>
             <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">{{ $product->code }}</span>
@@ -68,48 +68,6 @@
             </p>
         </div>
     </header>
-
-    {{-- SECTION 1: PRODUCT INFO & CONFIGURATION --}}
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-black/50 space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Configuration & Status</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-            {{-- Current Stock Info (Mirip Product Show) --}}
-            <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
-                <p class="text-xs text-muted uppercase tracking-wide mb-1">On Hand Stock</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($product->current_stock) }}</p>
-            </div>
-
-            {{-- Target Period Card --}}
-            <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
-                <p class="text-xs text-muted uppercase tracking-wide mb-1">Target Period</p>
-                <p class="text-2xl font-bold text-white">{{ now()->addMonth()->format('F Y') }}</p>
-                <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-                    Type: <span class="text-petronas font-bold">FUTURE</span>
-                </p>
-            </div>
-
-            {{-- Action Form (Full Width di Sisa Kolom) --}}
-            <div class="md:col-span-2 bg-carbon/50 rounded-lg p-4 border border-petronas/30 flex flex-col justify-center items-center">
-                <form action="{{ route('forecast.generate', $product->id) }}" method="POST" id="generateForm" class="w-full flex items-center gap-4">
-                    @csrf
-                    <input type="hidden" name="forecastPeriod" value="nextPeriod">
-                    
-                    <div class="flex-1">
-                        <p class="text-xs text-silver font-bold uppercase tracking-wide">Generate Forecast</p>
-                        <p class="text-[10px] text-muted mt-0.5">Run SARIMA algorithm to predict demand.</p>
-                    </div>
-
-                    <button type="submit" id="btn-generate" class="bg-petronas text-blackBase font-bold px-6 py-2.5 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                        </svg>
-                        <span>Start Process</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
 
     {{-- SECTION 2: HISTORY TABLE --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-black/50">
@@ -125,7 +83,8 @@
                         <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Period</th>
                         <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Forecast</th>
                         <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Stock Snap</th>
-                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Rec. Prod</th>
+                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Sys Rec. Prod Qty</th>
+                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Approved Qty</th>
                         <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Status</th>
                         <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Action</th>
                     </tr>
@@ -133,12 +92,16 @@
                 <tbody class="divide-y divide-carbon/50 overflow-y-auto">
                     @forelse($productionPlans as $plan)
                         <tr class="hover:bg-carbon transition-colors group">
-                            {{-- Period --}}
+                            {{-- Period (Bukan Tautan Lagi) --}}
                             <td class="px-4 py-3">
-                                <span class="text-silver font-bold block">{{ \Carbon\Carbon::parse($plan->period)->format('F Y') }}</span>
-                                <span class="text-[10px] text-muted">{{ $plan->created_at->format('d/m/Y H:i') }}</span>
+                                <span class="block text-silver font-bold">
+                                    {{ \Carbon\Carbon::parse($plan->period)->format('F Y') }}
+                                </span>
+                                <span class="text-[10px] text-muted block mt-0.5">
+                                    {{ $plan->created_at->format('d/m/Y H:i') }}
+                                </span>
                             </td>
-
+                            
                             {{-- Forecast --}}
                             <td class="px-4 py-3 text-right text-muted font-mono">
                                 {{ number_format($plan->forecast_qty) }}
@@ -153,6 +116,13 @@
                             <td class="px-4 py-3 text-right">
                                 <span class="font-bold font-mono {{ $plan->recommended_production_qty > 0 ? 'text-petronas text-base' : 'text-muted' }}">
                                     {{ number_format($plan->recommended_production_qty) }}
+                                </span>
+                            </td>
+
+                            {{-- Approved --}}
+                            <td class="px-4 py-3 text-right">
+                                <span class="font-bold font-mono {{ $plan->approved_production_qty > 0 ? 'text-petronas text-base' : 'text-muted' }}">
+                                    {{ number_format($plan->approved_production_qty) }}
                                 </span>
                             </td>
 
@@ -171,21 +141,32 @@
                                 </span>
                             </td>
 
-                            {{-- Action --}}
+                            {{-- Action (Icon Mata) --}}
                             <td class="px-4 py-3 text-center">
-                                <a href="{{ route('forecast.chart', $plan) }}" {{-- Isi Route --}}
-                                   class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-petronas hover:border-petronas transition shadow-sm"
-                                   title="View Details">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </a>
+                                @if($plan)
+                                    <a href="{{ route('production.showPlanDetails', ['productionPlan' => $plan->id]) }}" 
+                                       class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-petronas hover:border-petronas hover:bg-carbon transition shadow-sm"
+                                       title="Manage Batch & Realization">
+                                        {{-- Icon Mata (View) SVG --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </a>
+                                @else
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted" title="Plan unavailable">
+                                        {{-- Icon Mata (View) SVG --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-12 text-center text-muted italic bg-carbon/20">
+                            <td colspan="7" class="px-4 py-12 text-center text-muted italic bg-carbon/20">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <span class="text-2xl opacity-50">📊</span>
                                     <span>No history available for this product yet.</span>

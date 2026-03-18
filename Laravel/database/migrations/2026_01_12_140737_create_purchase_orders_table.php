@@ -54,7 +54,8 @@ return new class extends Migration
             // FOB Destination: Penjual nanggung ongkir sampai gudang pembeli.
             $table->enum('shipping_terms', ['FOB_shipping_point', 'FOB_destination'])->default('FOB_destination');
             
-            // Tanggal Estimasi Barang Sampai (Opsional)
+            // Tanggal Barang Sampai (Opsional)
+            // Ini baru bisa diisi kalau status PO sudah 'ordered'  
             $table->date('expected_arrival_date')->nullable(); 
 
             // --- JATUH TEMPO (BARU) ---

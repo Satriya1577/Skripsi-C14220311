@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('sales_payments', function (Blueprint $table) {
             $table->id();
     
-            // PERUBAHAN DISINI: Mengarah ke 'sales_orders'
             $table->foreignId('sales_order_id')
                 ->constrained('sales_orders')
                 ->onDelete('cascade'); 

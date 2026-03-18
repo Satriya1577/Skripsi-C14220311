@@ -19,6 +19,16 @@ class MaterialController extends Controller
         return view('materials.index',compact('materials'));
     }
 
+    public function create()
+    {
+        return view('materials.form');
+    }
+
+    public function edit(Material $material)
+    {
+        return view('materials.form', compact('material'));
+    }
+
     /**
      * Helper: Hitung Faktor Konversi
      */
@@ -60,7 +70,7 @@ class MaterialController extends Controller
     /**
      * Handle Create/Store Logic
      */
-    private function handleStore(Request $request)
+    public function store(Request $request)
     {
         // 1. VALIDASI INPUT (TIDAK BERUBAH)
         $request->validate([
@@ -195,7 +205,7 @@ class MaterialController extends Controller
     /**
      * Handle Update Logic
      */
-    public function handleUpdate(Request $request, Material $material)
+    public function update(Request $request, Material $material)
     {
         // 1. CEK RIWAYAT TRANSAKSI
         $hasTransaction = MaterialTransaction::where('material_id', $material->id)->exists();
@@ -293,14 +303,14 @@ class MaterialController extends Controller
     /**
      * Store Router (Create or Update)
      */
-    public function store(Request $request)
-    {
-        if ($request->filled('material_id')) {
-            $material = Material::findOrFail($request->material_id);
-            return $this->handleUpdate($request, $material);
-        }
-        return $this->handleStore($request);
-    }
+    // public function store(Request $request)
+    // {
+    //     if ($request->filled('material_id')) {
+    //         $material = Material::findOrFail($request->material_id);
+    //         return $this->handleUpdate($request, $material);
+    //     }
+    //     return $this->handleStore($request);
+    // }
 
     /**
      * Show Detail
@@ -427,5 +437,31 @@ class MaterialController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal: ' . $e->getMessage())->withInput();
         }
+    }
+
+    public function updateMaterialLeadTimeSafetyStockROP () {
+        // get all materials data
+
+        // hitung ulang lead time material  
+        // $this->calculateLeadTime()
+
+        // hitung ulang safety stock mateial
+        // $this->calculateSafetyStock()
+
+        // hitung ulang ROP material
+        // $this->calculateROP()
+    }
+
+    private function calculateLeadTime () {
+        // if manual lead time, hitung ulang average lead time dari min max
+        // if automatic lead time, hitung ulang average lead time dari rata-rata data transaksi 30 purchase order (expected_arrival_date - order_date ) terakhir
+    }
+
+    private function calculateSafetyStock () {
+        // data usage diambil dari tabel material transactions dengan tipe 'out' (usage) salama 30 hari terakhir, lalu dihitung rata-rata harian usage nya
+    }
+
+    private function calculateROP() {
+
     }
 }

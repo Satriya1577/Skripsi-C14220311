@@ -20,6 +20,18 @@
             }
         }
     </script>
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
 </head>
 
 <body class="bg-blackBase text-silver min-h-screen">
@@ -74,28 +86,28 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Stok Fisik ({{ $pUnit }})</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor, 2) }}</p>
+                <p class="text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor) }}</p>
             </div>
             
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Incoming Order</p>
-                <p class="text-2xl font-bold text-blue-400">{{ number_format($material->ordered_stock / $factor, 2) }} <span class="text-xs text-muted font-normal">{{ $pUnit }}</span></p>
+                <p class="text-2xl font-bold text-blue-400">{{ number_format($material->ordered_stock / $factor) }} <span class="text-xs text-muted font-normal">{{ $pUnit }}</span></p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Safety Stock</p>
                 <div class="flex items-end gap-1">
-                    <p class="text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor, 2) }}</p>
+                    <p class="text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor) }}</p>
                     <span class="text-xs text-muted mb-1">{{ $pUnit }}</span>
                 </div>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-                    ROP: {{ number_format($material->reorder_point / $factor, 2) }} {{ $pUnit }}
+                    ROP: {{ number_format($material->reorder_point / $factor) }} {{ $pUnit }}
                 </p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Estimasi Harga / {{ $pUnit }}</p>
-                <p class="text-2xl font-bold text-petronas">{{ number_format($material->price_per_unit * $factor, 2) }}</p>
+                <p class="text-2xl font-bold text-petronas">Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
             </div>
         </div>
 
@@ -244,11 +256,11 @@
                             </td>
 
                             <td class="px-3 py-2 text-right text-muted">
-                                {{ $transaction->price_per_unit ? number_format($transaction->price_per_unit * $factor, 2) : '-' }}
+                                Rp {{ $transaction->price_per_unit ? number_format($transaction->price_per_unit * $factor, 2, ',', '.') : '-' }}
                             </td>
 
                             <td class="px-3 py-2 font-semibold text-silver text-right">
-                                {{ $transaction->total_price ? number_format($transaction->total_price, 2) : '-' }}
+                                Rp {{ $transaction->total_price ? number_format($transaction->total_price, 2, ',', '.') : '-' }}
                             </td>
 
                             <td class="px-3 py-2 text-muted text-xs max-w-xs truncate">

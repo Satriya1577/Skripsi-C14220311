@@ -14,4 +14,270 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="product_id" id="911A9A10-09B1-3440-3128-FAFC023CB73E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:02:59 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="code" id="AB9D7538-227C-BF59-7F18-8F6CBC3DE461">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:06 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="name" id="A7372CEA-2BB8-A678-2AFA-CB2D5D3DFC5A">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:10 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="packaging" id="4EE3BE28-9813-1779-B395-B8AB66E57B34">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:28 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="current_stock" id="32ABBA95-C347-D56E-8703-7D79ED5FD5E4">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:40 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="commited_stock" id="E820E45C-1D91-217C-A936-A8115442F75E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:04:00 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="safety_stock" id="023B7179-5D0C-079B-359E-45693B6C6226">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:04:07 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="min_lead_time_days" id="6DB630F2-8B17-8501-B99D-5374D7FF9673">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:04:17 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="max_lead_time_days" id="57D0C654-7D2E-7C73-1378-6FF1D0132019">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:04:34 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="lead_time_average" id="835A466B-53A4-4FD7-ECCE-BE715978FBBB">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:04:44 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="is_manual_lead_time" id="C38136C6-10C1-B2E1-FCB9-B2C1BE19BEB5">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:00 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="batch_size" id="A8191338-4A9B-4802-6F26-E3BCA7B5A924">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:12 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="order_p" id="7F4F755E-33C4-ACCD-72CC-A7B386C2D9DD">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:23 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="order_d" id="CAEB62D0-4AE4-8721-4358-76AA04F25F8E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:34 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="order_q" id="E77CFBB6-4DE4-89F5-5629-02801EA575B1">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:38 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="seasonal_P" id="4B5566AF-AB93-637F-4447-3262291DD1F8">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:05:57 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="seasonal_D" id="0CB8B08D-0990-1AEA-F2E6-6E66F320992E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:02 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="seasonal_Q" id="F93CF3DE-EC9F-3759-EF19-189411FC04B8">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:08 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="rmse" id="2AFB66C1-F9BD-DB31-9B38-1460AE35EF54">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:12 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="mape" id="9BA9DBBB-7555-0CDC-52A1-5A214B65FD00">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:28 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="last_train_at" id="7CA07655-F51A-B215-AC62-47BFF2C4A75F">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:30 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="pre_processing" id="0BCFD31F-B8D3-CC66-3FA4-DF66E7201D26">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:38 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="price" id="3D15D4E3-009E-9553-AF61-6BAD7452457B">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:45 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="cost_price" id="1060AA6F-C65D-85EF-AF6E-FFF750E6FF95">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:06:52 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="F40CB420-4669-2FE3-5ACD-B085B5D42BF4" name="Product PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:05 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>911A9A10-09B1-3440-3128-FAFC023CB73E</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

@@ -14,4 +14,64 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="product_material_id" id="303B4460-E5C2-C342-123F-0D58B65D7F12">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:00:05 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="product_id" id="1EDAAF95-6954-D2EA-EA2E-97DBEE763A0E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:13 UTC</createdTime>
+<generatorID>6AB16159-EBC2-A158-B080-001CCE82E64D</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>911A9A10-09B1-3440-3128-FAFC023CB73E</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="material_id" id="1A007CCC-00BB-CE29-B99D-7ACEC3951159">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:24:55 UTC</createdTime>
+<generatorID>44582E64-92D9-12E7-19B2-2C8371C27526</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>68DDF872-90C9-5C2A-EC81-943CDE64A210</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="amount_needed" id="0A61A9F1-986F-28FE-F5D6-6B51DD1831E6">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:00:18 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="E7BF9A84-8C7D-F95F-91C4-D51585B7E22C" name="ProductMaterial PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:00:14 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>303B4460-E5C2-C342-123F-0D58B65D7F12</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

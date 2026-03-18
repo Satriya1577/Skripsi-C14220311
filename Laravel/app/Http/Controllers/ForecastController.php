@@ -86,48 +86,8 @@ class ForecastController extends Controller
             'mape' => $productionPlan->mape,
         ];
 
-        // 5. Query Material Recommendations (BOM & Stock Status)
-        // Tentukan jumlah produksi yang akan jadi patokan
-        // Gunakan 'approved_production_qty' jika sudah di-approve, 
-        // jika belum gunakan 'recommended_production_qty'
-        $targetQty = $productionPlan->status === 'approved' 
-                        ? $productionPlan->approved_production_qty 
-                        : $productionPlan->recommended_production_qty;
-
-        // Query untuk mengambil list material yang dibutuhkan produk ini
-        $materialRecommendations = DB::table('product_materials')
-            ->join('materials', 'product_materials.material_id', '=', 'materials.id')
-            ->where('product_materials.product_id', $product->id)
-            ->select('materials.code','materials.name',
-            // Gunakan purchase_unit jika ada, kalau kosong gunakan base unit
-            DB::raw('COALESCE(materials.purchase_unit, materials.unit) as unit'),
-            
-            // KEBUTUHAN (Qty Need)
-            // Rumus: (Target Produksi * Amount Needed) / Conversion Factor
-            // (Agar satuannya menjadi Purchase Unit)
-            DB::raw("({$targetQty} * product_materials.amount_needed) / materials.conversion_factor as qty_need"),
-            
-            // STOK SAAT INI
-            // Rumus: Current Stock / Conversion Factor
-            DB::raw("materials.current_stock / materials.conversion_factor as current_stock"),
-            
-            // SEDANG DALAM PERJALANAN (OTW)
-            // Menggunakan kolom ordered_stock (Sudah dipesan ke Supplier)
-            DB::raw("materials.ordered_stock / materials.conversion_factor as purchase_otw")
-        )->get()->map(function ($item) {
-            return (object) [
-                'material'      => (object) [
-                    'code' => $item->code, 
-                    'name' => $item->name, 
-                    'unit' => $item->unit
-                ],
-                'qty_need'      => $item->qty_need,
-                'current_stock' => $item->current_stock,
-                'purchase_otw'  => $item->purchase_otw
-            ];
-        });
-
-    return view('forecast.chart', compact('product', 'productionPlan', 'metrics', 'chartData', 'materialRecommendations'));
+       
+    return view('forecast.chart', compact('product', 'productionPlan', 'metrics', 'chartData'));
 }
 
     /**

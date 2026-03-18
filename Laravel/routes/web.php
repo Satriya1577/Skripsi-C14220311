@@ -5,6 +5,7 @@ use App\Http\Controllers\ForecastController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionPlanController;
 use App\Http\Controllers\ProductMaterialController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -31,6 +32,9 @@ Route::middleware(['auth'])->group(function () {
     // PRODUCT SECTION 
     // Product Routes
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::get('/products/edit/{product}', [ProductController::class, 'edit'])->name('products.edit'); 
+    Route::patch('/products/update/{product}', [ProductController::class, 'update'])->name('products.update'); // admin, inventory
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/show/{product}', [ProductController::class, 'show'])->name('products.show');  
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
@@ -43,9 +47,12 @@ Route::middleware(['auth'])->group(function () {
     // MATERIAL SECTION
     // Material Routes
     Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
+    Route::get('/materials/create', [MaterialController::class, 'create'])->name('materials.create');
+    Route::get('/materials/edit/{material}', [MaterialController::class, 'edit'])->name('materials.edit'); 
+    Route::patch('/materials/update/{material}', [MaterialController::class, 'update'])->name('materials.update'); // admin, inventory
     Route::post('/materials/store', [MaterialController::class, 'store'])->name('materials.store');
-    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
     Route::get('/materials/show/{material}', [MaterialController::class, 'show'])->name('materials.show');
+    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
     Route::post('/materials/adjustment', [MaterialController::class, 'storeAdjustment'])->name('materials.adjustment.store'); // admin, inventory
 
 
@@ -81,6 +88,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/purchases/payments/store', [PurchasePaymentController::class, 'store'])->name('purchase_payments.store'); // admin, accounting
     Route::delete('/purchases/payments/{purchasePayment}', [PurchasePaymentController::class, 'destroy'])->name('purchase_payments.destroy'); // admin, accounting
 
+    // PRODUCTION SECTION
+    // Production Routes
+    Route::get('/production', [ProductionController::class, 'index'])->name('production.index');
+    Route::get('production/show-plan/{product}', [ProductionController::class, 'showPlan'])->name('production.showPlan');
+    Route::get('/production/show-plan-details/{productionPlan}', [ProductionController::class, 'showPlanDetails'])->name('production.showPlanDetails');
+    Route::post('/production/store-batch', [ProductionController::class, 'storeBatch'])->name('production.storeBatch');
+    Route::get('/production/show-realization/{productionBatch}', [ProductionController::class, 'showRealization'])->name('production.showRealization');
+    Route::post('/production/store-realization', [ProductionController::class, 'storeRealization'])->name('production.storeRealization');
+    
+
 
     // REPORTS SECTION
     // Reports Routes
@@ -99,7 +116,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/forecast/approve/{productionPlan}', [ForecastController::class, 'approvePlan'])->name('forecast.approvePlan'); // admin, production
     
     // Production Plan Routes
-    Route::get('/production-plans/{production_plan}', [ProductionPlanController::class, 'show'])->name('production_plans.show');
+    // Route::get('/production-plans/{production_plan}', [ProductionPlanController::class, 'show'])->name('production_plans.show');
 
     // SETTINGS SECTION
     // Forecasting Routes

@@ -14,4 +14,62 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="production_realization_id" id="661F5655-6137-BE01-3297-CB4DA8A46B2B">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:19:40 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="production_batch_id" id="9648D27B-F489-8CB3-FC73-150EB87A7009">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:43:09 UTC</createdTime>
+<generatorID>B3AFBAE5-E47C-C011-C8A8-30089A4FB35D</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>A27781C4-66D2-19C1-3998-A5B56D2FA0FD</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="quantity_produced" id="800E1EA6-51B2-2859-03CD-0E6632F89C48">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:43:33 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="production_date" id="FD3A4913-D885-08B1-C257-DD29D84B225E">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 04:43:40 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="2431DE80-2CAC-BDED-10E1-785852EBB095" name="ProductionRealization PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:19:50 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>661F5655-6137-BE01-3297-CB4DA8A46B2B</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>

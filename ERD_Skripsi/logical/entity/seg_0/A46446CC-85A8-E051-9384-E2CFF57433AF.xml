@@ -14,4 +14,73 @@
 <maxVolumes>9999999</maxVolumes>
 <minVolumes>0</minVolumes>
 <normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="forecasting_job_id" id="F8A0120B-F1F8-F3FE-F2DE-0D2D105F4726">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:03:48 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="product_id" id="89C402F8-0817-4D49-5D4D-1F612CA7E937">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:03:13 UTC</createdTime>
+<generatorID>12BF85A3-A47C-7104-BA4F-0204C2ED3781</generatorID>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<referedAttribute>911A9A10-09B1-3440-3128-FAFC023CB73E</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="target_period" id="99C01487-F5DB-9F6A-2A57-424192864F49">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:29:41 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="status" id="83B8EB34-949F-FC24-7E7D-E58B241A4313">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:29:50 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="message_log" id="33954EA0-A34F-11AB-6391-1447F5DD88AE">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-16 04:29:56 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="84778336-F365-CA57-7F59-12EA80F971CA" name="ForecastingJob PK">
+<createdBy>Satriya Wibowo</createdBy>
+<createdTime>2026-03-18 05:03:55 UTC</createdTime>
+<ownerDesignName>ERD_Skripsi</ownerDesignName>
+<engineerTo>
+<item key="E1ADED7F-8DE3-87E2-45B2-BBB15435D69D" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>F8A0120B-F1F8-F3FE-F2DE-0D2D105F4726</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
 </Entity>
