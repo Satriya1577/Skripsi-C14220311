@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Material;
 use App\Http\Controllers\Controller;
 use App\Models\MaterialTransaction;
+use App\Models\PurchaseOrder;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -439,29 +441,136 @@ class MaterialController extends Controller
         }
     }
 
-    public function updateMaterialLeadTimeSafetyStockROP () {
-        // get all materials data
+   public function updateMaterialLeadTimeSafetyStockROP() 
+    {
+        $materials = Material::where('is_active', true)->get();
 
-        // hitung ulang lead time material  
-        // $this->calculateLeadTime()
+        DB::beginTransaction();
+        try {
+            foreach ($materials as $material) {
+                
+                // 1. Hitung Statistik Hari Tunggu (Lead Time Stats)
+                $leadTimeStats = $this->calculateLeadTimeStats($material);
+                $averageLeadTimeDays = $leadTimeStats['average'];
+                $minLeadTimeDays     = $leadTimeStats['min'];
+                $maxLeadTimeDays     = $leadTimeStats['max'];
 
-        // hitung ulang safety stock mateial
-        // $this->calculateSafetyStock()
+                // 2. Hitung Penggunaan Harian (Daily Usage Qty) selama 30 Hari Terakhir
+                $usageStats = $this->calculateUsageStats($material);
+                $averageDailyUsage = $usageStats['average'];
+                $maxDailyUsage     = $usageStats['max'];
 
-        // hitung ulang ROP material
-        // $this->calculateROP()
+                // 3. Hitung Safety Stock (Kuantitas)
+                // (Max Lead Time Days * Max Daily Usage Qty) - (Average Lead Time Days * Average Daily Usage Qty)
+                $maxDemand = $maxLeadTimeDays * $maxDailyUsage;
+                $averageLeadTimeDemand = $averageLeadTimeDays * $averageDailyUsage; // Lead Time Demand
+
+                $safetyStock = max(0, $maxDemand - $averageLeadTimeDemand);
+
+                // 4. Hitung ROP (Kuantitas)
+                $rop = $averageLeadTimeDemand + $safetyStock;
+
+                // 5. Update data material termasuk Min dan Max Lead Time
+                $material->update([
+                    'lead_time_average'  => $averageLeadTimeDays,
+                    'min_lead_time_days' => $minLeadTimeDays,
+                    'max_lead_time_days' => $maxLeadTimeDays,
+                    'safety_stock'       => $safetyStock,
+                    'reorder_point'      => $rop
+                ]);
+            }
+            DB::commit();
+            return redirect()->back()->with('success', 'Lead Time, Safety Stock, dan ROP seluruh material berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
     }
 
-    private function calculateLeadTime () {
-        // if manual lead time, hitung ulang average lead time dari min max
-        // if automatic lead time, hitung ulang average lead time dari rata-rata data transaksi 30 purchase order (expected_arrival_date - order_date ) terakhir
+    private function calculateLeadTimeStats(Material $material) 
+    {
+        // Jika manual, langsung gunakan nilai dari database
+        if ($material->is_manual_lead_time === 'manual') {
+            return [
+                'average' => ($material->min_lead_time_days + $material->max_lead_time_days) / 2,
+                'min'     => $material->min_lead_time_days,
+                'max'     => $material->max_lead_time_days,
+            ];
+        }
+
+        // --- Logika Automatic ---
+        $recentPoIds = MaterialTransaction::where('material_id', $material->id)
+            ->where('type', 'in')
+            ->whereNotNull('purchase_order_id')
+            ->orderBy('transaction_date', 'desc')
+            ->limit(100) // Tarik 100 data transaksi terakhir untuk disaring
+            ->pluck('purchase_order_id') // Ambil kolom ID PO saja
+            ->unique() // Saring ID duplikat menggunakan Collection Laravel (bukan SQL)
+            ->take(30); // Ambil 30 ID PO unik terbaru
+
+        // Fallback jika belum ada transaksi sama sekali
+        if ($recentPoIds->isEmpty()) {
+            return [
+                'average' => ($material->min_lead_time_days + $material->max_lead_time_days) / 2,
+                'min'     => $material->min_lead_time_days,
+                'max'     => $material->max_lead_time_days,
+            ];
+        }
+
+        $purchaseOrders = PurchaseOrder::whereIn('id', $recentPoIds)
+            ->where('status', 'received')
+            ->whereNotNull('expected_arrival_date')
+            ->get();
+
+        $leadTimes = [];
+
+        foreach ($purchaseOrders as $po) {
+            $orderDate = Carbon::parse($po->order_date);
+            $arrivalDate = Carbon::parse($po->expected_arrival_date);
+            
+            // Simpan selisih hari ke dalam array
+            $leadTimes[] = $orderDate->diffInDays($arrivalDate);
+        }
+
+        // Fallback jika array kosong (misal expected_arrival_date kosong semua)
+        if (empty($leadTimes)) {
+            return [
+                'average' => ($material->min_lead_time_days + $material->max_lead_time_days) / 2,
+                'min'     => $material->min_lead_time_days,
+                'max'     => $material->max_lead_time_days,
+            ];
+        }
+
+        // Kembalikan rata-rata, nilai terendah, dan nilai tertinggi dari riwayat PO
+        return [
+            'average' => array_sum($leadTimes) / count($leadTimes),
+            'min'     => min($leadTimes),
+            'max'     => max($leadTimes),
+        ];
     }
 
-    private function calculateSafetyStock () {
-        // data usage diambil dari tabel material transactions dengan tipe 'out' (usage) salama 30 hari terakhir, lalu dihitung rata-rata harian usage nya
-    }
+    private function calculateUsageStats(Material $material)
+    {
+        // Ambil data 30 hari ke belakang
+        $thirtyDaysAgo = now()->subDays(30)->format('Y-m-d');
+        
+        $usages = MaterialTransaction::where('material_id', $material->id)
+            ->where('type', 'out')
+            ->where('transaction_date', '>=', $thirtyDaysAgo)
+            ->get();
 
-    private function calculateROP() {
+        if ($usages->isEmpty()) {
+            return ['average' => 0, 'max' => 0];
+        }
 
+        // Jumlahkan Qty berdasarkan hari (untuk mencari peak pemakaian per hari)
+        $dailyUsages = $usages->groupBy('transaction_date')->map(function ($dayTransactions) {
+            return abs($dayTransactions->sum('qty')); 
+        });
+
+        return [
+            'average' => $dailyUsages->sum() / 30, // Rata-rata dari 30 hari kalender
+            'max'     => $dailyUsages->max()
+        ];
     }
 }

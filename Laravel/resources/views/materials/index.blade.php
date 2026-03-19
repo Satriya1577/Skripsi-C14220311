@@ -62,7 +62,7 @@
             <h2 class="text-lg font-bold text-petronas">Material List</h2>
             
             {{-- Tombol Update Dipindahkan Ke Sini --}}
-            <a href="#" class="bg-carbonSoft border border-petronas text-petronas text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
+            <a href="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" class="bg-carbonSoft border border-petronas text-petronas text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
@@ -78,10 +78,11 @@
                         <th class="px-3 py-2 text-left text-muted">Name</th>
                         <th class="px-3 py-2 text-center text-muted">Status</th> 
                         <th class="px-3 py-2 text-right text-muted">On Hand</th> 
-                        <th class="px-3 py-2 text-center text-muted">Base Unit</th>
                         <th class="px-3 py-2 text-center text-muted">Ordered Stock</th>
                         <th class="px-3 py-2 text-right text-muted border-l border-carbon">Safety Stock</th>
                         <th class="px-3 py-2 text-right text-petronas font-bold">ROP</th>
+                        <th class="px-3 py-2 text-center text-muted">Purchase Unit</th>
+                        <th class="px-3 py-2 text-center text-muted">Base Unit</th>
                         <th class="px-3 py-2 text-right text-muted border-l border-carbon">Buy Price / Unit</th> 
                         <th class="px-3 py-2 text-center text-muted">Actions</th>
                     </tr>
@@ -124,23 +125,22 @@
 
                             <td class="px-3 py-2 text-right font-semibold text-silver">
                                 {{ number_format($material->current_stock / $factor, 0) }} 
-                                <span class="ml-1 text-xs text-muted">{{ $material->purchase_unit }}</span>
                             </td>
-
-                            <td class="px-3 py-2 text-center text-muted">{{ $material->unit }}</td>
 
                             <td class="px-3 py-2 text-right font-semibold text-silver">
                                 {{ number_format($material->ordered_stock / $factor, 0) }} 
-                                <span class="ml-1 text-xs text-muted">{{ $material->purchase_unit }}</span>
                             </td>
 
                             <td class="px-3 py-2 text-right text-muted border-l border-carbon">
-                                {{ number_format($material->safety_stock) }}
+                                {{ number_format($material->safety_stock / $factor) }}
                             </td>
                             <td class="px-3 py-2 text-right text-petronas font-bold">
-                                {{ number_format($material->reorder_point) }}
+                                {{ number_format($material->reorder_point / $factor) }}
                             </td>
 
+                            <td class="px-3 py-2 text-center text-muted">{{ $material->purchase_unit }}</td>
+
+                            <td class="px-3 py-2 text-center text-muted">{{ $material->unit }}</td>
                             <td class="px-3 py-2 text-right font-semibold text-silver border-l border-carbon">
                                 Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}
                             </td>

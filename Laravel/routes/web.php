@@ -39,11 +39,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/products/show/{product}', [ProductController::class, 'show'])->name('products.show');  
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/adjustment', [ProductController::class, 'storeAdjustment'])->name('products.adjustment.store'); // admin, inventory
+    Route::get('/products/update-product-lead-time-safety-stock', [ProductController::class, 'updateProductLeadTimeSafetyStock'])->name('products.updateProductLeadTimeSafetyStock'); // admin, inventory 
     // Product Material Routes
     Route::post('/product-materials/store', [ProductMaterialController::class, 'store'])->name('product_materials.store'); // admin, production
     Route::delete('/product-materials/{product_material}', [ProductMaterialController::class, 'destroy'])->name('product_materials.destroy'); // admin, production
 
-
+    
     // MATERIAL SECTION
     // Material Routes
     Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
@@ -54,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/materials/show/{material}', [MaterialController::class, 'show'])->name('materials.show');
     Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
     Route::post('/materials/adjustment', [MaterialController::class, 'storeAdjustment'])->name('materials.adjustment.store'); // admin, inventory
+    Route::get('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStockROP'])->name('materials.updateMaterialLeadTimeSafetyStockROP'); // admin, inventory
 
 
     // PARTNER SECTION
