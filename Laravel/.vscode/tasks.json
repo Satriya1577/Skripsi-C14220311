@@ -1,0 +1,48 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "1. Run Laravel",
+            "type": "shell",
+            "command": "php artisan serve --host=0.0.0.0 --port=8000",
+            "presentation": {
+                "group": "skripsi",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "2. Run Queue (Long Process)",
+            "type": "shell",
+            // PERUBAHAN PENTING DI SINI:
+            // --timeout=3700 : Memberi waktu 1 jam lebih per JOB (bukan total semua job).
+            // --tries=1      : Jangan mengulang job jika gagal (karena akan membuang waktu 1 jam lagi).
+            "command": "php artisan queue:work --timeout=3700 --tries=1",
+            "presentation": {
+                "group": "skripsi",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "3. Run Python API",
+            "type": "shell",
+            "command": "python python_scripts/api_server.py",
+            "presentation": {
+                "group": "skripsi",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "▶️ START ALL SYSTEMS",
+            "dependsOn": [
+                "1. Run Laravel",
+                "2. Run Queue (Long Process)",
+                "3. Run Python API"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated", 
+                "group": "skripsi" 
+            }
+        }
+    ]
+}
