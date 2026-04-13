@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\MaterialTransaction;
 use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReportsController extends Controller
 {
@@ -13,42 +15,45 @@ class ReportsController extends Controller
     {
         return view('reports.index');
     }
-
     
-    public function showProductReports()
+    public function showProductReports(Request $request)
     {
-        $transactions = ProductTransaction::with(['product', 'salesOrder', 'productionRealization'])
-                        // ->orderBy('transaction_date', 'desc')
-                        ->orderBy('created_at', 'desc')
-                        ->paginate(20); // <--- Perubahan di sini
+        // Set default filter ke 30 hari yang lalu
+        $defaultStartDate = Carbon::now()->subDays(30)->format('Y-m-d');
+        $startDate = $request->input('start_date', $defaultStartDate);
 
-        return view('reports.products', compact('transactions'));
+        $reports = ProductTransaction::with('product') // Eager load untuk mengambil kode produk
+            ->select(
+                'product_id',
+                DB::raw('MAX(product_name_snapshot) as product_name'),
+                DB::raw('SUM(CASE WHEN qty > 0 THEN qty ELSE 0 END) as Masuk'),
+                DB::raw('SUM(CASE WHEN qty < 0 THEN qty ELSE 0 END) as Keluar')
+            )
+            ->whereDate('transaction_date', '>=', $startDate)
+            ->groupBy('product_id')
+            ->paginate(20);
+
+        return view('reports.products', compact('reports', 'startDate'));
     }
 
     public function showMaterialReports(Request $request)
     {
-        // 1. Inisialisasi Query dengan Eager Loading Relasi
-        $query = MaterialTransaction::with([
-            'material',              // Untuk nama & kode material
-            'purchaseOrder',         // Untuk referensi PO (jika ada)
-            'productionRealization'  // Untuk referensi Produksi (jika ada)
-        ]);
+        // Set default filter ke 30 hari yang lalu
+        $defaultStartDate = Carbon::now()->subDays(30)->format('Y-m-d');
+        $startDate = $request->input('start_date', $defaultStartDate);
 
-        // 2. Logika Filter Tanggal (Dari input form di View)
-        if ($request->filled('start_date')) {
-            $query->whereDate('transaction_date', '>=', $request->start_date);
-        }
+        $reports = MaterialTransaction::with('material') 
+            ->select(
+                'material_id',
+                DB::raw('MAX(material_name_snapshot) as material_name'),
+                DB::raw('SUM(CASE WHEN qty > 0 THEN qty/material_conversion_factor_snapshot ELSE 0 END) as Masuk'),
+                DB::raw('SUM(CASE WHEN qty < 0 THEN qty/material_conversion_factor_snapshot ELSE 0 END) as Keluar'),
+                DB::raw('MAX(purchase_unit_snapshot) as purchase_unit')
+            )
+            ->whereDate('transaction_date', '>=', $startDate)
+            ->groupBy('material_id') // Filter whereDate dihapus
+            ->paginate(20);
 
-        // 3. Sorting & Pagination
-        $transactions = $query->orderBy('transaction_date', 'desc') // Urutkan tanggal transaksi terbaru
-                              ->orderBy('created_at', 'desc')       // Jika tanggal sama, urutkan jam input terbaru
-                              ->paginate(20);                       // Batasi 20 per halaman
-
-        // Agar parameter filter tetap ada saat klik halaman 2, 3, dst.
-        $transactions->appends($request->all());
-
-        // 4. Return View
-        // Pastikan nama file blade Anda sesuai, misal: resources/views/reports/materials.blade.php
-        return view('reports.materials', compact('transactions'));
+        return view('reports.materials', compact('reports'));
     }
 }

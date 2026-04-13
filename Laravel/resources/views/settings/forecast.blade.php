@@ -54,11 +54,11 @@
             <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
                 @csrf
                 <button type="submit" id="btn-tune-all"
-                    @if($isGridSearchRunning) disabled @endif
-                    onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama tergantung jumlah produk. Lanjutkan?')"
+                    @if(isset($isGridSearchRunning) && $isGridSearchRunning) disabled @endif
+                    onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama. Lanjutkan?')"
                     class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-petronas font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
                     
-                    @if($isGridSearchRunning)
+                    @if(isset($isGridSearchRunning) && $isGridSearchRunning)
                         <div class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -90,7 +90,93 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto pb-4"> {{-- Added pb-4 for dropdown space --}}
+        {{-- ========================================================== --}}
+        {{-- KONDISI 1: TABEL EVALUASI KHUSUS (c14220311@john.petra.ac.id) --}}
+        {{-- ========================================================== --}}
+        @isset($sarimaProductEvaluations)
+        <div class="overflow-x-auto pb-4">
+            <table class="w-full text-sm border-collapse">
+                <thead class="bg-carbon text-xs uppercase tracking-wide">
+                    <tr>
+                        <th rowspan="2" class="px-3 py-2 text-left text-muted align-middle border-b border-carbonSoft">Product Info</th>
+                        <th colspan="7" class="px-1 py-2 text-center text-petronas border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
+                        <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Raw Data</th>
+                        <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Moving Avg</th>
+                        <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
+                        <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Box-Cox</th>
+                        <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
+                    </tr>
+                    <tr>
+                        <th class="px-1 py-2 text-center font-bold text-petronas border-l border-carbon">p</th>
+                        <th class="px-1 py-2 text-center font-bold text-petronas">d</th>
+                        <th class="px-1 py-2 text-center font-bold text-petronas">q</th>
+                        <th class="px-1 py-2 text-center font-bold text-silver border-l border-carbon/50">P</th>
+                        <th class="px-1 py-2 text-center font-bold text-silver">D</th>
+                        <th class="px-1 py-2 text-center font-bold text-silver">Q</th>
+                        <th class="px-1 py-2 text-center font-bold text-silver">s</th>
+                        <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
+                        <th class="px-2 py-2 text-right text-muted">MAPE</th>
+                        <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
+                        <th class="px-2 py-2 text-right text-muted">MAPE</th>
+                        <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
+                        <th class="px-2 py-2 text-right text-muted">MAPE</th>
+                        <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
+                        <th class="px-2 py-2 text-right text-muted">MAPE</th>
+                        <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
+                        <th class="px-2 py-2 text-right text-muted">MAPE</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-carbon/50">
+                    @forelse($sarimaProductEvaluations as $eval)
+                        <tr class="hover:bg-carbon transition-colors">
+                            <td class="px-3 py-2">
+                                <div class="flex flex-col">
+                                    <span class="font-semibold text-silver">{{ $eval->product_code }}</span>
+                                    <span class="text-xs text-muted truncate max-w-[150px]">{{ $eval->product_name }}</span>
+                                </div>
+                            </td>
+
+                            {{-- Parameters --}}
+                            <td class="px-1 py-2 text-center font-mono text-petronas border-l border-carbon">{{ $eval->raw_order_p }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-petronas">{{ $eval->raw_order_d }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-petronas">{{ $eval->raw_order_q }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-silver border-l border-carbon/50">{{ $eval->raw_seasonal_P }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-silver">{{ $eval->raw_seasonal_D }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-silver">{{ $eval->raw_seasonal_Q }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-silver">{{ $eval->raw_seasonal_s }}</td>
+
+                            {{-- RAW --}}
+                            <td class="px-2 py-2 text-right font-mono text-xs border-l border-carbon">{{ $eval->raw_rmse !== null ? number_format((float)$eval->raw_rmse, 2) : '-' }}</td>
+                            <td class="px-2 py-2 text-right font-mono text-xs">{{ $eval->raw_mape !== null ? number_format((float)$eval->raw_mape, 2).'%' : '-' }}</td>
+
+                            {{-- MA --}}
+                            <td class="px-2 py-2 text-right font-mono text-xs border-l border-carbon">{{ $eval->ma_rmse !== null ? number_format((float)$eval->ma_rmse, 2) : '-' }}</td>
+                            <td class="px-2 py-2 text-right font-mono text-xs">{{ $eval->ma_mape !== null ? number_format((float)$eval->ma_mape, 2).'%' : '-' }}</td>
+
+                            {{-- SG --}}
+                            <td class="px-2 py-2 text-right font-mono text-xs border-l border-carbon">{{ $eval->sg_rmse !== null ? number_format((float)$eval->sg_rmse, 2) : '-' }}</td>
+                            <td class="px-2 py-2 text-right font-mono text-xs">{{ $eval->sg_mape !== null ? number_format((float)$eval->sg_mape, 2).'%' : '-' }}</td>
+
+                            {{-- BC --}}
+                            <td class="px-2 py-2 text-right font-mono text-xs border-l border-carbon">{{ $eval->bc_rmse !== null ? number_format((float)$eval->bc_rmse, 2) : '-' }}</td>
+                            <td class="px-2 py-2 text-right font-mono text-xs">{{ $eval->bc_mape !== null ? number_format((float)$eval->bc_mape, 2).'%' : '-' }}</td>
+
+                            {{-- YJ --}}
+                            <td class="px-2 py-2 text-right font-mono text-xs border-l border-carbon">{{ $eval->yj_rmse !== null ? number_format((float)$eval->yj_rmse, 2) : '-' }}</td>
+                            <td class="px-2 py-2 text-right font-mono text-xs">{{ $eval->yj_mape !== null ? number_format((float)$eval->yj_mape, 2).'%' : '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="18" class="px-3 py-6 text-center text-muted italic">Tidak ada data evaluasi SARIMA yang tersedia.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- ========================================================== --}}
+        {{-- KONDISI 2: TABEL NORMAL UNTUK USER LAINNYA                 --}}
+        {{-- ========================================================== --}}
+        @else
+        <div class="overflow-x-auto pb-4"> 
             <table class="w-full text-sm">
                 <thead class="bg-carbon">
                     <tr>
@@ -101,9 +187,7 @@
                         <th class="px-1 py-3 text-center text-silver font-bold border-l border-carbonSoft">P</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">D</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">Q</th>
-                        {{-- KOLOM BARU S --}}
                         <th class="px-1 py-3 text-center text-silver font-bold">s</th> 
-                        
                         <th class="px-3 py-3 text-right text-muted border-l border-carbonSoft">RMSE</th>
                         <th class="px-3 py-3 text-right text-muted">MAPE</th>
                         <th class="px-3 py-3 text-left text-muted">Last Trained</th>
@@ -119,7 +203,6 @@
                         </form>
 
                         <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
-                            {{-- Product Info --}}
                             <td class="px-3 py-2">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-silver">{{ $product->code }}</span>
@@ -127,17 +210,14 @@
                                 </div>
                             </td>
 
-                            {{-- Non-Seasonal Params --}}
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_p" value="{{ $product->order_p }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_d" value="{{ $product->order_d }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_q" value="{{ $product->order_q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
 
-                            {{-- Seasonal Params --}}
                             <td class="px-1 py-2 text-center border-l border-carbon"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_P" value="{{ $product->seasonal_P }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_D" value="{{ $product->seasonal_D }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_Q" value="{{ $product->seasonal_Q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
 
-                            {{-- DROPDOWN S (SEASONALITY) --}}
                             <td class="px-1 py-2 text-center">
                                 <select form="form-{{ $product->id }}" name="seasonal_s" 
                                         class="w-14 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors appearance-none cursor-pointer hover:bg-carbonSoft">
@@ -149,7 +229,6 @@
                                 </select>
                             </td>
 
-                            {{-- Metrics --}}
                             <td class="px-3 py-2 text-right border-l border-carbon font-mono text-xs text-silver">
                                 {{ $product->rmse !== null ? number_format($product->rmse, 2) : '-' }}
                             </td>
@@ -157,7 +236,6 @@
                                 {{ $product->mape !== null ? number_format($product->mape, 2) . '%' : '-' }}
                             </td> 
 
-                            {{-- Last Trained --}}
                             <td class="px-3 py-2 text-xs text-muted">
                                 @if($product->last_trained_at)
                                     <div>{{ \Carbon\Carbon::parse($product->last_trained_at)->format('d M Y') }}</div>
@@ -167,7 +245,6 @@
                                 @endif
                             </td> 
 
-                            {{-- Action Button --}}
                             <td class="px-3 py-2 text-center">
                                 <button form="form-{{ $product->id }}" type="submit" disabled
                                         class="save-btn inline-flex items-center justify-center w-8 h-8 rounded 
@@ -182,12 +259,13 @@
                         </tr>
                     @endforeach
 
-                    @if($products->isEmpty())
+                    @if(isset($products) && $products->isEmpty())
                         <tr><td colspan="13" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
                     @endif
                 </tbody>
             </table>
         </div>
+        @endisset
     </section>
 
 </main>
@@ -201,11 +279,13 @@
         const textNormal = document.getElementById('btn-text-normal');
         const textLoading = document.getElementById('btn-text-loading');
 
-        if (gridAllForm) {
+        if (gridAllForm && btnTuneAll) {
             gridAllForm.addEventListener('submit', function() {
                 btnTuneAll.disabled = true;
-                textNormal.classList.add('hidden');
-                textLoading.classList.remove('hidden');
+                if(textNormal && textLoading) {
+                    textNormal.classList.add('hidden');
+                    textLoading.classList.remove('hidden');
+                }
             });
         }
 
@@ -214,12 +294,10 @@
 
         forms.forEach(form => {
             const formId = form.id;
-            
-            // Ambil semua Input dan Select dalam form tersebut
-            // Note: Selector ini mencari elemen input/select di seluruh dokumen yang punya atribut form="form-id"
-            // Karena elemennya berada di luar tag <form>, kita pakai atribut 'form'
             const inputs = document.querySelectorAll(`input[form="${formId}"], select[form="${formId}"]`);
             const saveBtn = document.querySelector(`button[form="${formId}"]`);
+
+            if(!saveBtn) return; // Prevent error if saveBtn doesn't exist in evaluation table
 
             const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
             const inactiveClasses = ['bg-carbon', 'text-muted', 'cursor-not-allowed', 'opacity-50'];
@@ -228,7 +306,6 @@
             inputs.forEach(input => {
                 input.dataset.original = input.value;
                 
-                // Event listener untuk input (ketik) dan change (dropdown)
                 input.addEventListener('input', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
                 input.addEventListener('change', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
             });

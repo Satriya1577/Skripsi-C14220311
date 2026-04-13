@@ -25,6 +25,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Redirect ke halaman dashboard/home setelah sukses
+            
             return redirect()->intended(route('home.index'))->with('success', 'Selamat datang kembali!');
         }
 

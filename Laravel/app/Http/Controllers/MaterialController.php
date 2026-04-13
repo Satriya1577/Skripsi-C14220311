@@ -9,6 +9,7 @@ use App\Models\PurchaseOrder;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
@@ -74,6 +75,10 @@ class MaterialController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'purchase'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk insert data bahan baku baru.')->withInput();
+        }
         // 1. VALIDASI INPUT (TIDAK BERUBAH)
         $request->validate([
             // Identitas
@@ -209,6 +214,10 @@ class MaterialController extends Controller
      */
     public function update(Request $request, Material $material)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'purchase'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengupdate data bahan baku.')->withInput();
+        }
         // 1. CEK RIWAYAT TRANSAKSI
         $hasTransaction = MaterialTransaction::where('material_id', $material->id)->exists();
 
@@ -330,8 +339,12 @@ class MaterialController extends Controller
      */
     public function destroy(Material $material)
     {
-        $material = Material::findOrFail($material->id);
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'purchase'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menghapus data bahan baku.')->withInput();
+        }
 
+        $material = Material::findOrFail($material->id);
         // 1. Cek Riwayat Transaksi
         if ($material->transactions()->exists()) {
             return back()->with('error', 'GAGAL: Material tidak bisa dihapus karena sudah memiliki riwayat transaksi.');
@@ -353,6 +366,10 @@ class MaterialController extends Controller
      */
     public function storeAdjustment(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
+        }
         $request->validate([
             'material_id'  => 'required|exists:materials,id',
             'actual_qty'   => 'required|numeric|min:0', 
@@ -443,8 +460,12 @@ class MaterialController extends Controller
 
    public function updateMaterialLeadTimeSafetyStockROP() 
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data lead time dan safety stok.')->withInput();
+        }
+        
         $materials = Material::where('is_active', true)->get();
-
         DB::beginTransaction();
         try {
             foreach ($materials as $material) {

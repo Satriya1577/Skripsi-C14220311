@@ -6,6 +6,7 @@ use App\Models\ProductMaterial;
 use App\Http\Controllers\Controller;
 use App\Imports\ProductMaterialsImport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -33,6 +34,10 @@ class ProductMaterialController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk manage data BoM.')->withInput();
+        }
         // 1. Validasi (Hapus Rule::unique agar bisa di-update)
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -86,7 +91,12 @@ class ProductMaterialController extends Controller
      */
     public function destroy(ProductMaterial $product_material)
     {
-        //
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk membuat Sales Order.')->withInput();
+        }
+        $product_material->delete();
+        return redirect()->back()->with('success', 'BoM deleted successfully.');
     }
 
     public function import() {

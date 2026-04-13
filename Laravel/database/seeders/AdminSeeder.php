@@ -24,6 +24,16 @@ class AdminSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'c14220311@john.petra.ac.id'], // Cek berdasarkan email ini
+            [
+                'name' => 'c14220311',
+                'password' => Hash::make('password'), // Password default
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+
         // 2. Daftar Role yang ingin dibuatkan user-nya
         $roles = ['sales', 'purchase', 'inventory', 'accounting', 'production'];
 

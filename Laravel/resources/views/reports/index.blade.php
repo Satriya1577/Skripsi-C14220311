@@ -73,10 +73,10 @@
                     </div>
                     
                     <h3 class="text-lg font-bold text-silver group-hover:text-petronas transition-colors">
-                        Product Stock Card
+                        Product Stock Report
                     </h3>
                     <p class="text-xs text-muted mt-2 leading-relaxed">
-                        Laporan mutasi stok barang jadi (Finish Good). Melacak riwayat produksi masuk dan penjualan keluar.
+                        Laporan stok produk jadi (Finish Good). Melacak riwayat produksi masuk dan penjualan keluar.
                     </p>
                 </div>
 

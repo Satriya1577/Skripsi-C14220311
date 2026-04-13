@@ -57,7 +57,7 @@ class PurchaseOrderController extends Controller
      */
     public function store(Request $request)
     {
-         // --- 0. CEK HAK AKSES ---
+        // --- 0. CEK HAK AKSES ---
         // Ambil user yang sedang login
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'purchase'])) {
@@ -136,9 +136,6 @@ class PurchaseOrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $purchaseOrder = PurchaseOrder::with('items')->findOrFail($id);
-
-
-
         $request->validate([
             'status' => 'required|in:draft,ordered,received,cancelled',
             'expected_arrival_date' => 'nullable|date',
@@ -445,7 +442,7 @@ class PurchaseOrderController extends Controller
 
     public function print(PurchaseOrder $purchaseOrder)
     {
-         $user = Auth::user();
+        $user = Auth::user();
         if (!in_array($user->role, ['admin', 'purchase'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mencetak Purchase Order.')->withInput();
         } else {

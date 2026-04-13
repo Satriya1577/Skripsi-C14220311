@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Partner;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PartnerController extends Controller
 {
@@ -24,6 +25,10 @@ class PartnerController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'sales', 'purchase'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk insert data distributor atau supplier.')->withInput();
+        }
         // 1. Validasi Input
         $rules = [
             // Cek Unik: Nama Perusahaan harus unik, TAPI kecualikan ID yang sedang diedit (jika ada)
@@ -63,6 +68,11 @@ class PartnerController extends Controller
      */
     public function destroy(Partner $partners)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'sales', 'purchase'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menghapus data distributor atau supplier.')->withInput();
+        }
+
         // Cari data berdasarkan ID, jika tidak ketemu akan error 404
         $partner = Partner::findOrFail($partners->id);
         

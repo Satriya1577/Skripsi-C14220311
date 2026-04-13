@@ -239,7 +239,7 @@
                                             data-code="{{ $product->code }}" 
                                             data-name="{{ $product->name }}"
                                             data-packaging="{{ $product->packaging }}">
-                                            {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->current_stock }})
+                                            {{ $product->code }} - {{ $product->name }} ({{ $product->packaging }}) (On Hand Stok: {{ $product->current_stock }})
                                         </option>
                                     @endforeach
                                 </select>

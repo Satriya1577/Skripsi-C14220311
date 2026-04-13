@@ -369,7 +369,7 @@ class SalesOrderController extends Controller
         // Ambil user yang sedang login
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'sales', 'inventory'])) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mencetak RFQ/Invoice.')->withInput();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mencetak dokumen.')->withInput();
         } else {
 
             // 1. Ambil Data Sales Order beserta relasi yang dibutuhkan

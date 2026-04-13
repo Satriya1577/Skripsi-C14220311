@@ -69,16 +69,18 @@
             </p>
         </div>
 
-        {{-- TOMBOL PRINT --}}
-        <div>
-            <a href="{{ route('purchases.print', $purchaseOrder->id) }}" target="_blank" 
-               class="flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-blackBase bg-silver hover:bg-white transition shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print PO</span>
-            </a>
-        </div>
+        @if($purchaseOrder->status != 'draft' && $purchaseOrder->status != 'cancelled')
+            {{-- TOMBOL PRINT --}}
+            <div>
+                <a href="{{ route('purchases.print', $purchaseOrder->id) }}" target="_blank" 
+                class="flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-blackBase bg-silver hover:bg-white transition shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print PO</span>
+                </a>
+            </div>
+        @endif
     </header>
 
     <form id="mainForm" action="{{ route('purchases.updateStatus', $purchaseOrder->id) }}" method="POST">
@@ -241,7 +243,7 @@
                                             data-code="{{ $material->code }}" 
                                             data-name="{{ $material->name }}"
                                             data-unit="{{ $material->purchase_unit }}">
-                                            {{ $material->code }} - {{ $material->name }} (Satuan Beli: {{ $material->purchase_unit }})
+                                            {{ $material->code }} - {{ $material->name }} (On Hand Stok: {{ $material->current_stock / $material->conversion_factor }} {{ $material->purchase_unit }})
                                         </option>
                                     @endforeach
                                 </select>

@@ -97,7 +97,7 @@ def forecast():
 
         # Check Length
         if len(time_series) < 24:
-             return jsonify({"error": "Data too short (need min 24 months)"}), 400
+            return jsonify({"error": "Data too short (need min 24 months)"}), 400
         
         # ==========================================
         # APPLY PREPROCESSING
@@ -304,7 +304,7 @@ def grid_search():
         final_best_method = 'raw'
         final_best_rmse = best_score_raw
         final_best_mape = mean_absolute_percentage_error(test_raw, np.full(len(test_raw), train_raw.mean())) * 100 # Dummy initial
-
+        all_preprocessing_metrics = {}
         print("--- STAGE 2: Preprocessing Tuning ---")
 
         for method in preprocessing_methods:
@@ -319,6 +319,10 @@ def grid_search():
                 mape_val = mean_absolute_percentage_error(test_raw, p_val) * 100
                 
                 final_best_mape = mape_val
+                all_preprocessing_metrics['raw'] = {
+                    "rmse": float(best_score_raw),
+                    "mape": float(mape_val)
+                }
                 continue 
 
             try:
@@ -351,8 +355,14 @@ def grid_search():
 
                 # 6. Hitung RMSE terhadap DATA ASLI (Real Test)
                 rmse_method = np.sqrt(mean_squared_error(test_raw, pred_final))
-                
-                print(f"Method: {method.upper()} -> RMSE: {rmse_method:.2f}")
+                mape_method = mean_absolute_percentage_error(test_raw, pred_final) * 100
+
+                print(f"Method: {method.upper()} -> RMSE: {rmse_method:.2f}, MAPE: {mape_method:.2f}%")
+
+                all_preprocessing_metrics[method] = {
+                    "rmse": float(rmse_method),
+                    "mape": float(mape_method)
+                }
 
                 # 7. Bandingkan
                 if rmse_method < final_best_rmse:
@@ -363,6 +373,11 @@ def grid_search():
 
             except Exception as e:
                 print(f"Method {method} failed: {e}")
+                all_preprocessing_metrics[method] = {
+                    "rmse": None,
+                    "mape": None,
+                    "error": str(e)
+                }
                 continue
 
         elapsed = time.time() - start_time
@@ -382,7 +397,8 @@ def grid_search():
             "metrics": {
                 "rmse": float(final_best_rmse),
                 "mape": float(final_best_mape)
-            }
+            },
+            "all_preprocessing_metrics": all_preprocessing_metrics
         })
 
     except Exception as e:

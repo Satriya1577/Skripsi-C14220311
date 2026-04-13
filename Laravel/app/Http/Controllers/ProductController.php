@@ -11,7 +11,8 @@ use App\Models\Material;
 use App\Models\ProductTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductionBatch; 
-use Carbon\Carbon; 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -39,6 +40,11 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'sales'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk insert data produk.')->withInput();
+        }
+
         // 1. VALIDASI INPUT (Khusus Create, pastikan code unik)
         $request->validate([
             'code'                => 'required|string|max:50|unique:products,code', 
@@ -109,6 +115,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'sales'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data produk.')->withInput();
+        }
+
         // 1. VALIDASI INPUT (Abaikan unique code untuk ID produk ini sendiri)
         $request->validate([
             'code'                => 'required|string|max:50|unique:products,code,' . $product->id, 
@@ -219,12 +230,21 @@ class ProductController extends Controller
     */
     public function destroy(product $product)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'sales'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menghapus data produk.')->withInput();
+        }
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 
     public function storeAdjustment(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
+        }
+
         $request->validate([
             'product_id'   => 'required|exists:products,id',
             'actual_qty'   => 'required|integer|min:0', // Stok fisik (Satuan Unit)
@@ -307,6 +327,10 @@ class ProductController extends Controller
 
     public function updateProductLeadTimeSafetyStock() 
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data lead time dan safety stok.')->withInput();
+        }
         // Ambil semua produk (Bisa juga difilter hanya yang aktif jika ada status aktif)
         $products = Product::all();
 

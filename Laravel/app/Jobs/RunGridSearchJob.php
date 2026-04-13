@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
+// Grid Search Untuk di program website
 class RunGridSearchJob implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -38,6 +39,7 @@ class RunGridSearchJob implements ShouldQueue
 
         try {
         
+            Log::info("RunGridSearchJob class");
             $rawSales = SalesOrderItem::where('product_id', $this->productId)
                 ->whereHas('salesOrder', function($query) {
                     $query->whereIn('status', ['confirmed', 'shipped']);
@@ -81,7 +83,7 @@ class RunGridSearchJob implements ShouldQueue
             $output = $response->json();
 
             if(isset($output['error'])) {
-                 throw new \Exception($output['error']);
+                throw new \Exception($output['error']);
             }
 
             // 4. Simpan Hasil Terbaik ke Tabel Products

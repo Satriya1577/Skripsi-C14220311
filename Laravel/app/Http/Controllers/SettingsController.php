@@ -10,8 +10,11 @@ use App\Imports\ProductsImport;
 use App\Imports\SalesImport;
 use App\Imports\SalesOrderImport;
 use App\Imports\SalesOrderItemImport;
+use App\Jobs\RunGridSearchEvaluationJob;
 use App\Jobs\RunGridSearchJob;
+use App\Models\CreateSarimaProductEvaluation;
 use App\Models\Product;
+use App\Models\SarimaProductEvaluation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
@@ -34,19 +37,27 @@ class SettingsController extends Controller
 
 
     public function forecasting() {
-        $products = Product::all();
+        $user = Auth::user();
+        $userEmail = $user->email;
 
+        if ($userEmail === 'c14220311@john.petra.ac.id'){
+            $sarimaProductEvaluations = SarimaProductEvaluation::all();
+            return view('settings.forecast', compact('sarimaProductEvaluations'));
+        } 
+
+        $products = Product::all();
         $isGridSearchRunning = DB::table('jobs')
         ->where('payload', 'like', '%RunGridSearchJob%')
         ->exists();
-
         return view('settings.forecast', compact('products', 'isGridSearchRunning')); 
     }
 
-
-
     public function updateSarimaParameters(Request $request) 
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         // 1. Validasi Input
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -82,26 +93,46 @@ class SettingsController extends Controller
 
    // --- IMPORT PRODUCTS ---
     public function importProducts(Request $request) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         return $this->processImport($request, new ProductsImport, 'Data Produk berhasil diimport!');
     }
 
     // --- IMPORT MATERIALS ---
     public function importMaterials(Request $request) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         return $this->processImport($request, new MaterialsImport, 'Data Material berhasil diimport!');
     }
 
     // --- IMPORT PARTNERS ---
     public function importPartners(Request $request) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         return $this->processImport($request, new PartnersImport, 'Data Partner berhasil diimport!');
     }
 
     // --- IMPORT RECIPES ---
     public function importProductMaterials(Request $request) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         return $this->processImport($request, new ProductMaterialsImport, 'Data Resep berhasil diimport!');
     }
 
     // --- IMPORT SALES ORDER ---
     public function importSalesOrder(Request $request) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         return $this->processImport($request, new SalesOrderImport, 'Data Sales Order berhasil diimport!');
     }
 
@@ -137,17 +168,28 @@ class SettingsController extends Controller
         }
     }
 
-    // SettingsController.php
+    
 
     public function runGridSearchAll()
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         $configs = Product::all();
         $jobs = [];
 
         foreach ($configs as $config) {
             // Masukkan ke Job Baru
             Log::info("Dispatching Grid Search Job for Product ID: {$config->id}");
-            $jobs[] = new RunGridSearchJob($config->id);
+            // if user->email == c14220311@john.petra.ac.id
+            if ($user->email === 'c14220311@john.petra.ac.id') {
+                // jalankan grid search untuk evaluasi sarima menjawab Rumusan Masalah
+                $jobs[] = new RunGridSearchEvaluationJob($config);
+            } else {
+                // jalankan grid search untuk program di website
+                $jobs[] = new RunGridSearchJob($config->id);
+            }
         }
 
         // Dispatch Batch
@@ -161,12 +203,21 @@ class SettingsController extends Controller
 
     public function userManagement()
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data user.')->withInput();
+        }
         $users = User::orderBy('created_at', 'desc')->paginate(10);        
         return view('settings.user', compact('users'));
     }
 
     public function storeUser(Request $request)
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menambah user baru.')->withInput();
+        }
+
         // 1. Tentukan apakah ini mode Edit atau Create
         $isEdit = $request->filled('user_id'); // Jika ada user_id, berarti Edit
 
@@ -237,6 +288,11 @@ class SettingsController extends Controller
     public function destroyUser(User $user)
     {
         $currentUser = Auth::user(); // User yang sedang login
+
+        
+        if (!in_array($currentUser->role, ['admin'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk menghapus data user.')->withInput();
+        }
 
         // 1. Cek Keamanan: Jangan biarkan user menghapus dirinya sendiri
         if ($currentUser->id === $user->id) {

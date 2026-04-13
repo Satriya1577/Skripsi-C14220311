@@ -11,6 +11,7 @@ use App\Models\ProductionPlan;
 use App\Models\ProductionRealization;
 use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -94,6 +95,10 @@ class ProductionController extends Controller
 
     public function storeBatch(Request $request) 
     {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk membuat batch produksi yang baru.')->withInput();
+        }
         // 1. Validasi input (hanya butuh ID Plan karena data lain sudah otomatis)
         $request->validate([
             'production_plan_id' => 'required|exists:production_plans,id',
@@ -155,6 +160,11 @@ class ProductionController extends Controller
         // Masukkan data product transaction untuk produksi ini
         // Update harga hpp produk menggunakan moving average
         // Cek apakah batch sudah selesai (qty_produced >= target), jika ya update end_date di batch menjadi hari ini, jika belum biarkan end_date tetap null (In Progress)
+
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk membuat riwayat realisasi produksi baru.')->withInput();
+        }
 
         $request->validate([
             'production_batch_id' => 'required|exists:production_batches,id',

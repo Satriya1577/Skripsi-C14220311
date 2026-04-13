@@ -117,7 +117,7 @@ class ForecastController extends Controller
     {
         // --- 0. CEK HAK AKSES ---
         $user = Auth::user();
-        if (!in_array($user->role, ['admin', 'production'])) {
+        if (!in_array($user->role, ['admin', 'purchase', 'production'])) {
             $msg = 'Terjadi kesalahan: Anda tidak memiliki akses.';
             
             if ($request->wantsJson()) {
