@@ -118,7 +118,7 @@
 
         {{-- 3. INCOME STATEMENT (LABA RUGI) --}}
         {{-- Ganti route sesuai route asli Anda --}}
-        <a href="#" 
+        <a href="{{ route('reports.incomeStatement') }}" 
            class="group relative bg-carbonSoft rounded-2xl p-6 border border-carbon hover:border-green-500 transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,197,94,0.1)] hover:-translate-y-1 overflow-hidden h-full flex flex-col">
             
             {{-- Background Glow Effect --}}

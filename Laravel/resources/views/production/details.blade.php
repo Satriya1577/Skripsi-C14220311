@@ -133,7 +133,7 @@
                 {{-- Left: Info & Recommendation --}}
                 <div class="flex-1">
                     <h2 class="text-lg font-bold text-petronas mb-1">Production Planning Target</h2>
-                    <p class="text-sm text-muted mb-4">Recommendation based on forecast, safety stock, and current snapshot.</p>
+                    <p class="text-sm text-muted mb-4">Recommendation based on forecast, safety stock, and on hand stock snapshot.</p>
                     
                     <div class="flex gap-4">
                         <div class="bg-carbon rounded-lg p-4 border border-petronas/30 shadow-[0_0_10px_rgba(0,161,155,0.05)] min-w-45">
@@ -205,7 +205,7 @@
                 <div class="flex justify-between items-end mb-4">
                     <div>
                         <h3 class="text-md font-bold text-petronas">Material Purchase Recommendations</h3>
-                        <p class="text-xs text-muted mt-1">Estimated raw material required (BOM) to fulfill the production suggestion.</p>
+                        <p class="text-xs text-muted mt-1">Estimated raw material required (BOM) to fulfill the production suggestion or approved plan.</p>
                     </div>
                 </div>
 

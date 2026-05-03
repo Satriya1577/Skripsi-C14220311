@@ -164,8 +164,8 @@
                         <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Distributor</th>
                         <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Order Status</th>
                         <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
-                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Total</th>
-                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Balance</th>
+                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Total Tagihan</th>
+                        <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Sisa Tagihan</th>
                         <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
                     </tr>
                 </thead>

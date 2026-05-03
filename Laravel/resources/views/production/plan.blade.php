@@ -60,7 +60,7 @@
     {{-- Header --}}
     <header class="flex justify-between items-end">
         <div>
-            <p class="text-xs uppercase tracking-widest text-muted">Produciton Plans</p>
+            <p class="text-xs uppercase tracking-widest text-muted">Production Plans</p>
             <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">{{ $product->code }}</span>
@@ -82,8 +82,8 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Period</th>
                         <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Forecast</th>
-                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Stock Snap</th>
-                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Sys Rec. Prod Qty</th>
+                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">On Hand Stock Qty (snapshot)</th>
+                        <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">System Recommendation Production Qty</th>
                         <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Approved Qty</th>
                         <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Status</th>
                         <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Action</th>

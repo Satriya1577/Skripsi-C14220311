@@ -240,12 +240,12 @@ def grid_search():
         # ==============================================================================
         
 
-        p = range(0, 5) 
+        p = range(0, 6) 
         d = range(0, 2) 
-        q = range(0, 5) 
-        P = range(0, 3) 
+        q = range(0, 6) 
+        P = range(0, 4) 
         D = range(0, 2) 
-        Q = range(0, 3) 
+        Q = range(0, 4) 
         s = [2, 3, 6, 12]
 
         pdq = list(itertools.product(p, d, q))

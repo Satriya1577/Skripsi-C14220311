@@ -125,7 +125,7 @@
     @if(is_null($batch->end_date))
     <section class="bg-carbonSoft rounded-xl p-6 border border-petronas/30 shadow-lg shadow-petronas/5 relative overflow-hidden">
         <div class="relative z-10">
-            <h2 class="text-lg font-bold text-petronas mb-1">Add Production Realization</h2>
+            <h2 class="text-lg font-bold text-petronas mb-1">Add Daily Production Realization For Batch {{ $batch->batch_number }}</h2>
             <p class="text-xs text-muted mb-4">Catat jumlah barang jadi yang berhasil diproduksi pada hari tertentu untuk batch ini.</p>
             
             {{-- Form Route sesuaikan dengan web.php Anda --}}
@@ -143,7 +143,7 @@
                     <div class="w-full md:w-1/3">
                         <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Jumlah Produksi (Qty)</label>
                         <div class="relative">
-                            <input type="number" name="qty_produced" value="{{ max(0, $remainingBatchQty ?? 0) }}" min="1" required 
+                            <input type="number" name="qty_produced" placeholder="{{ max(0, $remainingBatchQty ?? 0) }}" min="1" required 
                                 class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white font-mono focus:ring-1 focus:ring-petronas focus:border-petronas pr-12 transition">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-muted text-xs uppercase">{{ $product->packaging ?? 'Pcs' }}</span>
