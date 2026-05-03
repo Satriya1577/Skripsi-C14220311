@@ -59,14 +59,11 @@ class ReportsController extends Controller
 
     public function showIncomeStatement(Request $request)
     {
-       // Ambil filter bulan dan tahun dari request, default ke bulan ini
-        $month = $request->input('month', Carbon::now()->month);
-        $year = $request->input('year', Carbon::now()->year);
+        // Tentukan range 30 hari terakhir
+        $endDate = Carbon::today();
+        $startDate = Carbon::today()->subDays(30);
 
-        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month, 1)->endOfMonth();
-
-        // Query untuk mengambil rincian per produk yang terjual di bulan tersebut
+        // Query untuk mengambil rincian per produk yang terjual dalam 30 hari terakhir
         // Hanya menghitung sales_order dengan status confirmed atau shipped
         $salesDetails = DB::table('sales_order_items')
             ->join('sales_orders', 'sales_order_items.sales_order_id', '=', 'sales_orders.id')
@@ -89,18 +86,9 @@ class ReportsController extends Controller
         $grossProfit = $totalRevenue - $totalCogs;
         $profitMargin = $totalRevenue > 0 ? ($grossProfit / $totalRevenue) * 100 : 0;
 
-        // Data untuk dropdown filter bulan dan tahun
-        $months = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-        ];
-        
-        $years = range(Carbon::now()->year - 3, Carbon::now()->year + 1);
-
         return view('reports.incomestatement', compact(
             'salesDetails', 'totalRevenue', 'totalCogs', 'grossProfit', 
-            'profitMargin', 'month', 'year', 'months', 'years'
+            'profitMargin', 'startDate', 'endDate'
         ));
     }
 }

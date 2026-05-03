@@ -24,13 +24,6 @@
             }
         }
     </script>
-    <style>
-        /* Agar dropdown select di dark mode tampil lebih baik */
-        select option {
-            background-color: #1B1D1F; 
-            color: #C8CCCE;
-        }
-    </style>
 </head>
 
 <body class="bg-blackBase text-silver min-h-screen">
@@ -48,7 +41,7 @@
         </ol>
     </nav>
 
-    {{-- HEADER & FILTER --}}
+    {{-- HEADER & PERIODE INFO --}}
     <header class="border-b border-carbon pb-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -56,24 +49,20 @@
                     <p class="text-xs uppercase tracking-widest text-muted">Financial Report</p>
                 </div>
                 <h1 class="text-3xl font-extrabold text-white mt-1">Laporan Laba Rugi (Kotor)</h1>
-                <p class="text-sm text-muted mt-1">Laporan pendapatan penjualan dan harga pokok penjualan berdasarkan transaksi yang sudah diproses.</p>
+                <p class="text-sm text-muted mt-1">Laporan pendapatan penjualan dan harga pokok penjualan dalam 30 hari terakhir.</p>
             </div>
             
-            <form method="GET" action="{{ route('reports.incomeStatement') }}" class="flex items-center gap-3">
-                <select name="month" class="bg-carbon border border-carbonSoft text-silver text-sm rounded-lg focus:ring-petronas focus:border-petronas block p-2.5 outline-none transition-colors">
-                    @foreach($months as $m => $name)
-                        <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>{{ $name }}</option>
-                    @endforeach
-                </select>
-                <select name="year" class="bg-carbon border border-carbonSoft text-silver text-sm rounded-lg focus:ring-petronas focus:border-petronas block p-2.5 outline-none transition-colors">
-                    @foreach($years as $y)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="bg-petronas hover:bg-petronas/90 text-blackBase font-bold rounded-lg text-sm px-5 py-2.5 transition">
-                    Filter
-                </button>
-            </form>
+            {{-- INDIKATOR PERIODE --}}
+            <div class="flex items-center gap-3">
+                <div class="bg-carbon border border-carbonSoft rounded-lg px-5 py-2.5 flex items-center gap-3 shadow-lg shadow-black/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-petronas" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm font-bold text-silver">
+                        {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} &mdash; {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}
+                    </span>
+                </div>
+            </div>
         </div>
     </header>
 
