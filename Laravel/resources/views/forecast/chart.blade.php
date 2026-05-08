@@ -10,11 +10,11 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#F8FAFC',
-                        carbon: '#F1F5F9',
-                        carbonSoft: '#FFFFFF',
+                        blackBase: '#E2E8F0',
+                        carbon: '#CBD5E1',
+                        carbonSoft: '#F8FAFC',
                         silver: '#334155',
-                        petronas: '#00A19B',
+                        petronas: '#2563EB',
                         muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
