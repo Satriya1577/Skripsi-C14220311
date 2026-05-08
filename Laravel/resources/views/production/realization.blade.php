@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -94,7 +94,7 @@
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Target Batch Qty</p>
-                    <p class="text-2xl font-bold text-white">{{ number_format($batch->qty_produced, 0, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($batch->qty_produced, 0, ',', '.') }}</p>
                 </div>
                 <div class="p-3 bg-carbon rounded-lg text-petronas">🎯</div>
             </div>
@@ -137,14 +137,14 @@
                     {{-- <div class="w-full md:w-1/3">
                         <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Tanggal Produksi</label>
                         <input type="date" name="production_date" value="{{ date('Y-m-d') }}" required
-                            class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white focus:ring-1 focus:ring-petronas focus:border-petronas transition [color-scheme:dark]">
+                            class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 focus:ring-1 focus:ring-petronas focus:border-petronas transition [color-scheme:light]">
                     </div> --}}
 
                     <div class="w-full md:w-1/3">
                         <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Jumlah Produksi (Qty)</label>
                         <div class="relative">
                             <input type="number" name="qty_produced" placeholder="{{ max(0, $remainingBatchQty ?? 0) }}" min="1" required 
-                                class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white font-mono focus:ring-1 focus:ring-petronas focus:border-petronas pr-12 transition">
+                                class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 font-mono focus:ring-1 focus:ring-petronas focus:border-petronas pr-12 transition">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-muted text-xs uppercase">{{ $product->packaging ?? 'Pcs' }}</span>
                             </div>

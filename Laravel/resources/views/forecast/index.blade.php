@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6'
+                        muted: '#64748B'
                     }
                 }
             }
@@ -62,7 +62,7 @@
         </div>
     </div>
 
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-black/50">
+    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
         <h2 class="text-lg font-bold text-petronas mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

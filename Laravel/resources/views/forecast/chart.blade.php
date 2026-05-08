@@ -10,12 +10,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -68,7 +68,7 @@
         {{-- Card 1: Forecast Qty --}}
         <div class="bg-carbon rounded-lg p-4 border border-petronas/50 shadow-[0_0_10px_rgba(0,161,155,0.1)]">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Forecast Quantity</p>
-            <p class="text-2xl font-bold text-white">{{ number_format($productionPlan->forecast_qty) }}</p>
+            <p class="text-2xl font-bold text-slate-800">{{ number_format($productionPlan->forecast_qty) }}</p>
             <p class="text-[10px] text-muted border-t border-white/10 mt-2 pt-2">
                 Safety Stock: {{ number_format($productionPlan->safety_stock_snapshot) }}
             </p>

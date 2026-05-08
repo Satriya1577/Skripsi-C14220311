@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6'
+                        muted: '#64748B'
                     }
                 }
             }

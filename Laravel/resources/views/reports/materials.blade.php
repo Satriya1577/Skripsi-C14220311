@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981',
@@ -45,7 +45,7 @@
         <div class="flex items-center gap-3">
             <p class="text-xs uppercase tracking-widest text-muted">Inventory Report</p>
         </div>
-        <h1 class="text-3xl font-extrabold text-white mt-1">Laporan Stok Bahan Baku</h1>
+        <h1 class="text-3xl font-extrabold text-slate-800 mt-1">Laporan Stok Bahan Baku</h1>
         <p class="text-sm text-muted mt-1">Rekapitulasi total bahan baku masuk dan keluar selama 30 hari terakhir.</p>
     </header>
 
@@ -95,7 +95,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-muted italic bg-carbon/20">
+                            <td colspan="4" class="px-6 py-12 text-center text-muted italic bg-slate-100">
                                 Belum ada data mutasi stok.
                             </td>
                         </tr>

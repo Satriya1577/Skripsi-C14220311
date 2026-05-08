@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -70,7 +70,7 @@
     </header>
 
     {{-- SECTION 2: HISTORY TABLE --}}
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-black/50">
+    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-petronas">History & Production Plans</h2>
             <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Total: {{ $productionPlans->total() }}</span>
@@ -166,7 +166,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-12 text-center text-muted italic bg-carbon/20">
+                            <td colspan="7" class="px-4 py-12 text-center text-muted italic bg-slate-100">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <span class="text-2xl opacity-50">📊</span>
                                     <span>No history available for this product yet.</span>

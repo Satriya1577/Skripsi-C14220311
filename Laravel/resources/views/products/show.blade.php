@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -84,7 +84,7 @@
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Available Stock</p>
                 <div class="flex items-end gap-1">
-                    <p class="text-2xl font-bold text-white">{{ number_format($product->current_stock - $product->committed_stock, 0) }}</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($product->current_stock - $product->committed_stock, 0) }}</p>
                 </div>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
                     Safety Stock: {{ number_format($product->safety_stock, 0) }}
@@ -165,7 +165,7 @@
                     <div class="w-full md:w-1/4">
                         <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Usage Quantity</label>
                         <div class="relative">
-                            <input type="number" step="0.001" name="amount_needed" placeholder="0.00" required class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white font-mono focus:ring-1 focus:ring-petronas focus:border-petronas pr-12">
+                            <input type="number" step="0.001" name="amount_needed" placeholder="0.00" required class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 font-mono focus:ring-1 focus:ring-petronas focus:border-petronas pr-12">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-muted text-xs uppercase" id="unitLabel">Unit</span>
                             </div>
@@ -202,7 +202,7 @@
                         <tr class="hover:bg-carbon transition-colors group">
                             <td class="px-4 py-3 font-mono text-petronas">{{ $pm->material->code }}</td>
                             <td class="px-4 py-3 text-silver">{{ $pm->material->name }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-white">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-slate-800">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
                             <td class="px-4 py-3 text-center text-muted">{{ $pm->material->unit }}</td>
                             <td class="px-4 py-3 text-right text-muted font-mono text-xs">
                                 Rp {{ number_format($pm->amount_needed * $pm->material->price_per_unit, 2, ',', '.') }}
@@ -354,13 +354,13 @@
                                 @endif
                             </td>
 
-                            <td class="px-4 py-3 text-right font-mono font-bold text-white bg-carbon/20">
+                            <td class="px-4 py-3 text-right font-mono font-bold text-slate-800 bg-slate-100">
                                 {{ number_format($trx->current_stock_balance, 0) }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-muted italic bg-carbon/20 rounded-b-lg">
+                            <td colspan="6" class="px-6 py-12 text-center text-muted italic bg-slate-100 rounded-b-lg">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <span class="text-2xl">📦</span>
                                     <p>Belum ada pergerakan stok untuk produk ini.</p>

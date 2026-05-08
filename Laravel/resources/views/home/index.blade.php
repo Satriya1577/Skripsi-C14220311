@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444'
                     }
                 }
@@ -52,7 +52,7 @@
                 {{-- User Email --}}
                 <div class="px-4 py-3 border-b border-carbon mb-2">
                     <p class="text-[10px] text-muted uppercase tracking-wide">Signed in as</p>
-                    <p class="text-xs font-bold text-white truncate">{{ Auth::user()->email ?? 'user@example.com' }}</p>
+                    <p class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->email ?? 'user@example.com' }}</p>
                 </div>
                 
                 {{-- Settings (Optional shortcut) --}}
@@ -86,7 +86,7 @@
             <a href="{{ route('products.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-box-seam"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Product</h5>
@@ -97,7 +97,7 @@
             <a href="{{ route('materials.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-layers-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Material</h5>
@@ -108,7 +108,7 @@
             <a href="{{ route('partners.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-people-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Partners</h5>
@@ -119,7 +119,7 @@
             <a href="{{ route('sales.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-cart-check-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Sales (SO)</h5>
@@ -130,7 +130,7 @@
             <a href="{{ route('purchases.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-bag-check-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Purchase (PO)</h5>
@@ -141,7 +141,7 @@
             <a href="{{ route('production.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-gear-wide-connected"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Production</h5>
@@ -152,7 +152,7 @@
             <a href="{{ route('reports.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-file-earmark-bar-graph-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Reports</h5>
@@ -163,7 +163,7 @@
             <a href="{{ route('forecast.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Forecasting</h5>
@@ -174,7 +174,7 @@
             <a href="{{ route('settings.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
                     transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-white transition-colors text-4xl mb-3">
+                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-sliders"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Settings</h5>

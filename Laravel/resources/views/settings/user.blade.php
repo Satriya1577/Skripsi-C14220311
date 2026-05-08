@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B'
                     }
@@ -236,7 +236,7 @@
             <div class="w-10 h-10 rounded-full bg-danger/20 flex items-center justify-center text-danger border border-danger/30">
                 <i class="bi bi-exclamation-triangle-fill text-lg"></i>
             </div>
-            <h3 class="text-lg font-bold text-white">Delete User?</h3>
+            <h3 class="text-lg font-bold text-slate-800">Delete User?</h3>
         </div>
         <p class="text-sm text-muted mb-6 pl-13">
             Are you sure you want to delete this user? They will lose access to the system immediately. 

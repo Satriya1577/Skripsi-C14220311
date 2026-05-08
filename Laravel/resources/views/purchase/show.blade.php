@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -253,13 +253,13 @@
                         
                         <div class="w-full md:w-1/6">
                             <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Qty</label>
-                            <input type="number" id="qtyInput" placeholder="1" min="1" value="1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white font-mono placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
+                            <input type="number" id="qtyInput" placeholder="1" min="1" value="1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 font-mono placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
                         </div>
 
                         {{-- COST INPUT --}}
                         <div class="w-full md:w-1/5">
                             <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Cost (Rp)</label>
-                            <input type="number" id="priceInput" placeholder="0" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-white font-mono placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
+                            <input type="number" id="priceInput" placeholder="0" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 font-mono placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
                         </div>
 
                         {{-- HAPUS INPUT DISKON DI SINI --}}
@@ -316,7 +316,7 @@
                             
                             {{-- HAPUS CELL DISC DI SINI --}}
 
-                            <td class="px-4 py-3 text-right text-white font-bold font-mono">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right text-slate-800 font-bold font-mono">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                             
                             @if($purchaseOrder->status == 'draft')
                             <td class="px-4 py-3 text-center text-muted text-xs italic">
@@ -462,7 +462,7 @@
 
             <td class="px-4 py-3 text-right text-muted font-mono">Rp ${formatRupiah(cost)}</td>
             
-            <td class="px-4 py-3 text-right text-white font-bold font-mono">Rp ${formatRupiah(subtotal)}</td>
+            <td class="px-4 py-3 text-right text-slate-800 font-bold font-mono">Rp ${formatRupiah(subtotal)}</td>
             <td class="px-4 py-3 text-center text-xs text-muted">
                 <button type="button" onclick="removeNewItem('${uniqueId}', ${subtotal})" class="text-red-400 hover:text-red-600 font-bold px-2 py-1">✕</button>
             </td>

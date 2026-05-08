@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981'
@@ -80,7 +80,7 @@
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Approved Qty</p>
-                    <p class="text-2xl font-bold text-white">{{ number_format($targetQty, 0, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($targetQty, 0, ',', '.') }}</p>
                 </div>
                 <div class="p-3 bg-carbon rounded-lg text-petronas">🎯</div>
             </div>
@@ -110,7 +110,7 @@
     </header>
 
     {{-- WRAPPER UNTUK TABS --}}
-    <div class="bg-carbonSoft rounded-xl border border-carbon shadow-lg shadow-black/50 overflow-hidden">
+    <div class="bg-carbonSoft rounded-xl border border-carbon shadow-lg shadow-slate-200/60 overflow-hidden">
         
         {{-- TABS NAVIGATION --}}
         <div class="flex border-b border-carbon bg-carbon/50 overflow-x-auto">
@@ -148,7 +148,7 @@
                             <div class="bg-petronas/10 rounded-lg p-4 border border-petronas min-w-45">
                                 <p class="text-[10px] text-petronas uppercase tracking-wide mb-1 font-bold">Final Approved</p>
                                 <div class="flex items-baseline gap-1">
-                                    <p class="text-2xl font-bold text-white">{{ number_format($productionPlan->approved_production_qty) }}</p>
+                                    <p class="text-2xl font-bold text-slate-800">{{ number_format($productionPlan->approved_production_qty) }}</p>
                                     <span class="text-[10px] text-petronas/70">units</span>
                                 </div>
                             </div>
@@ -257,7 +257,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-8 text-center text-muted italic bg-carbon/20">
+                                    <td colspan="5" class="px-4 py-8 text-center text-muted italic bg-slate-100">
                                         <div class="flex flex-col items-center justify-center gap-1 opacity-50">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
@@ -332,7 +332,7 @@
                                 </td>
 
                                 {{-- Target Qty --}}
-                                <td class="px-4 py-4 text-right font-mono font-bold text-white">
+                                <td class="px-4 py-4 text-right font-mono font-bold text-slate-800">
                                     {{ number_format($targetBatchQty, 0, ',', '.') }}
                                 </td>
                                 

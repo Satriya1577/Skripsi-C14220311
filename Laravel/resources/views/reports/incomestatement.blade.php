@@ -9,12 +9,12 @@
             theme: {
                 extend: {
                     colors: {
-                        blackBase: '#000000',
-                        carbon: '#1B1D1F',
-                        carbonSoft: '#24272A',
-                        silver: '#C8CCCE',
+                        blackBase: '#F8FAFC',
+                        carbon: '#F1F5F9',
+                        carbonSoft: '#FFFFFF',
+                        silver: '#334155',
                         petronas: '#00A19B',
-                        muted: '#9DA3A6',
+                        muted: '#64748B',
                         danger: '#EF4444',
                         warning: '#F59E0B',
                         success: '#10B981',
@@ -48,13 +48,13 @@
                 <div class="flex items-center gap-3">
                     <p class="text-xs uppercase tracking-widest text-muted">Financial Report</p>
                 </div>
-                <h1 class="text-3xl font-extrabold text-white mt-1">Laporan Laba Rugi (Kotor)</h1>
+                <h1 class="text-3xl font-extrabold text-slate-800 mt-1">Laporan Laba Rugi (Kotor)</h1>
                 <p class="text-sm text-muted mt-1">Laporan pendapatan penjualan dan harga pokok penjualan dalam 30 hari terakhir.</p>
             </div>
             
             {{-- INDIKATOR PERIODE --}}
             <div class="flex items-center gap-3">
-                <div class="bg-carbon border border-carbonSoft rounded-lg px-5 py-2.5 flex items-center gap-3 shadow-lg shadow-black/50">
+                <div class="bg-carbon border border-carbonSoft rounded-lg px-5 py-2.5 flex items-center gap-3 shadow-lg shadow-slate-200/60">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-petronas" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -74,7 +74,7 @@
             <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
                 <div class="absolute right-0 top-0 h-full w-1.5 bg-success"></div>
                 <p class="text-xs font-bold text-muted uppercase tracking-widest">Total Pendapatan</p>
-                <h3 class="text-3xl font-bold text-white mt-2 font-mono">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 font-mono">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
                 <p class="text-[10px] text-muted mt-2 uppercase tracking-wide">Dari Sales Order (Confirmed/Shipped)</p>
             </div>
 
@@ -82,7 +82,7 @@
             <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
                 <div class="absolute right-0 top-0 h-full w-1.5 bg-danger"></div>
                 <p class="text-xs font-bold text-muted uppercase tracking-widest">HPP (Modal Produksi)</p>
-                <h3 class="text-3xl font-bold text-white mt-2 font-mono">Rp {{ number_format($totalCogs, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 font-mono">Rp {{ number_format($totalCogs, 0, ',', '.') }}</h3>
                 <p class="text-[10px] text-muted mt-2 uppercase tracking-wide">Total Modal Produksi Terjual</p>
             </div>
 
@@ -146,14 +146,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-muted italic bg-carbon/20">
+                            <td colspan="5" class="px-6 py-12 text-center text-muted italic bg-slate-100">
                                 Belum ada data penjualan yang dikonfirmasi/dikirim pada periode ini.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
                 {{-- TABLE FOOTER (GRAND TOTAL) --}}
-                <tfoot class="bg-carbon font-bold text-white border-t border-carbonSoft">
+                <tfoot class="bg-carbon font-bold text-slate-800 border-t border-carbonSoft">
                     <tr>
                         <td class="px-4 py-4 text-right tracking-widest text-xs text-muted" colspan="2">GRAND TOTAL</td>
                         <td class="px-4 py-4 text-right font-mono text-success">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
