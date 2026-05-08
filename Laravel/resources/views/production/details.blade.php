@@ -80,7 +80,7 @@
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Approved Qty</p>
-                    <p class="text-2xl font-bold text-slate-800">{{ number_format($targetQty, 0, ',', '.') }}</p>
+                    <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($targetQty, 0, ',', '.') }}</p>
                 </div>
                 <div class="p-3 bg-carbon rounded-lg text-slate-800">🎯</div>
             </div>
@@ -89,7 +89,7 @@
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Total Produced</p>
-                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalProduced, 0, ',', '.') }}</p>
+                    <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($totalProduced, 0, ',', '.') }}</p>
                 </div>
                 <div class="p-3 bg-petronas/10 rounded-lg text-slate-800">⚙️</div>
             </div>
@@ -139,7 +139,7 @@
                         <div class="bg-carbon rounded-lg p-4 border border-petronas/30 shadow-[0_0_10px_rgba(0,161,155,0.05)] min-w-45">
                             <p class="text-[10px] text-muted uppercase tracking-wide mb-1">System Suggestion</p>
                             <div class="flex items-baseline gap-1">
-                                <p class="text-2xl font-bold text-silver">{{ number_format($productionPlan->recommended_production_qty ?? 0) }}</p>
+                                <p class="font-mono text-2xl font-bold text-silver">{{ number_format($productionPlan->recommended_production_qty ?? 0) }}</p>
                                 <span class="text-[10px] text-muted">units</span>
                             </div>
                         </div>
@@ -148,7 +148,7 @@
                             <div class="bg-petronas/10 rounded-lg p-4 border border-petronas min-w-45">
                                 <p class="text-[10px] text-slate-800 uppercase tracking-wide mb-1 font-bold">Final Approved</p>
                                 <div class="flex items-baseline gap-1">
-                                    <p class="text-2xl font-bold text-slate-800">{{ number_format($productionPlan->approved_production_qty) }}</p>
+                                    <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($productionPlan->approved_production_qty) }}</p>
                                     <span class="text-[10px] text-slate-800/70">units</span>
                                 </div>
                             </div>

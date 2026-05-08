@@ -214,11 +214,11 @@
                             </td>
 
                             <td class="px-4 py-3 text-right font-bold text-silver">
-                                {{ number_format($so->grand_total, 0, ',', '.') }}
+                                Rp {{ number_format($so->grand_total, 2, ',', '.') }}
                             </td>
 
                             <td class="px-4 py-3 text-right font-mono text-xs {{ $so->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }}">
-                                {{ number_format($so->remaining_balance, 0, ',', '.') }}
+                                Rp {{ number_format($so->remaining_balance, 2, ',', '.') }}
                             </td>
 
                             <td class="px-4 py-3 text-center">

@@ -86,18 +86,18 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Stok Fisik ({{ $pUnit }})</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor) }}</p>
+                <p class="font-mono text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor) }}</p>
             </div>
             
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Incoming Order</p>
-                <p class="text-2xl font-bold text-blue-400">{{ number_format($material->ordered_stock / $factor) }} <span class="text-xs text-muted font-normal">{{ $pUnit }}</span></p>
+                <p class="font-mono text-2xl font-bold text-blue-400">{{ number_format($material->ordered_stock / $factor) }} <span class="font-mono text-xs text-muted font-normal">{{ $pUnit }}</span></p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Safety Stock</p>
                 <div class="flex items-end gap-1">
-                    <p class="text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor) }}</p>
+                    <p class="font-mono text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor) }}</p>
                     <span class="text-xs text-muted mb-1">{{ $pUnit }}</span>
                 </div>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
@@ -107,7 +107,7 @@
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Estimasi Harga / {{ $pUnit }}</p>
-                <p class="text-2xl font-bold text-slate-800">Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
+                <p class="font-mono text-2xl font-bold text-slate-800">Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
             </div>
         </div>
 
@@ -129,7 +129,7 @@
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <span class="text-xs text-muted block">Rata-rata Aktual</span>
-                        <span class="text-lg font-bold text-slate-800">{{ number_format($material->lead_time_average, 1) }} Hari</span>
+                        <span class="font-mono text-lg font-bold text-slate-800">{{ number_format($material->lead_time_average, 1) }} Hari</span>
                     </div>
                 </div>
             </div>

@@ -126,8 +126,8 @@
                                 {{ $product->current_stock - $product->committed_stock }}
                             </td>
                             <td class="px-3 py-2 text-center text-muted text-xs">{{ $product->safety_stock }}</td>
-                            <td class="px-3 py-2 text-center">Rp {{ number_format($product->cost_price, 2, ',', '.') }}</td>
-                            <td class="px-3 py-2 text-center">Rp {{ number_format($product->price, 2, ',', '.') }}</td>
+                            <td class="font-mono px-3 py-2 text-center">Rp {{ number_format($product->cost_price, 2, ',', '.') }}</td>
+                            <td class="font-mono px-3 py-2 text-center">Rp {{ number_format($product->price, 2, ',', '.') }}</td>
                             <td class="px-3 py-2 text-center space-x-2">
                                 <a href="{{ route('products.show', $product->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-blackBase hover:bg-petronas/90 transition">👁️</a>
                                 

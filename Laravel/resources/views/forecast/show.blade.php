@@ -89,7 +89,7 @@
             {{-- Current Stock Info (Mirip Product Show) --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">On Hand Stock</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($product->current_stock) }}</p>
+                <p class="font-mono text-2xl font-bold text-silver">{{ number_format($product->current_stock) }}</p>
             </div>
 
             {{-- Target Period Card --}}

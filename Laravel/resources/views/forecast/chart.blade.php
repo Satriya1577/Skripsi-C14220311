@@ -68,7 +68,7 @@
         {{-- Card 1: Forecast Qty --}}
         <div class="bg-carbon rounded-lg p-4 border border-petronas/50 shadow-[0_0_10px_rgba(0,161,155,0.1)]">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Forecast Quantity</p>
-            <p class="text-2xl font-bold text-slate-800">{{ number_format($productionPlan->forecast_qty) }}</p>
+            <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($productionPlan->forecast_qty) }}</p>
             <p class="text-[10px] text-muted border-t border-white/10 mt-2 pt-2">
                 Safety Stock: {{ number_format($productionPlan->safety_stock_snapshot) }}
             </p>
@@ -95,7 +95,7 @@
         {{-- Card 3: RMSE --}}
         <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Model Accuracy (RMSE)</p>
-            <p class="text-2xl font-bold text-silver">{{ number_format($metrics['rmse'], 4) }}</p>
+            <p class="font-mono text-2xl font-bold text-silver">{{ number_format($metrics['rmse'], 4) }}</p>
             <p class="text-[10px] text-muted mt-2">Root Mean Squared Error</p>
         </div>
 

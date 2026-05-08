@@ -222,12 +222,12 @@
 
                             {{-- Grand Total --}}
                             <td class="px-4 py-3 text-right font-bold text-silver">
-                                Rp {{ number_format($po->grand_total, 0, ',', '.') }}
+                                Rp {{ number_format($po->grand_total, 2, ',', '.') }}
                             </td>
 
                             {{-- Balance (Sisa Hutang) --}}
                             <td class="px-4 py-3 text-right font-mono text-xs {{ $po->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }}">
-                                {{ number_format($po->remaining_balance, 0, ',', '.') }}
+                                Rp {{ number_format($po->remaining_balance, 2, ',', '.') }}
                             </td>
 
                             {{-- Action --}}

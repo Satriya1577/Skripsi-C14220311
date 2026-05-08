@@ -73,18 +73,18 @@
             {{-- Stock Info --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">On Hand Stock</p>
-                <p class="text-2xl font-bold text-silver">{{ number_format($product->current_stock, 0) }}</p>
+                <p class="font-mono text-2xl font-bold text-silver">{{ number_format($product->current_stock, 0) }}</p>
             </div>
             
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Reserved Stock</p>
-                <p class="text-2xl font-bold text-slate-800">{{ number_format($product->committed_stock, 0) }}</p>
+                <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($product->committed_stock, 0) }}</p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Available Stock</p>
                 <div class="flex items-end gap-1">
-                    <p class="text-2xl font-bold text-slate-800">{{ number_format($product->current_stock - $product->committed_stock, 0) }}</p>
+                    <p class="font-mono text-2xl font-bold text-slate-800">{{ number_format($product->current_stock - $product->committed_stock, 0) }}</p>
                 </div>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
                     Safety Stock: {{ number_format($product->safety_stock, 0) }}
@@ -93,7 +93,7 @@
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Selling Price</p>
-                <p class="text-2xl font-bold text-silver">Rp {{ number_format($product->price, 2, ',', '.') }}</p>
+                <p class="font-mono text-2xl font-bold text-silver">Rp {{ number_format($product->price, 2, ',', '.') }}</p>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
                     HPP: Rp {{ number_format($product->cost_price, 2, ',', '.') }}
                 </p>
@@ -118,7 +118,7 @@
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <span class="text-xs text-muted block">Rata-rata Aktual</span>
-                        <span class="text-lg font-bold text-slate-800">{{ number_format($product->lead_time_average, 1, ',', '.') }} Hari</span>
+                        <span class="font-mono text-lg font-bold text-slate-800">{{ number_format($product->lead_time_average, 1, ',', '.') }} Hari</span>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,7 @@
                 <div class="flex gap-6 items-center">
                     <div>
                         <span class="text-xs text-muted block">Batch Size (Lot)</span>
-                        <span class="text-lg font-bold text-silver">{{ number_format($product->batch_size, 0, ',', '.') }} Pcs</span>
+                        <span class="font-mono text-lg font-bold text-silver">{{ number_format($product->batch_size, 0, ',', '.') }} Pcs</span>
                     </div>
                     {{-- Placeholder untuk info lain jika ada, misal Machine Capacity --}}
                 </div>
@@ -202,7 +202,7 @@
                         <tr class="hover:bg-carbon transition-colors group">
                             <td class="px-4 py-3 font-mono text-slate-800">{{ $pm->material->code }}</td>
                             <td class="px-4 py-3 text-silver">{{ $pm->material->name }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-slate-800">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
+                            <td class="font-mono px-4 py-3 text-right font-bold text-slate-800">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
                             <td class="px-4 py-3 text-center text-muted">{{ $pm->material->unit }}</td>
                             <td class="px-4 py-3 text-right text-muted font-mono text-xs">
                                 Rp {{ number_format($pm->amount_needed * $pm->material->price_per_unit, 2, ',', '.') }}

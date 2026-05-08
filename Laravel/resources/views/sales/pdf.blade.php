@@ -98,7 +98,7 @@
                     {{ $item->product_packaging_snapshot ?? $item->product->packaging ?? '-' }}
                 </td>
                 <td style="text-align: center;">{{ $item->quantity }}</td>
-                <td style="text-align: right;">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                <td style="text-align: right;">Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
                 
                 {{-- TAMPILAN DISKON --}}
                 <td style="text-align: center;">
@@ -109,7 +109,7 @@
                     @endif
                 </td>
 
-                <td style="text-align: right;">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                <td style="text-align: right;">Rp {{ number_format($item->subtotal, 2, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -119,7 +119,7 @@
         <div class="totals">
             <div class="totals-row">
                 <span class="totals-label">Subtotal</span>
-                <span class="totals-value">Rp {{ number_format($salesOrder->items->sum('subtotal'), 0, ',', '.') }}</span>
+                <span class="font-mono totals-value">Rp {{ number_format($salesOrder->items->sum('subtotal'), 2, ',', '.') }}</span>
             </div>
             
             <div class="totals-row">
@@ -128,7 +128,7 @@
                 </span>
                 <span class="totals-value">
                     @if($salesOrder->shipping_payment_type == 'bill_to_customer')
-                        Rp {{ number_format($salesOrder->shipping_cost, 0, ',', '.') }}
+                        Rp {{ number_format($salesOrder->shipping_cost, 2, ',', '.') }}
                     @else
                         Rp 0 (Free)
                     @endif
@@ -137,7 +137,7 @@
 
             <div class="totals-row grand-total">
                 <span class="totals-label">GRAND TOTAL</span>
-                <span class="totals-value">Rp {{ number_format($salesOrder->grand_total, 0, ',', '.') }}</span>
+                <span class="font-mono totals-value">Rp {{ number_format($salesOrder->grand_total, 2, ',', '.') }}</span>
             </div>
         </div>
     </div>

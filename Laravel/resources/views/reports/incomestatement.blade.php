@@ -90,7 +90,7 @@
             <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
                 <div class="absolute right-0 top-0 h-full w-1.5 bg-petronas"></div>
                 <p class="text-xs font-bold text-muted uppercase tracking-widest">Laba Kotor (Gross Profit)</p>
-                <h3 class="text-3xl font-bold text-slate-800 mt-2 font-mono">Rp {{ number_format($grossProfit, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 font-mono">Rp {{ number_format($grossProfit, 2, ',', '.') }}</h3>
                 <p class="text-xs font-bold mt-2 tracking-wide {{ $profitMargin > 0 ? 'text-success' : 'text-danger' }}">
                     Margin Keuntungan: {{ number_format($profitMargin, 2) }}%
                 </p>
@@ -131,12 +131,12 @@
                             
                             {{-- PENDAPATAN --}}
                             <td class="px-4 py-3 text-right font-mono text-success font-bold">
-                                Rp {{ number_format($detail->total_revenue, 0, ',', '.') }}
+                                Rp {{ number_format($detail->total_revenue, 2, ',', '.') }}
                             </td>
                             
                             {{-- HPP --}}
                             <td class="px-4 py-3 text-right font-mono text-danger font-bold">
-                                Rp {{ number_format($detail->total_cogs, 0, ',', '.') }}
+                                Rp {{ number_format($detail->total_cogs, 2, ',', '.') }}
                             </td>
                             
                             {{-- LABA KOTOR --}}
@@ -158,7 +158,7 @@
                         <td class="px-4 py-4 text-right tracking-widest text-xs text-muted" colspan="2">GRAND TOTAL</td>
                         <td class="px-4 py-4 text-right font-mono text-success">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
                         <td class="px-4 py-4 text-right font-mono text-danger">Rp {{ number_format($totalCogs, 0, ',', '.') }}</td>
-                        <td class="px-4 py-4 text-right font-mono text-slate-800 text-base">Rp {{ number_format($grossProfit, 0, ',', '.') }}</td>
+                        <td class="px-4 py-4 text-right font-mono text-slate-800 text-base">Rp {{ number_format($grossProfit, 2, ',', '.') }}</td>
                     </tr>
                 </tfoot>
             </table>

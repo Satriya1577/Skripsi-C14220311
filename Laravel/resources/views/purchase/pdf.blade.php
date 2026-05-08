@@ -103,9 +103,9 @@
                 
                 <td style="text-align: center;">{{ $item->quantity + 0 }}</td>
                 
-                <td style="text-align: right;">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                <td style="text-align: right;">Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
                 
-                <td style="text-align: right;">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                <td style="text-align: right;">Rp {{ number_format($item->subtotal, 2, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -115,7 +115,7 @@
         <div class="totals">
             <div class="totals-row">
                 <span class="totals-label">Subtotal</span>
-                <span class="totals-value">Rp {{ number_format($purchaseOrder->items->sum('subtotal'), 0, ',', '.') }}</span>
+                <span class="font-mono totals-value">Rp {{ number_format($purchaseOrder->items->sum('subtotal'), 2, ',', '.') }}</span>
             </div>
             
             <div class="totals-row">
@@ -127,7 +127,7 @@
                 </span>
                 <span class="totals-value">
                     @if($purchaseOrder->shipping_terms == 'FOB_shipping_point')
-                        Rp {{ number_format($purchaseOrder->shipping_cost, 0, ',', '.') }}
+                        Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}
                     @else
                         Rp 0 (Vendor)
                     @endif
@@ -136,7 +136,7 @@
 
             <div class="totals-row grand-total">
                 <span class="totals-label">TOTAL ORDER</span>
-                <span class="totals-value">Rp {{ number_format($purchaseOrder->grand_total, 0, ',', '.') }}</span>
+                <span class="font-mono totals-value">Rp {{ number_format($purchaseOrder->grand_total, 2, ',', '.') }}</span>
             </div>
         </div>
     </div>

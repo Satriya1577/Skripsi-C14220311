@@ -72,20 +72,20 @@
             {{-- Grand Total --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Total Tagihan (Grand Total)</p>
-                <p class="text-xl font-bold text-silver">Rp {{ number_format($salesOrder->grand_total, 0, ',', '.') }}</p>
+                <p class="font-mono text-xl font-bold text-silver">Rp {{ number_format($salesOrder->grand_total, 2, ',', '.') }}</p>
             </div>
 
             {{-- Sudah Dibayar --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Sudah Dibayar</p>
-                <p class="text-xl font-bold text-success">Rp {{ number_format($salesOrder->paid_amount, 0, ',', '.') }}</p>
+                <p class="font-mono text-xl font-bold text-success">Rp {{ number_format($salesOrder->paid_amount, 0, ',', '.') }}</p>
             </div>
 
             {{-- Sisa Hutang --}}
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Sisa Hutang</p>
                 <p class="text-xl font-bold {{ $salesOrder->remaining_balance > 0 ? 'text-danger' : 'text-muted' }}">
-                    Rp {{ number_format($salesOrder->remaining_balance, 0, ',', '.') }}
+                    Rp {{ number_format($salesOrder->remaining_balance, 2, ',', '.') }}
                 </p>
             </div>
         </div>

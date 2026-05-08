@@ -107,12 +107,12 @@
                 </div>
                 <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                     <p class="text-xs text-muted uppercase tracking-wide mb-1">Grand Total</p>
-                    <p class="text-xl font-bold text-slate-800">Rp {{ number_format($purchaseOrder->grand_total, 0, ',', '.') }}</p>
+                    <p class="font-mono text-xl font-bold text-slate-800">Rp {{ number_format($purchaseOrder->grand_total, 2, ',', '.') }}</p>
                 </div>
                 <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                     <p class="text-xs text-muted uppercase tracking-wide mb-1">Sisa Hutang</p>
                     <p class="text-lg font-bold {{ $purchaseOrder->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }}">
-                        Rp {{ number_format($purchaseOrder->remaining_balance, 0, ',', '.') }}
+                        Rp {{ number_format($purchaseOrder->remaining_balance, 2, ',', '.') }}
                     </p>
                 </div>
             </div>
@@ -217,7 +217,7 @@
                     <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                         <p class="text-xs text-muted uppercase tracking-wide mb-1">Biaya Realisasi</p>
                         <p class="text-lg font-bold text-silver">
-                            Rp {{ number_format($purchaseOrder->shipping_cost, 0, ',', '.') }}
+                            Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -312,11 +312,11 @@
                             </td>
 
                             {{-- KOLOM COST --}}
-                            <td class="px-4 py-3 text-right text-muted font-mono">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right text-muted font-mono">Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
                             
                             {{-- HAPUS CELL DISC DI SINI --}}
 
-                            <td class="px-4 py-3 text-right text-slate-800 font-bold font-mono">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 text-right text-slate-800 font-bold font-mono">Rp {{ number_format($item->subtotal, 2, ',', '.') }}</td>
                             
                             @if($purchaseOrder->status == 'draft')
                             <td class="px-4 py-3 text-center text-muted text-xs italic">
@@ -332,7 +332,7 @@
                             <td colspan="4" class="px-4 py-2 text-right text-muted text-xs uppercase">Items Subtotal</td>
                             <td class="px-4 py-2 text-right text-silver font-mono text-sm">
                                 @php $itemsTotal = $purchaseOrder->items->sum('subtotal'); @endphp
-                                Rp {{ number_format($itemsTotal, 0, ',', '.') }}
+                                Rp {{ number_format($itemsTotal, 2, ',', '.') }}
                             </td>
                             @if($purchaseOrder->status == 'draft') <td></td> @endif
                         </tr>
@@ -340,16 +340,16 @@
                             <td colspan="4" class="px-4 py-2 text-right text-muted text-xs uppercase">Shipping Cost <span class="text-[10px] text-slate-800 ml-1">({{ $purchaseOrder->shipping_terms == 'FOB_shipping_point' ? 'Kita Tanggung' : 'Supplier' }})</span></td>
                             <td class="px-4 py-2 text-right text-silver font-mono text-sm">
                                 @if($purchaseOrder->shipping_terms == 'FOB_shipping_point') 
-                                    Rp {{ number_format($purchaseOrder->shipping_cost, 0, ',', '.') }}
+                                    Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}
                                 @else 
-                                    <span class="text-muted line-through">Rp {{ number_format($purchaseOrder->shipping_cost, 0, ',', '.') }}</span> <span class="text-[10px] text-slate-800 block">Free</span> 
+                                    <span class="font-mono text-muted line-through">Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}</span> <span class="font-mono text-[10px] text-slate-800 block">Free</span> 
                                 @endif
                             </td>
                             @if($purchaseOrder->status == 'draft') <td></td> @endif
                         </tr>
                         <tr class="border-t border-carbon">
                             <td colspan="4" class="px-4 py-4 text-right text-silver font-bold uppercase text-xs">Total Amount</td>
-                            <td class="px-4 py-4 text-right text-slate-800 font-extrabold font-mono text-lg">Rp <span id="grandTotalDisplay">{{ number_format($purchaseOrder->grand_total, 0, ',', '.') }}</span></td>
+                            <td class="px-4 py-4 text-right text-slate-800 font-extrabold font-mono text-lg">Rp <span id="grandTotalDisplay">{{ number_format($purchaseOrder->grand_total, 2, ',', '.') }}</span></td>
                             @if($purchaseOrder->status == 'draft') <td></td> @endif
                         </tr>
                     </tfoot>
@@ -494,7 +494,7 @@
     }
 
     function formatRupiah(angka) {
-        return new Intl.NumberFormat('id-ID').format(angka);
+        return new Intl.NumberFormat('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(angka);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
