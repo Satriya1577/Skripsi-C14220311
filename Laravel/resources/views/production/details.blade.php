@@ -211,13 +211,13 @@
 
         <div class="overflow-x-auto rounded-lg border border-carbon">
           <table class="w-full text-sm text-left">
-            <thead class="bg-carbon text-muted text-[10px] uppercase tracking-wider">
+            <thead class="bg-carbon text-black text-[10px] uppercase tracking-wider">
               <tr>
                 <th class="px-4 py-3 font-semibold">Material Code & Name</th>
                 <th class="px-4 py-3 font-semibold text-right">Qty Needed</th>
                 <th class="px-4 py-3 font-semibold text-right">Current Stock</th>
                 <th class="px-4 py-3 font-semibold text-right">Purchase OTW</th>
-                <th class="px-4 py-3 font-semibold text-right text-slate-800">Purchase Suggestion</th>
+                <th class="px-4 py-3 font-semibold text-right text-black">Purchase Suggestion</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-carbon/50">
@@ -296,12 +296,12 @@
 
       <div class="overflow-x-auto rounded-lg border border-carbon">
         <table class="w-full text-sm text-left">
-          <thead class="bg-carbon text-muted text-xs uppercase tracking-wider">
+          <thead class="bg-carbon text-black text-xs uppercase tracking-wider">
             <tr>
               <th class="px-4 py-3 font-medium">Batch Number</th>
               <th class="px-4 py-3 font-medium">Start Date</th>
               <th class="px-4 py-3 font-medium">End Date</th>
-              <th class="px-4 py-3 font-medium text-right text-slate-800">Realized Qty</th>
+              <th class="px-4 py-3 font-medium text-right text-black">Realized Qty</th>
               <th class="px-4 py-3 font-medium text-right">Target Qty Per Batch</th>
               <th class="px-4 py-3 font-medium text-center">Status</th>
               <th class="px-4 py-3 font-medium text-center">Action</th>
@@ -355,7 +355,7 @@
                     {{-- Ubah form menjadi tag <a> biasa --}}
                     <a href="{{ route('production.showRealization', $productionBatch) }}" 
                       title="Input Realization" 
-                      class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-blue-600 hover:border-petronas hover:bg-carbon transition shadow-sm">
+                      class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-slate-800 hover:text-blue-600 hover:border-petronas hover:bg-carbon transition shadow-sm">
                       
                       {{-- Icon Mata (View / Input) --}}
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">

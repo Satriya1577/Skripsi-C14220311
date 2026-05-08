@@ -211,7 +211,7 @@
       {{-- Action Buttons --}}
       <div class="md:col-span-4 flex flex-wrap justify-end gap-3 pt-4 border-t border-carbon"> 
         <a href="{{ route('products.index') }}" 
-          class="px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition text-center inline-block">
+          class="px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition text-center inline-block">
           Cancel
         </a>
         
@@ -236,8 +236,8 @@
       minInput.readOnly = false;
       maxInput.readOnly = false;
       
-      minInput.classList.remove('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
-      maxInput.classList.remove('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
+      minInput.classList.remove('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
+      maxInput.classList.remove('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
       minInput.classList.add('bg-carbon', 'text-silver');
       maxInput.classList.add('bg-carbon', 'text-silver');
       
@@ -246,8 +246,8 @@
       minInput.readOnly = true;
       maxInput.readOnly = true;
       
-      minInput.classList.add('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
-      maxInput.classList.add('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
+      minInput.classList.add('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
+      maxInput.classList.add('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
       minInput.classList.remove('bg-carbon', 'text-silver');
       maxInput.classList.remove('bg-carbon', 'text-silver');
       

@@ -179,14 +179,14 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">Realization History</h2>
-      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">
+      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-slate-800 border border-carbon">
         Total Entries: {{ $realizations->count() ?? 0 }}
       </span>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-carbon">
       <table class="w-full text-sm text-left">
-        <thead class="bg-carbon text-muted text-xs uppercase tracking-wider">
+        <thead class="bg-carbon text-black text-xs uppercase tracking-wider">
           <tr>
             <th class="px-4 py-3 font-medium w-16 text-center">No</th>
             <th class="px-4 py-3 font-medium">Tanggal Produksi</th>

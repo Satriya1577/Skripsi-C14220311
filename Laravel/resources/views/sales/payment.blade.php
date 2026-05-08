@@ -214,12 +214,12 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Tanggal</th>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Metode</th>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">No. Ref</th>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Catatan</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Jumlah</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Action</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Tanggal</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Metode</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">No. Ref</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Catatan</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Jumlah</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">

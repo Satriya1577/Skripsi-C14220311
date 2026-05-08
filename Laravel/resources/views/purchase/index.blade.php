@@ -160,14 +160,14 @@
       <table class="w-full text-sm border-collapse">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Date</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">PO No.</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Supplier</th>
-            <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Status</th>
-            <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
-            <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Total</th>
-            <th class="px-4 py-3 text-right text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Balance</th>
-            <th class="px-4 py-3 text-center text-muted text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Date</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">PO No.</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Supplier</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Status</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
+            <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Total</th>
+            <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Balance</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -197,7 +197,7 @@
                     'ordered'  => 'bg-blue-900/30 text-blue-400 border-blue-800',  // OTW
                     'received' => 'bg-blue-200 text-blue-800 border-petronas',  // Done
                     'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
-                    default   => 'bg-carbon text-muted'
+                    default   => 'bg-carbon text-slate-800'
                   };
                 @endphp
                 <span class="px-2 py-1 rounded text-[10px] font-bold uppercase border {{ $statusColor }}">

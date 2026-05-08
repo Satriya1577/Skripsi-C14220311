@@ -106,7 +106,7 @@
       {{-- <div>
         <label class="text-xs text-muted uppercase tracking-wide">Safety Stock</label>
         <input type="number" name="safety_stock" id="safety_stock" value="{{ $material->safety_stock ?? 0 }}" readonly
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-muted cursor-not-allowed focus:outline-none"
+          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-slate-800 cursor-not-allowed focus:outline-none"
           title="Dihitung otomatis oleh sistem">
       </div>
 
@@ -269,7 +269,7 @@
       {{-- Action Buttons --}}
       <div class="md:col-span-4 flex justify-end gap-3 pt-4 border-t border-carbon">
         <a href="{{ route('materials.index') }}" 
-          class="px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition inline-block text-center">
+          class="px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition inline-block text-center">
           Cancel
         </a>
         
@@ -295,16 +295,16 @@
     if (isManual) {
       minInput.readOnly = false;
       maxInput.readOnly = false;
-      minInput.classList.remove('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
-      maxInput.classList.remove('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
+      minInput.classList.remove('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
+      maxInput.classList.remove('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
       minInput.classList.add('bg-carbon', 'text-silver');
       maxInput.classList.add('bg-carbon', 'text-silver');
       infoContainer.classList.add('hidden');
     } else {
       minInput.readOnly = true;
       maxInput.readOnly = true;
-      minInput.classList.add('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
-      maxInput.classList.add('text-muted', 'cursor-not-allowed', 'bg-carbonSoft');
+      minInput.classList.add('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
+      maxInput.classList.add('text-slate-800', 'cursor-not-allowed', 'bg-carbonSoft');
       minInput.classList.remove('bg-carbon', 'text-silver');
       maxInput.classList.remove('bg-carbon', 'text-silver');
       infoContainer.classList.remove('hidden');

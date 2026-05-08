@@ -111,7 +111,7 @@
       {{-- Action Buttons --}}
       <div class="md:col-span-4 flex flex-wrap justify-end gap-3 pt-2"> 
         <button type="button" id="cancelBtn" onclick="resetForm()"
-          class="hidden px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">
+          class="hidden px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">
           Cancel
         </button>
         
@@ -130,12 +130,12 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-3 py-2 text-left text-muted">Company</th>
-            <th class="px-3 py-2 text-left text-muted">Contact Person</th>
-            <th class="px-3 py-2 text-center text-muted">Type</th> 
-            <th class="px-3 py-2 text-left text-muted">Contact Info</th> 
-            <th class="px-3 py-2 text-left text-muted">Address</th>
-            <th class="px-3 py-2 text-center text-muted">Actions</th>
+            <th class="px-3 py-2 text-left text-black">Company</th>
+            <th class="px-3 py-2 text-left text-black">Contact Person</th>
+            <th class="px-3 py-2 text-center text-black">Type</th> 
+            <th class="px-3 py-2 text-left text-black">Contact Info</th> 
+            <th class="px-3 py-2 text-left text-black">Address</th>
+            <th class="px-3 py-2 text-center text-black">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -232,7 +232,7 @@
     <h3 class="text-lg font-bold text-danger mb-2">Confirm Deletion</h3>
     <p class="text-sm text-muted mb-6">Are you sure you want to delete this partner? <br><span class="text-red-400 font-semibold">Related transactions might be affected.</span></p>
     <div class="flex justify-end gap-3">
-      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">Cancel</button>
+      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">Cancel</button>
       <button onclick="confirmDelete()" class="px-5 py-2 rounded-lg bg-danger text-blackBase font-bold hover:bg-red-600 transition">Delete</button>
     </div>
   </div>

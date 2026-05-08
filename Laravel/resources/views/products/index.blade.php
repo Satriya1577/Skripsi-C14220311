@@ -72,15 +72,15 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-3 py-2 text-center text-muted">Code</th>
-            <th class="px-3 py-2 text-left text-muted">Name / Specs</th> 
-            <th class="px-3 py-2 text-center text-muted">On Hand</th> 
-            <th class="px-3 py-2 text-center text-slate-800 font-semibold">Reserved</th> 
-            <th class="px-3 py-2 text-center text-silver font-bold border-l border-carbon">Available</th> 
-            <th class="px-3 py-2 text-center text-muted">Safety</th>
-            <th class="px-3 py-2 text-center text-muted">HPP</th>
-            <th class="px-3 py-2 text-center text-muted">Selling Price</th>
-            <th class="px-3 py-2 text-center text-muted">Actions</th>
+            <th class="px-3 py-2 text-center text-black">Code</th>
+            <th class="px-3 py-2 text-left text-black">Name / Specs</th> 
+            <th class="px-3 py-2 text-center text-black">On Hand</th> 
+            <th class="px-3 py-2 text-center text-black font-semibold">Reserved</th> 
+            <th class="px-3 py-2 text-center text-black font-bold border-l border-carbon">Available</th> 
+            <th class="px-3 py-2 text-center text-black">Safety</th>
+            <th class="px-3 py-2 text-center text-black">HPP</th>
+            <th class="px-3 py-2 text-center text-black">Selling Price</th>
+            <th class="px-3 py-2 text-center text-black">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -160,7 +160,7 @@
     <h3 class="text-lg font-bold text-danger mb-2">Confirm Deletion</h3>
     <p class="text-sm text-muted mb-6">Are you sure? <span class="text-red-400 font-semibold">Cannot be undone.</span></p>
     <div class="flex justify-end gap-3">
-      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">Cancel</button>
+      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">Cancel</button>
       <button onclick="confirmDelete()" class="px-5 py-2 rounded-lg bg-danger text-blackBase font-bold hover:bg-red-600 transition">Delete</button>
     </div>
   </div>

@@ -78,7 +78,7 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
     <div class="flex justify-between items-center">
       <h2 class="text-lg font-bold text-slate-800">Informasi Material (Satuan Beli)</h2>
-      <div class="text-xs text-muted bg-carbon px-3 py-1 rounded-full border border-carbon/50">
+      <div class="text-xs text-slate-800 bg-carbon px-3 py-1 rounded-full border border-carbon/50">
         Kategori: <span class="text-silver font-bold uppercase">{{ $material->category_type }}</span>
       </div>
     </div>
@@ -214,12 +214,12 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-3 py-2 text-left text-muted">Date</th>
-            <th class="px-3 py-2 text-left text-muted">Type</th>
-            <th class="px-3 py-2 text-right text-muted">Qty ({{ $pUnit }})</th>
-            <th class="px-3 py-2 text-right text-muted">Buy Price / {{ $pUnit }}</th>
-            <th class="px-3 py-2 text-right text-muted">Total</th>
-            <th class="px-3 py-2 text-left text-muted">Desc</th>
+            <th class="px-3 py-2 text-left text-black">Date</th>
+            <th class="px-3 py-2 text-left text-black">Type</th>
+            <th class="px-3 py-2 text-right text-black">Qty ({{ $pUnit }})</th>
+            <th class="px-3 py-2 text-right text-black">Buy Price / {{ $pUnit }}</th>
+            <th class="px-3 py-2 text-right text-black">Total</th>
+            <th class="px-3 py-2 text-left text-black">Desc</th>
           </tr>
         </thead>
         <tbody>

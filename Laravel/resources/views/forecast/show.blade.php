@@ -127,19 +127,19 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">History & Production Plans</h2>
-      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Total: {{ $productionPlans->total() }}</span>
+      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-slate-800 border border-carbon">Total: {{ $productionPlans->total() }}</span>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-carbon h-125"> {{-- Fixed Height Scroll --}}
       <table class="w-full text-sm relative">
         <thead class="bg-carbon sticky top-0 z-10"> {{-- Sticky Header --}}
           <tr>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Period</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Forecast</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Stock Snap</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Rec. Prod</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Status</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Action</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Period</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Forecast</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Stock Snap</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Rec. Prod</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Status</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50 overflow-y-auto">

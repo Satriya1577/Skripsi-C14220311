@@ -116,7 +116,7 @@
       {{-- Action Buttons --}}
       <div class="md:col-span-2 flex justify-end gap-3 pt-2 border-t border-carbon mt-2">
         <button type="button" id="cancelBtn" onclick="resetForm()"
-          class="hidden px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">
+          class="hidden px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">
           Cancel
         </button>
         
@@ -145,10 +145,10 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">User Info</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Role</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Joined At</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">User Info</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Role</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Joined At</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -175,7 +175,7 @@
                     'sales'   => 'bg-warning/20 text-warning border-warning/30',
                     'purchase'  => 'bg-blue-500/20 text-blue-400 border-blue-500/30',
                     'inventory' => 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-                    'none'    => 'bg-carbon text-muted border-carbon',
+                    'none'    => 'bg-carbon text-slate-800 border-carbon',
                     default   => 'bg-gray-700 text-silver border-gray-600',
                   };
                 @endphp
@@ -202,7 +202,7 @@
                   <form action="{{ route('settings.destroyUser', $user->id) }}" method="POST" class="inline">
                     @csrf @method('DELETE')
                     <button type="button" onclick="openDeleteModal(this)" 
-                      class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-muted hover:border-danger hover:text-danger hover:bg-danger/10 transition shadow-sm"
+                      class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-slate-800 hover:border-danger hover:text-danger hover:bg-danger/10 transition shadow-sm"
                       title="Delete User">
                       <i class="bi bi-trash-fill text-xs"></i>
                     </button>

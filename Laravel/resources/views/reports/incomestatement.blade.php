@@ -106,11 +106,11 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon text-xs uppercase tracking-wide">
           <tr>
-            <th class="px-4 py-3 text-left text-muted border-b border-carbonSoft">Nama Produk</th>
-            <th class="px-4 py-3 text-center text-muted border-b border-carbonSoft">Qty Terjual</th>
-            <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Pendapatan</th>
-            <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Total HPP</th>
-            <th class="px-4 py-3 text-right text-slate-800 border-b border-carbonSoft">Laba Kotor</th>
+            <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Nama Produk</th>
+            <th class="px-4 py-3 text-center text-black border-b border-carbonSoft">Qty Terjual</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Pendapatan</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Total HPP</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Laba Kotor</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">

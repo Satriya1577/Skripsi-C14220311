@@ -84,7 +84,7 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800">SARIMA Parameters & Performance</h2>
-      <div class="text-xs text-muted flex gap-4 bg-carbon px-3 py-1.5 rounded-lg border border-carbon">
+      <div class="text-xs text-slate-800 flex gap-4 bg-carbon px-3 py-1.5 rounded-lg border border-carbon">
         <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-petronas"></span> Non-Seasonal</span>
         <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-silver"></span> Seasonal</span>
       </div>
@@ -98,32 +98,32 @@
       <table class="w-full text-sm border-collapse">
         <thead class="bg-carbon text-xs uppercase tracking-wide">
           <tr>
-            <th rowspan="2" class="px-3 py-2 text-left text-muted align-middle border-b border-carbonSoft">Product Info</th>
-            <th colspan="7" class="px-1 py-2 text-center text-slate-800 border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
-            <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Raw Data</th>
-            <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Moving Avg</th>
-            <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
-            <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Box-Cox</th>
-            <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
+            <th rowspan="2" class="px-3 py-2 text-left text-black align-middle border-b border-carbonSoft">Product Info</th>
+            <th colspan="7" class="px-1 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
+            <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Raw Data</th>
+            <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Moving Avg</th>
+            <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
+            <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Box-Cox</th>
+            <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
           </tr>
           <tr>
-            <th class="px-1 py-2 text-center font-bold text-slate-800 border-l border-carbon">p</th>
-            <th class="px-1 py-2 text-center font-bold text-slate-800">d</th>
-            <th class="px-1 py-2 text-center font-bold text-slate-800">q</th>
-            <th class="px-1 py-2 text-center font-bold text-silver border-l border-carbon/50">P</th>
-            <th class="px-1 py-2 text-center font-bold text-silver">D</th>
-            <th class="px-1 py-2 text-center font-bold text-silver">Q</th>
-            <th class="px-1 py-2 text-center font-bold text-silver">s</th>
-            <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-muted">MAPE</th>
-            <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-muted">MAPE</th>
-            <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-muted">MAPE</th>
-            <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-muted">MAPE</th>
-            <th class="px-2 py-2 text-right text-muted border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-muted">MAPE</th>
+            <th class="px-1 py-2 text-center font-bold text-black border-l border-carbon">p</th>
+            <th class="px-1 py-2 text-center font-bold text-black">d</th>
+            <th class="px-1 py-2 text-center font-bold text-black">q</th>
+            <th class="px-1 py-2 text-center font-bold text-black border-l border-carbon/50">P</th>
+            <th class="px-1 py-2 text-center font-bold text-black">D</th>
+            <th class="px-1 py-2 text-center font-bold text-black">Q</th>
+            <th class="px-1 py-2 text-center font-bold text-black">s</th>
+            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
+            <th class="px-2 py-2 text-right text-black">MAPE</th>
+            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
+            <th class="px-2 py-2 text-right text-black">MAPE</th>
+            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
+            <th class="px-2 py-2 text-right text-black">MAPE</th>
+            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
+            <th class="px-2 py-2 text-right text-black">MAPE</th>
+            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
+            <th class="px-2 py-2 text-right text-black">MAPE</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -180,18 +180,18 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-3 py-3 text-left text-muted">Product Info</th>
-            <th class="px-1 py-3 text-center text-slate-800 font-bold">p</th>
-            <th class="px-1 py-3 text-center text-slate-800 font-bold">d</th>
-            <th class="px-1 py-3 text-center text-slate-800 font-bold">q</th>
-            <th class="px-1 py-3 text-center text-silver font-bold border-l border-carbonSoft">P</th>
-            <th class="px-1 py-3 text-center text-silver font-bold">D</th>
-            <th class="px-1 py-3 text-center text-silver font-bold">Q</th>
-            <th class="px-1 py-3 text-center text-silver font-bold">s</th> 
-            <th class="px-3 py-3 text-right text-muted border-l border-carbonSoft">RMSE</th>
-            <th class="px-3 py-3 text-right text-muted">MAPE</th>
-            <th class="px-3 py-3 text-left text-muted">Last Trained</th>
-            <th class="px-3 py-3 text-center text-muted">Actions</th>
+            <th class="px-3 py-3 text-left text-black">Product Info</th>
+            <th class="px-1 py-3 text-center text-black font-bold">p</th>
+            <th class="px-1 py-3 text-center text-black font-bold">d</th>
+            <th class="px-1 py-3 text-center text-black font-bold">q</th>
+            <th class="px-1 py-3 text-center text-black font-bold border-l border-carbonSoft">P</th>
+            <th class="px-1 py-3 text-center text-black font-bold">D</th>
+            <th class="px-1 py-3 text-center text-black font-bold">Q</th>
+            <th class="px-1 py-3 text-center text-black font-bold">s</th> 
+            <th class="px-3 py-3 text-right text-black border-l border-carbonSoft">RMSE</th>
+            <th class="px-3 py-3 text-right text-black">MAPE</th>
+            <th class="px-3 py-3 text-left text-black">Last Trained</th>
+            <th class="px-3 py-3 text-center text-black">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -249,7 +249,7 @@
                 <button form="form-{{ $product->id }}" type="submit" disabled
                     class="save-btn inline-flex items-center justify-center w-8 h-8 rounded 
                       transition-all duration-200
-                      bg-carbon text-muted cursor-not-allowed opacity-50"
+                      bg-carbon text-slate-800 cursor-not-allowed opacity-50"
                     title="Save Configuration">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
                     <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
@@ -300,7 +300,7 @@
       if(!saveBtn) return; // Prevent error if saveBtn doesn't exist in evaluation table
 
       const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
-      const inactiveClasses = ['bg-carbon', 'text-muted', 'cursor-not-allowed', 'opacity-50'];
+      const inactiveClasses = ['bg-carbon', 'text-slate-800', 'cursor-not-allowed', 'opacity-50'];
 
       // Simpan nilai asli
       inputs.forEach(input => {

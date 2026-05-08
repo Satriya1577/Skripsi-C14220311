@@ -107,7 +107,7 @@
 
       <div class="flex justify-end gap-3 pt-4">
         <a href="{{ route('settings.index') }}"
-          class="px-6 py-2 rounded-lg border border-muted text-muted hover:bg-carbon transition">
+          class="px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">
           Cancel
         </a>
 
@@ -122,7 +122,7 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon w-full">
     <div class="flex items-center gap-2 mb-4">
       <h2 class="text-lg font-bold text-slate-800">Panduan Kolom Excel</h2>
-      <span class="text-xs bg-carbon px-2 py-1 rounded text-muted">Format Wajib</span>
+      <span class="text-xs bg-carbon px-2 py-1 rounded text-slate-800">Format Wajib</span>
     </div>
 
     <p class="text-sm text-muted mb-6">
@@ -134,9 +134,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Nama Kolom</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Deskripsi</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Nama Kolom</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Deskripsi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -194,9 +194,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Nama Kolom</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Deskripsi</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Nama Kolom</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Deskripsi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -279,9 +279,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Nama Kolom</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Deskripsi</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Nama Kolom</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Deskripsi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -324,9 +324,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Nama Kolom</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Deskripsi</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Nama Kolom</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Deskripsi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -357,9 +357,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Nama Kolom</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Deskripsi</th>
-            <th class="px-4 py-3 text-left text-muted text-xs uppercase">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Nama Kolom</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Deskripsi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">

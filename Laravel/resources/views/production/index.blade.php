@@ -66,9 +66,9 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted font-medium uppercase text-xs tracking-wider">Product Code</th>
-            <th class="px-4 py-3 text-left text-muted font-medium uppercase text-xs tracking-wider">Product Name</th>
-            <th class="px-4 py-3 text-center text-muted font-medium uppercase text-xs tracking-wider">Action</th>
+            <th class="px-4 py-3 text-left text-black font-medium uppercase text-xs tracking-wider">Product Code</th>
+            <th class="px-4 py-3 text-left text-black font-medium uppercase text-xs tracking-wider">Product Name</th>
+            <th class="px-4 py-3 text-center text-black font-medium uppercase text-xs tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50 bg-carbonSoft">

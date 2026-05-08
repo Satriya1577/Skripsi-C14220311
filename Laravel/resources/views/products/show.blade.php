@@ -183,18 +183,18 @@
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
      <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">Current Recipe List</h2>
-      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Items: {{ $product->productMaterials->count() }}</span>
+      <span class="text-xs bg-carbon px-3 py-1 rounded-full text-slate-800 border border-carbon">Items: {{ $product->productMaterials->count() }}</span>
     </div>
     <div class="overflow-x-auto rounded-lg border border-carbon">
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Material Code</th>
-            <th class="px-4 py-3 text-left text-muted uppercase text-xs tracking-wider">Material Name</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Qty Usage</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Unit</th>
-            <th class="px-4 py-3 text-right text-muted uppercase text-xs tracking-wider">Est. Cost</th>
-            <th class="px-4 py-3 text-center text-muted uppercase text-xs tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Material Code</th>
+            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Material Name</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Qty Usage</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Unit</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Est. Cost</th>
+            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -275,7 +275,7 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi</h2>
       <div class="flex gap-2">
-        <span class="text-xs bg-carbon px-3 py-1.5 rounded-lg text-muted border border-carbon">
+        <span class="text-xs bg-carbon px-3 py-1.5 rounded-lg text-slate-800 border border-carbon">
           Total Data: {{ $transactions->total() }}
         </span>
       </div>
@@ -285,12 +285,12 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon text-xs uppercase tracking-wide">
           <tr>
-            <th class="px-4 py-3 text-left text-muted border-b border-carbonSoft">Tanggal</th>
-            <th class="px-4 py-3 text-center text-muted border-b border-carbonSoft">Tipe</th>
-            <th class="px-4 py-3 text-left text-muted border-b border-carbonSoft">Ref. & Keterangan</th>
-            <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Masuk</th>
-            <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Keluar</th>
-            <th class="px-4 py-3 text-right text-silver font-bold border-b border-carbonSoft bg-carbon/50">Saldo</th>
+            <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Tanggal</th>
+            <th class="px-4 py-3 text-center text-black border-b border-carbonSoft">Tipe</th>
+            <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Ref. & Keterangan</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Masuk</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Keluar</th>
+            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
