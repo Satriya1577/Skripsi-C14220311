@@ -32,13 +32,13 @@
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('production.index') }}" class="hover:text-petronas transition-colors">Production</a></li>
+            <li><a href="{{ route('production.index') }}" class="hover:text-blue-600 transition-colors">Production</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('production.showPlan', $product) }}" class="hover:text-petronas transition-colors">Plan-{{ $product->code }}</a></li>
+            <li><a href="{{ route('production.showPlan', $product) }}" class="hover:text-blue-600 transition-colors">Plan-{{ $product->code }}</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Plan-{{ $product->code }}-Details</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Plan-{{ $product->code }}-Details</li>
         </ol>
     </nav>
 
@@ -50,11 +50,11 @@
             <div>
                 <p class="text-xs uppercase tracking-widest text-muted mb-1">Plan details</p>
                 <div class="flex items-center gap-3">
-                    <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
+                    <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
                     {{-- Status Badge Ditambahkan Di Sini --}}
                     @php
                         $statusClass = match($productionPlan->status) {
-                            'approved' => 'bg-petronas/10 text-petronas border-petronas/30',
+                            'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
                             'rejected' => 'bg-danger/10 text-danger border-danger/30',
                             default    => 'bg-warning/10 text-warning border-warning/30',
                         };
@@ -82,16 +82,16 @@
                     <p class="text-xs text-muted uppercase tracking-wide">Approved Qty</p>
                     <p class="text-2xl font-bold text-slate-800">{{ number_format($targetQty, 0, ',', '.') }}</p>
                 </div>
-                <div class="p-3 bg-carbon rounded-lg text-petronas">🎯</div>
+                <div class="p-3 bg-carbon rounded-lg text-slate-800">🎯</div>
             </div>
             
             {{-- Card 2: Total Batched --}}
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Total Produced</p>
-                    <p class="text-2xl font-bold text-petronas">{{ number_format($totalProduced, 0, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalProduced, 0, ',', '.') }}</p>
                 </div>
-                <div class="p-3 bg-petronas/10 rounded-lg text-petronas">⚙️</div>
+                <div class="p-3 bg-petronas/10 rounded-lg text-slate-800">⚙️</div>
             </div>
             
             {{-- Card 3: Remaining Target --}}
@@ -114,7 +114,7 @@
         
         {{-- TABS NAVIGATION --}}
         <div class="flex border-b border-carbon bg-carbon/50 overflow-x-auto">
-            <button onclick="openTab(event, 'tab-plan')" id="btn-tab-plan" class="tab-btn px-6 py-4 text-sm font-bold uppercase tracking-wide border-b-2 border-petronas text-petronas transition-colors whitespace-nowrap">
+            <button onclick="openTab(event, 'tab-plan')" id="btn-tab-plan" class="tab-btn px-6 py-4 text-sm font-bold uppercase tracking-wide border-b-2 border-petronas text-slate-800 transition-colors whitespace-nowrap">
                 Production Plan & BOM
             </button>
             
@@ -132,7 +132,7 @@
             <div class="flex flex-col md:flex-row items-start md:items-end gap-6 mb-8">
                 {{-- Left: Info & Recommendation --}}
                 <div class="flex-1">
-                    <h2 class="text-lg font-bold text-petronas mb-1">Production Planning Target</h2>
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">Production Planning Target</h2>
                     <p class="text-sm text-muted mb-4">Recommendation based on forecast, safety stock, and on hand stock snapshot.</p>
                     
                     <div class="flex gap-4">
@@ -146,10 +146,10 @@
 
                         @if($productionPlan->status == 'approved')
                             <div class="bg-petronas/10 rounded-lg p-4 border border-petronas min-w-45">
-                                <p class="text-[10px] text-petronas uppercase tracking-wide mb-1 font-bold">Final Approved</p>
+                                <p class="text-[10px] text-slate-800 uppercase tracking-wide mb-1 font-bold">Final Approved</p>
                                 <div class="flex items-baseline gap-1">
                                     <p class="text-2xl font-bold text-slate-800">{{ number_format($productionPlan->approved_production_qty) }}</p>
-                                    <span class="text-[10px] text-petronas/70">units</span>
+                                    <span class="text-[10px] text-slate-800/70">units</span>
                                 </div>
                             </div>
                         @endif
@@ -186,7 +186,7 @@
                         </form>
                     @elseif($productionPlan->status == 'approved')
                         <div class="flex flex-col items-end justify-end h-full pb-2">
-                            <div class="flex items-center gap-2 text-petronas">
+                            <div class="flex items-center gap-2 text-slate-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                                 </svg>
@@ -204,7 +204,7 @@
             <div class="border-t border-carbon pt-6">
                 <div class="flex justify-between items-end mb-4">
                     <div>
-                        <h3 class="text-md font-bold text-petronas">Material Purchase Recommendations</h3>
+                        <h3 class="text-md font-bold text-slate-800">Material Purchase Recommendations</h3>
                         <p class="text-xs text-muted mt-1">Estimated raw material required (BOM) to fulfill the production suggestion or approved plan.</p>
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                                 <th class="px-4 py-3 font-semibold text-right">Qty Needed</th>
                                 <th class="px-4 py-3 font-semibold text-right">Current Stock</th>
                                 <th class="px-4 py-3 font-semibold text-right">Purchase OTW</th>
-                                <th class="px-4 py-3 font-semibold text-right text-petronas">Purchase Suggestion</th>
+                                <th class="px-4 py-3 font-semibold text-right text-slate-800">Purchase Suggestion</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-carbon/50">
@@ -278,7 +278,7 @@
         {{-- TAB CONTENT 2: BATCH LIST TABLE --}}
         <div id="tab-batch" class="tab-content p-6 hidden">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-                <h2 class="text-lg font-bold text-petronas">Batch History</h2>
+                <h2 class="text-lg font-bold text-slate-800">Batch History</h2>
                 
                 {{-- Form Create Batch Diletakkan Di Sini --}}
                 <form action="{{ route('production.storeBatch') }}" method="POST">
@@ -301,7 +301,7 @@
                             <th class="px-4 py-3 font-medium">Batch Number</th>
                             <th class="px-4 py-3 font-medium">Start Date</th>
                             <th class="px-4 py-3 font-medium">End Date</th>
-                            <th class="px-4 py-3 font-medium text-right text-petronas">Realized Qty</th>
+                            <th class="px-4 py-3 font-medium text-right text-slate-800">Realized Qty</th>
                             <th class="px-4 py-3 font-medium text-right">Target Qty Per Batch</th>
                             <th class="px-4 py-3 font-medium text-center">Status</th>
                             <th class="px-4 py-3 font-medium text-center">Action</th>
@@ -316,7 +316,7 @@
                                 $targetBatchQty = $productionBatch->qty_produced;
                             @endphp
                             <tr class="hover:bg-carbon/40 transition-colors group">
-                                <td class="px-4 py-4 font-mono font-bold text-petronas">
+                                <td class="px-4 py-4 font-mono font-bold text-slate-800">
                                     {{ $productionBatch->batch_number }}
                                 </td>
                                 <td class="px-4 py-4 text-silver">
@@ -355,7 +355,7 @@
                                         {{-- Ubah form menjadi tag <a> biasa --}}
                                         <a href="{{ route('production.showRealization', $productionBatch) }}" 
                                            title="Input Realization" 
-                                           class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-petronas hover:border-petronas hover:bg-carbon transition shadow-sm">
+                                           class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-blue-600 hover:border-petronas hover:bg-carbon transition shadow-sm">
                                             
                                             {{-- Icon Mata (View / Input) --}}
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
@@ -405,7 +405,7 @@
         // Reset styling semua tombol tab
         let tabBtns = document.getElementsByClassName("tab-btn");
         for (let i = 0; i < tabBtns.length; i++) {
-            tabBtns[i].classList.remove("border-petronas", "text-petronas");
+            tabBtns[i].classList.remove("border-petronas", "text-slate-800");
             tabBtns[i].classList.add("border-transparent", "text-muted");
         }
 
@@ -416,7 +416,7 @@
             targetTab.classList.add("block");
             
             evt.currentTarget.classList.remove("border-transparent", "text-muted");
-            evt.currentTarget.classList.add("border-petronas", "text-petronas");
+            evt.currentTarget.classList.add("border-petronas", "text-slate-800");
         }
     }
 

@@ -28,25 +28,25 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('settings.index') }}" class="hover:text-petronas transition-colors">Settings</a></li>
+            <li><a href="{{ route('settings.index') }}" class="hover:text-blue-600 transition-colors">Settings</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Model Configuration</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Model Configuration</li>
         </ol>
     </nav>
 
     @if (session('success'))
         <div class="bg-carbonSoft border border-petronas rounded-xl p-4 flex justify-between items-center">
-            <p class="text-sm text-petronas font-semibold">{{ session('success') }}</p>
-            <button onclick="this.parentElement.remove()" class="text-muted hover:text-petronas transition">✕</button>
+            <p class="text-sm text-slate-800 font-semibold">{{ session('success') }}</p>
+            <button onclick="this.parentElement.remove()" class="text-muted hover:text-blue-600 transition">✕</button>
         </div>
     @endif
 
     <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">System Configuration</p>
-            <h1 class="text-3xl font-extrabold text-petronas">Model Configuration</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">Model Configuration</h1>
             <p class="text-sm text-muted mt-1">Atur parameter SARIMA dan pantau akurasi model per produk</p>
         </div>
 
@@ -56,7 +56,7 @@
                 <button type="submit" id="btn-tune-all"
                     @if(isset($isGridSearchRunning) && $isGridSearchRunning) disabled @endif
                     onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama. Lanjutkan?')"
-                    class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-petronas font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
+                    class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-slate-800 font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
                     
                     @if(isset($isGridSearchRunning) && $isGridSearchRunning)
                         <div class="flex items-center gap-2">
@@ -83,7 +83,7 @@
 
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
-            <h2 class="text-lg font-bold text-petronas">SARIMA Parameters & Performance</h2>
+            <h2 class="text-lg font-bold text-slate-800">SARIMA Parameters & Performance</h2>
             <div class="text-xs text-muted flex gap-4 bg-carbon px-3 py-1.5 rounded-lg border border-carbon">
                 <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-petronas"></span> Non-Seasonal</span>
                 <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-silver"></span> Seasonal</span>
@@ -99,7 +99,7 @@
                 <thead class="bg-carbon text-xs uppercase tracking-wide">
                     <tr>
                         <th rowspan="2" class="px-3 py-2 text-left text-muted align-middle border-b border-carbonSoft">Product Info</th>
-                        <th colspan="7" class="px-1 py-2 text-center text-petronas border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
+                        <th colspan="7" class="px-1 py-2 text-center text-slate-800 border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
                         <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Raw Data</th>
                         <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Moving Avg</th>
                         <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
@@ -107,9 +107,9 @@
                         <th colspan="2" class="px-2 py-2 text-center text-silver border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
                     </tr>
                     <tr>
-                        <th class="px-1 py-2 text-center font-bold text-petronas border-l border-carbon">p</th>
-                        <th class="px-1 py-2 text-center font-bold text-petronas">d</th>
-                        <th class="px-1 py-2 text-center font-bold text-petronas">q</th>
+                        <th class="px-1 py-2 text-center font-bold text-slate-800 border-l border-carbon">p</th>
+                        <th class="px-1 py-2 text-center font-bold text-slate-800">d</th>
+                        <th class="px-1 py-2 text-center font-bold text-slate-800">q</th>
                         <th class="px-1 py-2 text-center font-bold text-silver border-l border-carbon/50">P</th>
                         <th class="px-1 py-2 text-center font-bold text-silver">D</th>
                         <th class="px-1 py-2 text-center font-bold text-silver">Q</th>
@@ -137,9 +137,9 @@
                             </td>
 
                             {{-- Parameters --}}
-                            <td class="px-1 py-2 text-center font-mono text-petronas border-l border-carbon">{{ $eval->raw_order_p }}</td>
-                            <td class="px-1 py-2 text-center font-mono text-petronas">{{ $eval->raw_order_d }}</td>
-                            <td class="px-1 py-2 text-center font-mono text-petronas">{{ $eval->raw_order_q }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-slate-800 border-l border-carbon">{{ $eval->raw_order_p }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-slate-800">{{ $eval->raw_order_d }}</td>
+                            <td class="px-1 py-2 text-center font-mono text-slate-800">{{ $eval->raw_order_q }}</td>
                             <td class="px-1 py-2 text-center font-mono text-silver border-l border-carbon/50">{{ $eval->raw_seasonal_P }}</td>
                             <td class="px-1 py-2 text-center font-mono text-silver">{{ $eval->raw_seasonal_D }}</td>
                             <td class="px-1 py-2 text-center font-mono text-silver">{{ $eval->raw_seasonal_Q }}</td>
@@ -181,9 +181,9 @@
                 <thead class="bg-carbon">
                     <tr>
                         <th class="px-3 py-3 text-left text-muted">Product Info</th>
-                        <th class="px-1 py-3 text-center text-petronas font-bold">p</th>
-                        <th class="px-1 py-3 text-center text-petronas font-bold">d</th>
-                        <th class="px-1 py-3 text-center text-petronas font-bold">q</th>
+                        <th class="px-1 py-3 text-center text-slate-800 font-bold">p</th>
+                        <th class="px-1 py-3 text-center text-slate-800 font-bold">d</th>
+                        <th class="px-1 py-3 text-center text-slate-800 font-bold">q</th>
                         <th class="px-1 py-3 text-center text-silver font-bold border-l border-carbonSoft">P</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">D</th>
                         <th class="px-1 py-3 text-center text-silver font-bold">Q</th>
@@ -210,9 +210,9 @@
                                 </div>
                             </td>
 
-                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_p" value="{{ $product->order_p }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
-                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_d" value="{{ $product->order_d }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
-                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_q" value="{{ $product->order_q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-petronas font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_p" value="{{ $product->order_p }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-slate-800 font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_d" value="{{ $product->order_d }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-slate-800 font-bold focus:outline-none focus:border-petronas transition-colors"></td>
+                            <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="order_q" value="{{ $product->order_q }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-slate-800 font-bold focus:outline-none focus:border-petronas transition-colors"></td>
 
                             <td class="px-1 py-2 text-center border-l border-carbon"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_P" value="{{ $product->seasonal_P }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>
                             <td class="px-1 py-2 text-center"><input form="form-{{ $product->id }}" type="number" min="0" max="5" name="seasonal_D" value="{{ $product->seasonal_D }}" class="w-10 text-center bg-blackBase border border-carbon rounded-lg py-1 text-silver font-medium focus:outline-none focus:border-petronas transition-colors"></td>

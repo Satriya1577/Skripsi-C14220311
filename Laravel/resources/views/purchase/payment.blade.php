@@ -32,11 +32,11 @@
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('purchases.index') }}" class="hover:text-petronas transition-colors">Purchase Orders</a></li>
+            <li><a href="{{ route('purchases.index') }}" class="hover:text-blue-600 transition-colors">Purchase Orders</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Payment</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Payment</li>
         </ol>
     </nav>
 
@@ -59,7 +59,7 @@
                     {{ $purchaseOrder->payment_status }}
                 </span>
             </div>
-            <h1 class="text-3xl font-extrabold text-petronas mt-1">Pembayaran: {{ $purchaseOrder->po_number }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800 mt-1">Pembayaran: {{ $purchaseOrder->po_number }}</h1>
             <p class="text-sm text-muted mt-1">
                 Supplier: <span class="font-bold text-silver">{{ $purchaseOrder->company_name }}</span>
             </p>
@@ -128,7 +128,7 @@
     {{-- KONDISI 3: FORM INPUT BAYAR --}}
     @elseif($purchaseOrder->remaining_balance > 0)
         <section class="bg-carbonSoft rounded-xl p-6 border border-petronas/30 shadow-lg shadow-petronas/5">
-            <h2 class="text-lg font-bold text-petronas mb-4">Input Pembayaran Keluar (Out)</h2>
+            <h2 class="text-lg font-bold text-slate-800 mb-4">Input Pembayaran Keluar (Out)</h2>
             
             <form action="{{ route('purchase_payments.store') }}" method="POST">
                 @csrf
@@ -209,7 +209,7 @@
 
     {{-- SECTION 3: RIWAYAT PEMBAYARAN --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
-        <h2 class="text-lg font-bold text-petronas mb-4">Riwayat Pembayaran</h2>
+        <h2 class="text-lg font-bold text-slate-800 mb-4">Riwayat Pembayaran</h2>
 
         <div class="overflow-x-auto rounded-lg border border-carbon">
             <table class="w-full text-sm">

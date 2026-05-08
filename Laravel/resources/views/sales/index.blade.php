@@ -31,9 +31,9 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Sales Orders</li>
+            <li class="text-slate-800 font-semibold">Sales Orders</li>
         </ol>
     </nav>
 
@@ -41,14 +41,14 @@
 
     <header>
         <p class="text-xs uppercase tracking-widest text-muted">Transaction Data</p>
-        <h1 class="text-3xl font-extrabold text-petronas">Sales Order Management</h1>
+        <h1 class="text-3xl font-extrabold text-slate-800">Sales Order Management</h1>
         <p class="text-sm text-muted mt-1">Kelola data pesanan penjualan, status pengiriman, dan pembayaran.</p>
     </header>
 
     {{-- Form Section --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 shadow-lg shadow-blackBase">
         {{-- Header Form (Icon dihapus, style disamakan dengan Product Index) --}}
-        <h2 class="text-lg font-bold text-petronas">Create Sales Order (Draft)</h2>
+        <h2 class="text-lg font-bold text-slate-800">Create Sales Order (Draft)</h2>
 
         <form action="{{ route('sales.store') }}" method="POST" class="space-y-6">
             @csrf
@@ -77,7 +77,7 @@
             {{-- ROW 2: DATA DISTRIBUTOR (DALAM 1 KOTAK) --}}
             <div class="bg-carbon/40 p-5 rounded-xl border border-carbon space-y-4">
                 <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-sm font-bold text-petronas uppercase tracking-wider">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
                         Data Distributor
                     </h3>
                 </div>
@@ -100,7 +100,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-petronas">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-800">
                             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                         </div>
                     </div>
@@ -146,12 +146,12 @@
     {{-- List Sales Orders --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Order List</h2>
+            <h2 class="text-lg font-bold text-slate-800">Order List</h2>
             
             <form action="{{ route('sales.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
                 <input type="text" name="search" placeholder="Search SO No. or Distributor..." value="{{ request('search') }}"
                     class="w-full md:w-64 px-4 py-2 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
-                <button type="submit" class="px-4 py-2 bg-carbon border border-muted text-xs rounded-lg hover:text-petronas transition">Search</button>
+                <button type="submit" class="px-4 py-2 bg-carbon border border-muted text-xs rounded-lg hover:text-blue-600 transition">Search</button>
             </form>
         </div>
 
@@ -176,7 +176,7 @@
                                 {{ \Carbon\Carbon::parse($so->transaction_date)->format('d/m/Y') }}
                             </td>
                             
-                            <td class="px-4 py-3 font-semibold text-petronas font-mono text-xs">
+                            <td class="px-4 py-3 font-semibold text-slate-800 font-mono text-xs">
                                 {{ $so->so_code }}
                             </td>
                             
@@ -189,7 +189,7 @@
                                     $statusColor = match($so->status) {
                                         'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
                                         'confirmed' => 'bg-blue-900/30 text-blue-400 border-blue-800',
-                                        'shipped' => 'bg-petronas/20 text-petronas border-petronas',
+                                        'shipped' => 'bg-blue-200 text-blue-800 border-petronas',
                                         'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
                                         default => 'bg-carbon text-muted'
                                     };
@@ -224,7 +224,7 @@
                             <td class="px-4 py-3 text-center">
                                 <div class="flex justify-center items-center gap-2">
                                     <a href="{{ route('sales.show', $so->id) }}" 
-                                       class="w-8 h-8 flex items-center justify-center rounded bg-petronas/10 text-petronas border border-petronas/30 hover:bg-petronas hover:text-blackBase transition"
+                                       class="w-8 h-8 flex items-center justify-center rounded bg-blue-100 text-blue-700 border border-petronas/30 hover:bg-petronas hover:text-blackBase transition"
                                        title="View Detail">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -233,7 +233,7 @@
                                     </a>
 
                                     <a href="{{ route('sales.showPayments', $so->id) }}" 
-                                       class="w-8 h-8 flex items-center justify-center rounded bg-carbon text-silver border border-muted/30 hover:border-petronas hover:text-petronas transition"
+                                       class="w-8 h-8 flex items-center justify-center rounded bg-carbon text-silver border border-muted/30 hover:border-petronas hover:text-blue-600 transition"
                                        title="Payment History">
                                         <span class="text-sm">💰</span>
                                     </a>

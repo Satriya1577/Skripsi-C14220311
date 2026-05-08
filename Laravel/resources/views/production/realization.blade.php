@@ -44,20 +44,20 @@
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('production.index') }}" class="hover:text-petronas transition-colors">Production</a></li>
+            <li><a href="{{ route('production.index') }}" class="hover:text-blue-600 transition-colors">Production</a></li>
             <li class="opacity-40">/</li>
             {{-- Sesuaikan route ini dengan nama route Anda yang sebenarnya --}}
-            <li><a href="{{ route('production.showPlan', $product) }}" class="hover:text-petronas transition-colors">Plan-{{ $product->code }}</a></li>
+            <li><a href="{{ route('production.showPlan', $product) }}" class="hover:text-blue-600 transition-colors">Plan-{{ $product->code }}</a></li>
             <li class="opacity-40">/</li>
             @if($productionPlan)
-                <li><a href="{{ route('production.showPlanDetails', $productionPlan) }}" class="hover:text-petronas transition-colors">Plan-{{ $product->code }}-Details</a></li>
+                <li><a href="{{ route('production.showPlanDetails', $productionPlan) }}" class="hover:text-blue-600 transition-colors">Plan-{{ $product->code }}-Details</a></li>
             @else
                 <li class="text-muted">Plan details unavailable</li>
             @endif
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Realization-{{ $batch->batch_number }}</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Realization-{{ $batch->batch_number }}</li>
         </ol>
     </nav>
 
@@ -69,7 +69,7 @@
             <div>
                 <p class="text-xs uppercase tracking-widest text-muted mb-1">Batch Realization</p>
                 <div class="flex items-center gap-3">
-                    <h1 class="text-3xl font-extrabold text-petronas">{{ $batch->batch_number }}</h1>
+                    <h1 class="text-3xl font-extrabold text-slate-800">{{ $batch->batch_number }}</h1>
                     @if(is_null($batch->end_date))
                         <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-warning/10 text-warning border border-warning/30 flex items-center gap-1">
                             <span class="animate-pulse w-1.5 h-1.5 bg-warning rounded-full"></span> In Progress
@@ -96,15 +96,15 @@
                     <p class="text-xs text-muted uppercase tracking-wide">Target Batch Qty</p>
                     <p class="text-2xl font-bold text-slate-800">{{ number_format($batch->qty_produced, 0, ',', '.') }}</p>
                 </div>
-                <div class="p-3 bg-carbon rounded-lg text-petronas">🎯</div>
+                <div class="p-3 bg-carbon rounded-lg text-slate-800">🎯</div>
             </div>
             
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
                 <div>
                     <p class="text-xs text-muted uppercase tracking-wide">Realized Qty</p>
-                    <p class="text-2xl font-bold text-petronas">{{ number_format($totalRealized ?? 0, 0, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ number_format($totalRealized ?? 0, 0, ',', '.') }}</p>
                 </div>
-                <div class="p-3 bg-petronas/10 rounded-lg text-petronas">⚙️</div>
+                <div class="p-3 bg-petronas/10 rounded-lg text-slate-800">⚙️</div>
             </div>
             
             <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
@@ -125,7 +125,7 @@
     @if(is_null($batch->end_date))
     <section class="bg-carbonSoft rounded-xl p-6 border border-petronas/30 shadow-lg shadow-petronas/5 relative overflow-hidden">
         <div class="relative z-10">
-            <h2 class="text-lg font-bold text-petronas mb-1">Add Daily Production Realization For Batch {{ $batch->batch_number }}</h2>
+            <h2 class="text-lg font-bold text-slate-800 mb-1">Add Daily Production Realization For Batch {{ $batch->batch_number }}</h2>
             <p class="text-xs text-muted mb-4">Catat jumlah barang jadi yang berhasil diproduksi pada hari tertentu untuk batch ini.</p>
             
             {{-- Form Route sesuaikan dengan web.php Anda --}}
@@ -178,7 +178,7 @@
     {{-- SECTION 2: REALIZATION HISTORY TABLE --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-petronas">Realization History</h2>
+            <h2 class="text-lg font-bold text-slate-800">Realization History</h2>
             <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">
                 Total Entries: {{ $realizations->count() ?? 0 }}
             </span>
@@ -205,7 +205,7 @@
                                 {{ \Carbon\Carbon::parse($rz->production_date)->format('d F Y') }}
                             </td>
                             
-                            <td class="px-4 py-4 text-right font-mono font-bold text-petronas text-base">
+                            <td class="px-4 py-4 text-right font-mono font-bold text-slate-800 text-base">
                                 +{{ number_format($rz->qty_produced, 0, ',', '.') }}
                             </td>
                             

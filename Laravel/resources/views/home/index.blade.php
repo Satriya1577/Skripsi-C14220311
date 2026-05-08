@@ -38,7 +38,7 @@
             </div>
             
             {{-- Icon User --}}
-            <div class="w-10 h-10 rounded-full bg-carbon border border-carbonSoft flex items-center justify-center text-petronas shadow-lg group-hover:border-petronas transition-all">
+            <div class="w-10 h-10 rounded-full bg-carbon border border-carbonSoft flex items-center justify-center text-slate-800 shadow-lg group-hover:border-petronas transition-all">
                 <i class="bi bi-person-fill text-xl"></i>
             </div>
 
@@ -56,7 +56,7 @@
                 </div>
                 
                 {{-- Settings (Optional shortcut) --}}
-                <a href="{{ route('settings.index') }}" class="w-full text-left px-4 py-2.5 rounded-lg text-sm text-silver hover:bg-carbon hover:text-petronas transition-colors flex items-center gap-3 mb-1">
+                <a href="{{ route('settings.index') }}" class="w-full text-left px-4 py-2.5 rounded-lg text-sm text-silver hover:bg-carbon hover:text-blue-600 transition-colors flex items-center gap-3 mb-1">
                     <i class="bi bi-sliders"></i> Settings
                 </a>
 
@@ -76,7 +76,7 @@
     <main class="max-w-6xl mx-auto px-6 py-8 flex flex-col justify-between min-h-screen relative">
 
         <header class="text-center mb-10 pt-12 pb-4">
-            <h1 class="text-3xl font-extrabold text-petronas">Production Planning System</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">Production Planning System</h1>
             <p class="text-muted mt-2 text-sm">Integrated Inventory, Procurement, and Forecasting System</p>
         </header>
 

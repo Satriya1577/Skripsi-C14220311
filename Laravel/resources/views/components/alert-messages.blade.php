@@ -4,15 +4,15 @@
     @if (session('success'))
         <div class="bg-carbonSoft border border-petronas rounded-xl p-4 flex items-start gap-4 shadow-[0_0_15px_rgba(0,161,155,0.1)]">
             {{-- Icon --}}
-            <span class="text-petronas text-lg font-bold mt-0.5 shrink-0">✓</span>
+            <span class="text-slate-800 text-lg font-bold mt-0.5 shrink-0">✓</span>
             
             {{-- Text Content --}}
-            <div class="text-sm text-petronas font-semibold flex-1 pt-1">
+            <div class="text-sm text-slate-800 font-semibold flex-1 pt-1">
                 {{ session('success') }}
             </div>
 
             {{-- Close Button --}}
-            <button onclick="this.parentElement.remove()" class="text-muted hover:text-petronas transition font-bold text-lg shrink-0 -mt-1">✕</button>
+            <button onclick="this.parentElement.remove()" class="text-muted hover:text-blue-600 transition font-bold text-lg shrink-0 -mt-1">✕</button>
         </div>
     @endif
 

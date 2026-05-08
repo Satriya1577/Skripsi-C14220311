@@ -33,11 +33,11 @@
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted mb-6">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-30 select-none">/</li>
-            <li><a href="{{ route('reports.index') }}" class="hover:text-petronas transition-colors">Reports Center</a></li>
+            <li><a href="{{ route('reports.index') }}" class="hover:text-blue-600 transition-colors">Reports Center</a></li>
             <li class="opacity-30 select-none">/</li>
-            <li class="text-petronas font-bold pointer-events-none" aria-current="page">Material Stock Card</li>
+            <li class="text-slate-800 font-bold pointer-events-none" aria-current="page">Material Stock Card</li>
         </ol>
     </nav>
 
@@ -52,7 +52,7 @@
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Akumulasi Transaksi</h2>
+            <h2 class="text-lg font-bold text-slate-800">Akumulasi Transaksi</h2>
             {{-- Filter form dihapus dari sini --}}
         </div>
 
@@ -74,7 +74,7 @@
                             {{-- MATERIAL INFO --}}
                             <td class="px-4 py-3">
                                 <div class="font-bold text-silver">{{ $report->material_name }}</div>
-                                <div class="text-[10px] text-petronas font-mono">{{ $report->material->code ?? '-' }}</div>
+                                <div class="text-[10px] text-slate-800 font-mono">{{ $report->material->code ?? '-' }}</div>
                             </td>
 
                             {{-- SATUAN --}}

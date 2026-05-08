@@ -30,9 +30,9 @@
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Partners</li>
+            <li class="text-slate-800 font-semibold">Partners</li>
         </ol>
     </nav>
 
@@ -40,13 +40,13 @@
 
     <header>
         <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
-        <h1 class="text-3xl font-extrabold text-petronas">Partner Management</h1>
+        <h1 class="text-3xl font-extrabold text-slate-800">Partner Management</h1>
         <p class="text-sm text-muted mt-1">Kelola data Distributor, Supplier, dan Mitra Bisnis</p>
     </header>
 
     {{-- Form Section --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-        <h2 class="text-lg font-bold text-petronas" id="formHeader">Add New Partner</h2>
+        <h2 class="text-lg font-bold text-slate-800" id="formHeader">Add New Partner</h2>
         <form action="{{ route('partners.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6"> 
             @csrf
             {{-- Hidden ID untuk Mode Edit --}}
@@ -78,7 +78,7 @@
                         <option value="supplier">Supplier</option>
                         <option value="both">Both (Dist & Supp)</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-petronas">
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-800">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
 
     {{-- List Section --}}
     <section class="bg-carbonSoft rounded-xl p-6">
-        <h2 class="text-lg font-bold text-petronas mb-4">Partner List</h2>
+        <h2 class="text-lg font-bold text-slate-800 mb-4">Partner List</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-carbon">
@@ -154,7 +154,7 @@
                             {{-- Type Badge --}}
                             <td class="px-3 py-3 text-center">
                                 @if($partner->type === 'distributor')
-                                    <span class="px-2 py-1 rounded bg-petronas/10 text-petronas text-xs font-bold border border-petronas/20">Distributor</span>
+                                    <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-bold border border-petronas/20">Distributor</span>
                                 @elseif($partner->type === 'supplier')
                                     <span class="px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 text-xs font-bold border border-yellow-500/20">Supplier</span>
                                 @else
@@ -171,7 +171,7 @@
                                         </div>
                                     @endif
                                     @if($partner->email)
-                                        <div class="text-xs text-petronas flex items-center gap-1">
+                                        <div class="text-xs text-slate-800 flex items-center gap-1">
                                             <span class="opacity-50">✉️</span> {{ $partner->email }}
                                         </div>
                                     @endif
@@ -189,7 +189,7 @@
                             {{-- Actions --}}
                             <td class="px-3 py-3 text-center space-x-2">
                                 <button type="button" onclick='editPartner(@json($partner))' 
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded border border-petronas text-petronas hover:bg-petronas/10 transition">
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded border border-blue-600 text-blue-600 hover:bg-petronas/10 transition">
                                     ✏️
                                 </button>
                                 <form action="{{ route('partners.destroy', $partner->id) }}" method="POST" class="inline">

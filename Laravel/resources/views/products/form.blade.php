@@ -42,11 +42,11 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('products.index') }}" class="hover:text-petronas transition-colors">Products</a></li>
+            <li><a href="{{ route('products.index') }}" class="hover:text-blue-600 transition-colors">Products</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">{{ isset($product) ? 'Edit' : 'Create' }}</li>
+            <li class="text-slate-800 font-semibold">{{ isset($product) ? 'Edit' : 'Create' }}</li>
         </ol>
     </nav>
     
@@ -54,7 +54,7 @@
     
     <header class="pb-4">
         <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
-        <h1 class="text-3xl font-extrabold text-petronas">
+        <h1 class="text-3xl font-extrabold text-slate-800">
             {{ isset($product) ? 'Edit Product: ' . $product->code : 'Create New Product' }}
         </h1>
         <p class="text-sm text-muted mt-1">
@@ -110,7 +110,7 @@
             {{-- Row 3: Lead Time Management --}}
             <div class="md:col-span-4 bg-carbon/50 p-4 rounded-xl border border-carbon">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
-                    <label class="text-sm font-bold text-petronas uppercase tracking-wide">
+                    <label class="text-sm font-bold text-slate-800 uppercase tracking-wide">
                         <i class="bi bi-clock-history mr-1"></i> Lead Time Average Calculation
                     </label>
                     
@@ -149,18 +149,18 @@
                     </div>
 
                     <div>
-                        <span class="text-xs text-petronas uppercase block mb-1 font-bold">Avg Actual (Days)</span>
+                        <span class="text-xs text-slate-800 uppercase block mb-1 font-bold">Avg Actual (Days)</span>
                         <input id="lead_time_average" type="text" value="{{ $product->lead_time_average ?? 0 }}" readonly
-                            class="w-full px-4 py-2 rounded-lg bg-blackBase border border-carbonSoft text-petronas font-extrabold cursor-not-allowed focus:outline-none tracking-wider">
+                            class="w-full px-4 py-2 rounded-lg bg-blackBase border border-carbonSoft text-slate-800 font-extrabold cursor-not-allowed focus:outline-none tracking-wider">
                         <p class="text-[10px] text-muted mt-1">Rata-rata aktual (System Calculated).</p>
                     </div>
                 </div>
                 
                 <div id="automaticInfo" class="hidden mt-4 p-3 bg-petronas/10 border border-petronas/20 rounded-lg text-left text-xs">
                     <div class="flex items-start gap-2">
-                        <i class="bi bi-info-circle-fill text-petronas mt-0.5"></i>
+                        <i class="bi bi-info-circle-fill text-slate-800 mt-0.5"></i>
                         <div class="text-silver">
-                            <strong class="text-petronas">Mode Automatic Aktif:</strong>
+                            <strong class="text-slate-800">Mode Automatic Aktif:</strong>
                             <p class="mt-1 opacity-80">
                                 Sistem akan otomatis mengupdate Min & Max Lead Time berdasarkan rata-rata <strong>30 Batch Produksi terakhir</strong>. 
                             </p>
@@ -173,7 +173,7 @@
             @if(!isset($product))
                 <div id="stockOpnameSection" class="md:col-span-4 bg-carbon rounded-xl p-4 border border-carbonSoft mt-2">
                     <div class="flex items-center gap-2 mb-4 border-b border-carbon pb-2">
-                        <h3 class="text-sm font-bold text-petronas uppercase tracking-wide">
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">
                             <i class="bi bi-box-seam mr-1"></i> Stock Opname (Initial Stock)
                         </h3>
                     </div>

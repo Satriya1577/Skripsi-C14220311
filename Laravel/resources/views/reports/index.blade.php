@@ -30,12 +30,12 @@
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
             <li>
-                <a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">
+                <a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">
                     Home
                 </a>
             </li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">
+            <li class="text-slate-800 font-semibold" aria-current="page">
                 Reports Center
             </li>
         </ol>
@@ -46,7 +46,7 @@
         <p class="text-xs uppercase tracking-widest text-muted">
             Analytics & History
         </p>
-        <h1 class="text-3xl font-extrabold text-petronas">
+        <h1 class="text-3xl font-extrabold text-slate-800">
             Reports
         </h1>
         <p class="text-sm text-muted mt-1">
@@ -68,11 +68,11 @@
 
             <div class="relative z-10 flex flex-col h-full justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-xl bg-carbon border border-carbonSoft flex items-center justify-center text-petronas mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-carbon border border-carbonSoft flex items-center justify-center text-slate-800 mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
                         <i class="bi bi-box-seam text-2xl"></i>
                     </div>
                     
-                    <h3 class="text-lg font-bold text-silver group-hover:text-petronas transition-colors">
+                    <h3 class="text-lg font-bold text-silver group-hover:text-blue-600 transition-colors">
                         Product Stock Report
                     </h3>
                     <p class="text-xs text-muted mt-2 leading-relaxed">
@@ -80,7 +80,7 @@
                     </p>
                 </div>
 
-                <div class="mt-6 flex items-center text-xs font-bold text-muted group-hover:text-petronas transition-colors">
+                <div class="mt-6 flex items-center text-xs font-bold text-muted group-hover:text-blue-600 transition-colors">
                     <span>View Report</span>
                     <i class="bi bi-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
                 </div>

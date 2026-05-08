@@ -44,11 +44,11 @@
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('forecast.index') }}" class="hover:text-petronas transition-colors">Forecasting</a></li>
+            <li><a href="{{ route('forecast.index') }}" class="hover:text-blue-600 transition-colors">Forecasting</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Show</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Show</li>
         </ol>
     </nav>
 
@@ -62,7 +62,7 @@
         {{-- Sisi Kiri: Info Produk --}}
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">Forecast Generation</p>
-            <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">{{ $product->code }}</span>
                 {{ $product->packaging ?? 'No Packaging Info' }}
@@ -83,7 +83,7 @@
 
     {{-- SECTION 1: PRODUCT INFO & CONFIGURATION --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60 space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Configuration & Status</h2>
+        <h2 class="text-lg font-bold text-slate-800">Configuration & Status</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             {{-- Current Stock Info (Mirip Product Show) --}}
@@ -97,7 +97,7 @@
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Target Period</p>
                 <p class="text-2xl font-bold text-slate-800">{{ now()->addMonth()->format('F Y') }}</p>
                 <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-                    Type: <span class="text-petronas font-bold">FUTURE</span>
+                    Type: <span class="text-slate-800 font-bold">FUTURE</span>
                 </p>
             </div>
 
@@ -126,7 +126,7 @@
     {{-- SECTION 2: HISTORY TABLE --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-petronas">History & Production Plans</h2>
+            <h2 class="text-lg font-bold text-slate-800">History & Production Plans</h2>
             <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Total: {{ $productionPlans->total() }}</span>
         </div>
 
@@ -163,7 +163,7 @@
 
                             {{-- Recommended --}}
                             <td class="px-4 py-3 text-right">
-                                <span class="font-bold font-mono {{ $plan->recommended_production_qty > 0 ? 'text-petronas text-base' : 'text-muted' }}">
+                                <span class="font-bold font-mono {{ $plan->recommended_production_qty > 0 ? 'text-slate-800 text-base' : 'text-muted' }}">
                                     {{ number_format($plan->recommended_production_qty) }}
                                 </span>
                             </td>
@@ -173,7 +173,7 @@
                                 @php
                                     $status = $plan->status ?? 'pending';
                                     $badgeClass = match($status) {
-                                        'approved' => 'bg-petronas/10 text-petronas border-petronas/30',
+                                        'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
                                         'rejected' => 'bg-danger/10 text-danger border-danger/30',
                                         default    => 'bg-warning/10 text-warning border-warning/30',
                                     };
@@ -187,7 +187,7 @@
                             <td class="px-4 py-3 text-center">
                                 {{-- Tombol di table dikembalikan hanya berisi chart mata (view details) --}}
                                 <a href="{{ route('forecast.chart', $plan) }}" 
-                                   class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-petronas hover:border-petronas transition shadow-sm"
+                                   class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-blue-600 hover:border-petronas transition shadow-sm"
                                    title="View Forecast Details">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />

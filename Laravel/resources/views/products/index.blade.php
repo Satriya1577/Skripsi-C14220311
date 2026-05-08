@@ -29,9 +29,9 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Products</li>
+            <li class="text-slate-800 font-semibold">Products</li>
         </ol>
     </nav>
     
@@ -41,7 +41,7 @@
     <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
-            <h1 class="text-3xl font-extrabold text-petronas">Product Management</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">Product Management</h1>
             <p class="text-sm text-muted mt-1">Kelola data produk, stok, dan parameter produksi</p>
         </div>
         <a href="{{ route('products.create') }}" class="bg-petronas text-blackBase font-bold px-6 py-2.5 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20 flex items-center gap-2">
@@ -57,10 +57,10 @@
         
         {{-- BUNGKUSAN FLEXBOX BARU UNTUK JUDUL & TOMBOL UPDATE --}}
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Product List</h2>
+            <h2 class="text-lg font-bold text-slate-800">Product List</h2>
             
             {{-- TOMBOL UPDATE BARU --}}
-            <a href="{{ route('products.updateProductLeadTimeSafetyStock') }}" class="bg-carbonSoft border border-petronas text-petronas text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
+            <a href="{{ route('products.updateProductLeadTimeSafetyStock') }}" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
@@ -75,7 +75,7 @@
                         <th class="px-3 py-2 text-center text-muted">Code</th>
                         <th class="px-3 py-2 text-left text-muted">Name / Specs</th> 
                         <th class="px-3 py-2 text-center text-muted">On Hand</th> 
-                        <th class="px-3 py-2 text-center text-petronas font-semibold">Reserved</th> 
+                        <th class="px-3 py-2 text-center text-slate-800 font-semibold">Reserved</th> 
                         <th class="px-3 py-2 text-center text-silver font-bold border-l border-carbon">Available</th> 
                         <th class="px-3 py-2 text-center text-muted">Safety</th>
                         <th class="px-3 py-2 text-center text-muted">HPP</th>
@@ -100,7 +100,7 @@
                                         @if($product->is_manual_lead_time === 'manual')
                                             <span class="text-silver">⏱ Manual</span>
                                         @else
-                                            <span class="text-petronas">⏱ Auto</span>
+                                            <span class="text-slate-800">⏱ Auto</span>
                                         @endif
                                         
                                         <span class="text-muted mx-1">|</span>
@@ -121,7 +121,7 @@
                             </td>
 
                             <td class="px-3 py-2 text-center">{{ $product->current_stock }}</td>
-                            <td class="px-3 py-2 text-center text-petronas font-medium">{{ $product->committed_stock }}</td>
+                            <td class="px-3 py-2 text-center text-slate-800 font-medium">{{ $product->committed_stock }}</td>
                             <td class="px-3 py-2 text-center font-bold text-silver border-l border-carbon">
                                 {{ $product->current_stock - $product->committed_stock }}
                             </td>

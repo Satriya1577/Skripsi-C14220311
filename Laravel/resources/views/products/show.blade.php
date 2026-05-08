@@ -44,11 +44,11 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('products.index') }}" class="hover:text-petronas transition-colors">Products</a></li>
+            <li><a href="{{ route('products.index') }}" class="hover:text-blue-600 transition-colors">Products</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">View & Recipe</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">View & Recipe</li>
         </ol>
     </nav>
 
@@ -57,7 +57,7 @@
     <header class="flex justify-between items-end">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">Product Details & Formulation</p>
-            <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">{{ $product->code }}</span>
                 {{ $product->packaging ?? 'No Packaging Info' }}
@@ -67,7 +67,7 @@
 
     {{-- SECTION 1: PRODUCT SPECIFICATION --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Product Specification</h2>
+        <h2 class="text-lg font-bold text-slate-800">Product Specification</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
             {{-- Stock Info --}}
@@ -78,7 +78,7 @@
             
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Reserved Stock</p>
-                <p class="text-2xl font-bold text-petronas">{{ number_format($product->committed_stock, 0) }}</p>
+                <p class="text-2xl font-bold text-slate-800">{{ number_format($product->committed_stock, 0) }}</p>
             </div>
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
@@ -106,7 +106,7 @@
                 <div class="flex justify-between items-start mb-2">
                     <p class="text-xs text-muted uppercase tracking-wide">Lead Time Management</p>
                     <span class="text-[10px] uppercase px-2 py-0.5 rounded border 
-                        {{ $product->is_manual_lead_time === 'manual' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-petronas/10 text-petronas border-petronas/30' }}">
+                        {{ $product->is_manual_lead_time === 'manual' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-blue-100 text-blue-700 border-petronas/30' }}">
                         {{ $product->is_manual_lead_time === 'manual' ? 'Manual' : 'Automatic' }}
                     </span>
                 </div>
@@ -118,7 +118,7 @@
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <span class="text-xs text-muted block">Rata-rata Aktual</span>
-                        <span class="text-lg font-bold text-petronas">{{ number_format($product->lead_time_average, 1, ',', '.') }} Hari</span>
+                        <span class="text-lg font-bold text-slate-800">{{ number_format($product->lead_time_average, 1, ',', '.') }} Hari</span>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
     {{-- SECTION 2: RECIPE MANAGEMENT --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-petronas/30 shadow-lg shadow-petronas/5 relative overflow-hidden">
         <div class="relative z-10">
-            <h2 class="text-lg font-bold text-petronas mb-1">
+            <h2 class="text-lg font-bold text-slate-800 mb-1">
                 Product Recipe (Bill of Materials)
             </h2>
             <p class="text-xs text-muted mb-4">Tambahkan bahan baku yang dibutuhkan untuk memproduksi <strong>1 Unit</strong> produk ini.</p>
@@ -182,7 +182,7 @@
     {{-- SECTION 3: RECIPE LIST --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-petronas">Current Recipe List</h2>
+            <h2 class="text-lg font-bold text-slate-800">Current Recipe List</h2>
             <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Items: {{ $product->productMaterials->count() }}</span>
         </div>
         <div class="overflow-x-auto rounded-lg border border-carbon">
@@ -200,7 +200,7 @@
                 <tbody class="divide-y divide-carbon/50">
                     @forelse ($product->productMaterials as $pm)
                         <tr class="hover:bg-carbon transition-colors group">
-                            <td class="px-4 py-3 font-mono text-petronas">{{ $pm->material->code }}</td>
+                            <td class="px-4 py-3 font-mono text-slate-800">{{ $pm->material->code }}</td>
                             <td class="px-4 py-3 text-silver">{{ $pm->material->name }}</td>
                             <td class="px-4 py-3 text-right font-bold text-slate-800">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
                             <td class="px-4 py-3 text-center text-muted">{{ $pm->material->unit }}</td>
@@ -224,7 +224,7 @@
 
     {{-- SECTION 4: STOCK ADJUSTMENT --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Stock Adjustment (Opname)</h2>
+        <h2 class="text-lg font-bold text-slate-800">Stock Adjustment (Opname)</h2>
         <form action="{{ route('products.adjustment.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @csrf
             <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -273,7 +273,7 @@
     {{-- SECTION 5: RIWAYAT TRANSAKSI --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-petronas">Riwayat Transaksi</h2>
+            <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi</h2>
             <div class="flex gap-2">
                 <span class="text-xs bg-carbon px-3 py-1.5 rounded-lg text-muted border border-carbon">
                     Total Data: {{ $transactions->total() }}

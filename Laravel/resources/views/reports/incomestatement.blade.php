@@ -33,11 +33,11 @@
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted mb-6">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-30 select-none">/</li>
-            <li><a href="{{ route('reports.index') }}" class="hover:text-petronas transition-colors">Reports Center</a></li>
+            <li><a href="{{ route('reports.index') }}" class="hover:text-blue-600 transition-colors">Reports Center</a></li>
             <li class="opacity-30 select-none">/</li>
-            <li class="text-petronas font-bold pointer-events-none" aria-current="page">Laporan Laba Rugi</li>
+            <li class="text-slate-800 font-bold pointer-events-none" aria-current="page">Laporan Laba Rugi</li>
         </ol>
     </nav>
 
@@ -55,7 +55,7 @@
             {{-- INDIKATOR PERIODE --}}
             <div class="flex items-center gap-3">
                 <div class="bg-carbon border border-carbonSoft rounded-lg px-5 py-2.5 flex items-center gap-3 shadow-lg shadow-slate-200/60">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-petronas" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span class="text-sm font-bold text-silver">
@@ -90,7 +90,7 @@
             <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
                 <div class="absolute right-0 top-0 h-full w-1.5 bg-petronas"></div>
                 <p class="text-xs font-bold text-muted uppercase tracking-widest">Laba Kotor (Gross Profit)</p>
-                <h3 class="text-3xl font-bold text-petronas mt-2 font-mono">Rp {{ number_format($grossProfit, 0, ',', '.') }}</h3>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 font-mono">Rp {{ number_format($grossProfit, 0, ',', '.') }}</h3>
                 <p class="text-xs font-bold mt-2 tracking-wide {{ $profitMargin > 0 ? 'text-success' : 'text-danger' }}">
                     Margin Keuntungan: {{ number_format($profitMargin, 2) }}%
                 </p>
@@ -98,7 +98,7 @@
         </div>
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Rincian Kontribusi per Produk</h2>
+            <h2 class="text-lg font-bold text-slate-800">Rincian Kontribusi per Produk</h2>
         </div>
 
         {{-- TABLE SECTION --}}
@@ -110,7 +110,7 @@
                         <th class="px-4 py-3 text-center text-muted border-b border-carbonSoft">Qty Terjual</th>
                         <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Pendapatan</th>
                         <th class="px-4 py-3 text-right text-muted border-b border-carbonSoft">Total HPP</th>
-                        <th class="px-4 py-3 text-right text-petronas border-b border-carbonSoft">Laba Kotor</th>
+                        <th class="px-4 py-3 text-right text-slate-800 border-b border-carbonSoft">Laba Kotor</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-carbon/50">
@@ -140,7 +140,7 @@
                             </td>
                             
                             {{-- LABA KOTOR --}}
-                            <td class="px-4 py-3 text-right font-mono text-petronas font-bold">
+                            <td class="px-4 py-3 text-right font-mono text-slate-800 font-bold">
                                 Rp {{ number_format($detailProfit, 0, ',', '.') }}
                             </td>
                         </tr>
@@ -158,7 +158,7 @@
                         <td class="px-4 py-4 text-right tracking-widest text-xs text-muted" colspan="2">GRAND TOTAL</td>
                         <td class="px-4 py-4 text-right font-mono text-success">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
                         <td class="px-4 py-4 text-right font-mono text-danger">Rp {{ number_format($totalCogs, 0, ',', '.') }}</td>
-                        <td class="px-4 py-4 text-right font-mono text-petronas text-base">Rp {{ number_format($grossProfit, 0, ',', '.') }}</td>
+                        <td class="px-4 py-4 text-right font-mono text-slate-800 text-base">Rp {{ number_format($grossProfit, 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>
             </table>

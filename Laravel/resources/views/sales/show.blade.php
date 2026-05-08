@@ -31,11 +31,11 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('sales.index') }}" class="hover:text-petronas transition-colors">Sales Orders</a></li>
+            <li><a href="{{ route('sales.index') }}" class="hover:text-blue-600 transition-colors">Sales Orders</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Detail</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Detail</li>
         </ol>
     </nav>
 
@@ -49,7 +49,7 @@
                     $badgeColor = match($salesOrder->status) {
                         'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
                         'confirmed' => 'bg-blue-900/30 text-blue-400 border-blue-800',
-                        'shipped' => 'bg-petronas/20 text-petronas border-petronas',
+                        'shipped' => 'bg-blue-200 text-blue-800 border-petronas',
                         'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
                         default => 'bg-carbon'
                     };
@@ -58,7 +58,7 @@
                     {{ $salesOrder->status }}
                 </span>
             </div>
-            <h1 class="text-3xl font-extrabold text-petronas mt-1">{{ $salesOrder->so_code }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800 mt-1">{{ $salesOrder->so_code }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">
                     {{ \Carbon\Carbon::parse($salesOrder->transaction_date)->format('d M Y') }}
@@ -88,7 +88,7 @@
         <div id="deletedItemsContainer"></div>
 
         <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-            <h2 class="text-lg font-bold text-petronas mb-4">Transaction Information</h2>
+            <h2 class="text-lg font-bold text-slate-800 mb-4">Transaction Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
                 <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                     <p class="text-xs text-muted uppercase tracking-wide mb-1">Payment Status</p>
@@ -104,7 +104,7 @@
                 </div>
                 <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                     <p class="text-xs text-muted uppercase tracking-wide mb-1">Grand Total</p>
-                    <p class="text-xl font-bold text-petronas">Rp {{ number_format($salesOrder->grand_total, 0, ',', '.') }}</p>
+                    <p class="text-xl font-bold text-slate-800">Rp {{ number_format($salesOrder->grand_total, 0, ',', '.') }}</p>
                 </div>
                 <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                     <p class="text-xs text-muted uppercase tracking-wide mb-1">Sisa Tagihan</p>
@@ -129,11 +129,11 @@
         {{-- SECTION: SHIPPING INFORMATION --}}
         <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 mt-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-bold text-petronas">Shipping Information</h2>
+                <h2 class="text-lg font-bold text-slate-800">Shipping Information</h2>
                 
                 {{-- Badge Indikator --}}
                 @if($salesOrder->status == 'confirmed')
-                    <span class="text-xs bg-petronas/10 text-petronas px-2 py-1 rounded border border-petronas/20 animate-pulse">
+                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
                         Input Mode Active
                     </span>
                 @elseif($salesOrder->status == 'shipped')
@@ -205,7 +205,7 @@
                             @if($salesOrder->shipping_payment_type == 'bill_to_customer')
                                 <span class="text-warning">Ditanggung Pembeli</span>
                             @else
-                                <span class="text-petronas">Ditanggung Perusahaan</span>
+                                <span class="text-slate-800">Ditanggung Perusahaan</span>
                             @endif
                         </p>
                     </div>
@@ -224,7 +224,7 @@
         @if($salesOrder->status == 'draft')
             <section class="bg-carbonSoft rounded-xl p-6 border border-petronas/30 shadow-lg shadow-petronas/5 relative overflow-hidden mt-6">
                 <div class="relative z-10">
-                    <h2 class="text-lg font-bold text-petronas mb-1">Add Sales Item</h2>
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">Add Sales Item</h2>
                     <p class="text-xs text-muted mb-6">Tambahkan produk ke tabel di bawah sebelum melakukan konfirmasi.</p>
                     
                     <div class="flex flex-col md:flex-row gap-4 items-end">
@@ -267,7 +267,7 @@
 
         <section class="bg-carbonSoft rounded-xl p-6 border border-carbon mt-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-petronas">Order Items List</h2>
+                <h2 class="text-lg font-bold text-slate-800">Order Items List</h2>
                 <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Items Count: <span id="itemCountDisplay">{{ $salesOrder->items->count() }}</span></span>
             </div>
 
@@ -349,16 +349,16 @@
                             @if($salesOrder->status == 'draft') <td></td> @endif
                         </tr>
                         <tr>
-                            <td colspan="5" class="px-4 py-2 text-right text-muted text-xs uppercase">Shipping Cost <span class="text-[10px] text-petronas ml-1">({{ $salesOrder->shipping_payment_type == 'bill_to_customer' ? 'Customer' : 'Company' }})</span></td>
+                            <td colspan="5" class="px-4 py-2 text-right text-muted text-xs uppercase">Shipping Cost <span class="text-[10px] text-slate-800 ml-1">({{ $salesOrder->shipping_payment_type == 'bill_to_customer' ? 'Customer' : 'Company' }})</span></td>
                             <td class="px-4 py-2 text-right text-silver font-mono text-sm">
                                 @if($salesOrder->shipping_payment_type == 'bill_to_customer') Rp {{ number_format($salesOrder->shipping_cost, 0, ',', '.') }}
-                                @else <span class="text-muted line-through">Rp {{ number_format($salesOrder->shipping_cost, 0, ',', '.') }}</span> <span class="text-[10px] text-petronas block">Gratis Ongkir</span> @endif
+                                @else <span class="text-muted line-through">Rp {{ number_format($salesOrder->shipping_cost, 0, ',', '.') }}</span> <span class="text-[10px] text-slate-800 block">Gratis Ongkir</span> @endif
                             </td>
                             @if($salesOrder->status == 'draft') <td></td> @endif
                         </tr>
                         <tr class="border-t border-carbon">
                             <td colspan="5" class="px-4 py-4 text-right text-silver font-bold uppercase text-xs">Total Amount</td>
-                            <td class="px-4 py-4 text-right text-petronas font-extrabold font-mono text-lg">Rp <span id="grandTotalDisplay">{{ number_format($salesOrder->grand_total, 0, ',', '.') }}</span></td>
+                            <td class="px-4 py-4 text-right text-slate-800 font-extrabold font-mono text-lg">Rp <span id="grandTotalDisplay">{{ number_format($salesOrder->grand_total, 0, ',', '.') }}</span></td>
                             @if($salesOrder->status == 'draft') <td></td> @endif
                         </tr>
                     </tfoot>
@@ -452,7 +452,7 @@
         row.className = 'hover:bg-carbon transition-colors bg-petronas/5'; 
         row.innerHTML = `
             <td class="px-4 py-3">
-                <div class="text-silver font-bold">${productName} <span class="text-xs text-petronas font-normal">(New)</span></div>
+                <div class="text-silver font-bold">${productName} <span class="text-xs text-slate-800 font-normal">(New)</span></div>
                 <div class="text-xs text-muted font-mono">${productCode}</div>
             </td>
             <td class="px-4 py-3 text-center text-silver font-mono text-xs">${productPackaging}</td>

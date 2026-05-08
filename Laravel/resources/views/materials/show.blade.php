@@ -46,11 +46,11 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('materials.index') }}" class="hover:text-petronas transition-colors">Materials</a></li>
+            <li><a href="{{ route('materials.index') }}" class="hover:text-blue-600 transition-colors">Materials</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Detail</li>
+            <li class="text-slate-800 font-semibold">Detail</li>
         </ol>
     </nav>
 
@@ -60,7 +60,7 @@
         <p class="text-xs uppercase tracking-widest text-muted">Inventory Control</p>
         
         <div class="flex items-center gap-4 mt-1">
-            <h1 class="text-3xl font-extrabold text-petronas">{{ $material->name }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">{{ $material->name }}</h1>
             
             <span class="px-3 py-1 rounded-full text-xs font-bold uppercase border
                 {{ $material->is_active ? 'bg-green-900/30 text-green-400 border-green-500/30' : 'bg-red-900/30 text-red-400 border-red-500/30' }}">
@@ -77,7 +77,7 @@
     {{-- SECTION 1: INFORMASI MATERIAL --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
         <div class="flex justify-between items-center">
-            <h2 class="text-lg font-bold text-petronas">Informasi Material (Satuan Beli)</h2>
+            <h2 class="text-lg font-bold text-slate-800">Informasi Material (Satuan Beli)</h2>
             <div class="text-xs text-muted bg-carbon px-3 py-1 rounded-full border border-carbon/50">
                 Kategori: <span class="text-silver font-bold uppercase">{{ $material->category_type }}</span>
             </div>
@@ -107,7 +107,7 @@
 
             <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Estimasi Harga / {{ $pUnit }}</p>
-                <p class="text-2xl font-bold text-petronas">Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
+                <p class="text-2xl font-bold text-slate-800">Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
                 <div class="flex justify-between items-start mb-2">
                     <p class="text-xs text-muted uppercase tracking-wide">Lead Time Management</p>
                     <span class="text-[10px] uppercase px-2 py-0.5 rounded border 
-                        {{ $material->is_manual_lead_time === 'manual' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-petronas/10 text-petronas border-petronas/30' }}">
+                        {{ $material->is_manual_lead_time === 'manual' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-blue-100 text-blue-700 border-petronas/30' }}">
                         {{ $material->is_manual_lead_time === 'manual' ? 'Manual' : 'Automatic' }}
                     </span>
                 </div>
@@ -129,7 +129,7 @@
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <span class="text-xs text-muted block">Rata-rata Aktual</span>
-                        <span class="text-lg font-bold text-petronas">{{ number_format($material->lead_time_average, 1) }} Hari</span>
+                        <span class="text-lg font-bold text-slate-800">{{ number_format($material->lead_time_average, 1) }} Hari</span>
                     </div>
                 </div>
             </div>
@@ -138,7 +138,7 @@
                 <p class="text-xs text-muted uppercase tracking-wide mb-1">Packaging Detail</p>
                 <p class="text-sm text-silver">
                     <span class="font-bold">1 {{ $pUnit }}</span> berisi 
-                    <span class="font-bold text-petronas">{{ (float)$material->packaging_size }} {{ $material->packaging_unit }}</span>
+                    <span class="font-bold text-slate-800">{{ (float)$material->packaging_size }} {{ $material->packaging_unit }}</span>
                 </p>
                 <p class="text-[10px] text-muted mt-2">
                     *Sistem mengkonversi {{ $material->packaging_unit }} menjadi {{ $material->unit }} dengan faktor {{ number_format($factor / ($material->packaging_size ?: 1)) }}x
@@ -149,7 +149,7 @@
 
     {{-- SECTION 2: STOCK ADJUSTMENT --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-        <h2 class="text-lg font-bold text-petronas">Stock Adjustment (Opname)</h2>
+        <h2 class="text-lg font-bold text-slate-800">Stock Adjustment (Opname)</h2>
 
         @if($material->is_active)
             <form action="{{ route('materials.adjustment.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -206,7 +206,7 @@
     {{-- SECTION 3: RIWAYAT TRANSAKSI --}}
     <section class="bg-carbonSoft rounded-xl p-6">
         <div class="flex justify-between items-end mb-4">
-            <h2 class="text-lg font-bold text-petronas">Riwayat Transaksi</h2>
+            <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi</h2>
             <span class="text-xs text-muted italic">Semua angka ditampilkan dalam satuan {{ $pUnit }}</span>
         </div>
 

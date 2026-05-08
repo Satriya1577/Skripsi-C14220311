@@ -29,9 +29,9 @@
 
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">Materials</li>
+            <li class="text-slate-800 font-semibold">Materials</li>
         </ol>
     </nav>
 
@@ -40,7 +40,7 @@
     <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
-            <h1 class="text-3xl font-extrabold text-petronas">Material Management</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">Material Management</h1>
             <p class="text-sm text-muted mt-1">Kelola bahan baku, satuan, stok, dan harga</p>
         </div>
         
@@ -59,10 +59,10 @@
     {{-- TABLE SECTION --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
-            <h2 class="text-lg font-bold text-petronas">Material List</h2>
+            <h2 class="text-lg font-bold text-slate-800">Material List</h2>
             
             {{-- Tombol Update Dipindahkan Ke Sini --}}
-            <a href="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" class="bg-carbonSoft border border-petronas text-petronas text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
+            <a href="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
@@ -80,7 +80,7 @@
                         <th class="px-3 py-2 text-right text-muted">On Hand</th> 
                         <th class="px-3 py-2 text-center text-muted">Ordered Stock</th>
                         <th class="px-3 py-2 text-right text-muted border-l border-carbon">Safety Stock</th>
-                        <th class="px-3 py-2 text-right text-petronas font-bold">ROP</th>
+                        <th class="px-3 py-2 text-right text-slate-800 font-bold">ROP</th>
                         <th class="px-3 py-2 text-center text-muted">Purchase Unit</th>
                         <th class="px-3 py-2 text-center text-muted">Base Unit</th>
                         <th class="px-3 py-2 text-right text-muted border-l border-carbon">Buy Price / Unit</th> 
@@ -103,7 +103,7 @@
                                         @if($material->is_manual_lead_time === 'manual')
                                             <span class="text-silver">⏱ Manual</span>
                                         @else
-                                            <span class="text-petronas">⏱ Auto</span>
+                                            <span class="text-slate-800">⏱ Auto</span>
                                         @endif
                                         <span class="text-muted mx-1">|</span>
                                         <span class="{{ $material->lead_time_average ? 'text-silver' : 'text-muted' }} font-bold">
@@ -134,7 +134,7 @@
                             <td class="px-3 py-2 text-right text-muted border-l border-carbon">
                                 {{ number_format($material->safety_stock / $factor) }}
                             </td>
-                            <td class="px-3 py-2 text-right text-petronas font-bold">
+                            <td class="px-3 py-2 text-right text-slate-800 font-bold">
                                 {{ number_format($material->reorder_point / $factor) }}
                             </td>
 

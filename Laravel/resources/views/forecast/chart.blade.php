@@ -33,11 +33,11 @@
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('forecast.index') }}" class="hover:text-petronas transition-colors">Forecasting</a></li>
+            <li><a href="{{ route('forecast.index') }}" class="hover:text-blue-600 transition-colors">Forecasting</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Chart Analysis</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Chart Analysis</li>
         </ol>
     </nav>
 
@@ -47,7 +47,7 @@
     <header class="flex flex-col md:flex-row justify-between items-end border-b border-carbon pb-6">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted mb-1">Forecast Result</p>
-            <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
             <p class="text-sm text-silver mt-1 flex items-center gap-2">
                 <span class="bg-carbon px-2 py-0.5 rounded text-xs font-mono border border-carbonSoft">{{ $product->code }}</span>
                 <span>Target Period: <strong>{{ \Carbon\Carbon::parse($productionPlan->period)->format('F Y') }}</strong></span>
@@ -56,7 +56,7 @@
         
         <div class="mt-4 md:mt-0">
             <span class="px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wide 
-                {{ $productionPlan->status == 'approved' ? 'bg-petronas/10 text-petronas border-petronas/30' : ($productionPlan->status == 'rejected' ? 'bg-danger/10 text-danger border-danger/30' : 'bg-warning/10 text-warning border-warning/30') }}">
+                {{ $productionPlan->status == 'approved' ? 'bg-blue-100 text-blue-700 border-petronas/30' : ($productionPlan->status == 'rejected' ? 'bg-danger/10 text-danger border-danger/30' : 'bg-warning/10 text-warning border-warning/30') }}">
                 {{ ucfirst($productionPlan->status) }}
             </span>
         </div>
@@ -78,7 +78,7 @@
         <div class="bg-carbon rounded-lg p-4 border border-carbonSoft group hover:border-petronas/30 transition-colors">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">SARIMA Config</p>
             <div class="flex items-end gap-1 mt-1 font-mono">
-                <span class="text-xl font-bold text-petronas">
+                <span class="text-xl font-bold text-slate-800">
                     ({{ $productionPlan->order_p }},{{ $productionPlan->order_d }},{{ $productionPlan->order_q }})
                 </span>
                 <span class="text-muted text-xs mb-1">x</span>
@@ -113,7 +113,7 @@
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon h-125 flex flex-col relative">
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h2 class="text-lg font-bold text-petronas">Demand Visualization</h2>
+                <h2 class="text-lg font-bold text-slate-800">Demand Visualization</h2>
                 <p class="text-xs text-muted">Comparison between Actual Sales History and Forecasted Demand.</p>
             </div>
             
@@ -125,7 +125,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-[#00A19B]"></span>
-                    <span class="text-petronas font-bold">Prediction</span>
+                    <span class="text-slate-800 font-bold">Prediction</span>
                 </div>
             </div>
         </div>

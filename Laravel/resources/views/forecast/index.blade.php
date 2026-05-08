@@ -29,12 +29,12 @@
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
             <li>
-                <a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">
+                <a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">
                     Home
                 </a>
             </li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">
+            <li class="text-slate-800 font-semibold" aria-current="page">
                 Forecasting
             </li>
         </ol>
@@ -44,7 +44,7 @@
         <p class="text-xs uppercase tracking-widest text-muted">
             Predictive Analytics
         </p>
-        <h1 class="text-3xl font-extrabold text-petronas">
+        <h1 class="text-3xl font-extrabold text-slate-800">
             Sales Forecasting
         </h1>
         <p class="text-sm text-muted mt-1">
@@ -63,7 +63,7 @@
     </div>
 
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
-        <h2 class="text-lg font-bold text-petronas mb-4 flex items-center gap-2">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -82,7 +82,7 @@
                 <tbody class="divide-y divide-carbon/50 bg-carbonSoft">
                     @foreach ($products as $product)
                         <tr class="hover:bg-carbon transition-colors group">
-                            <td class="px-4 py-3 font-mono text-petronas font-bold">
+                            <td class="px-4 py-3 font-mono text-slate-800 font-bold">
                                 {{ $product->code }}
                             </td>
                             

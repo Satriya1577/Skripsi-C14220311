@@ -26,7 +26,7 @@
     <div class="w-full max-w-md p-8 bg-carbonSoft border border-carbon rounded-2xl shadow-[0_0_30px_rgba(0,161,155,0.1)]">
         
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold text-petronas">Login System</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">Login System</h1>
             <p class="text-sm text-muted mt-2">Production Planning System</p>
         </div>
 
@@ -41,7 +41,7 @@
         @endif
 
         @if (session('success'))
-            <div class="mb-4 p-3 bg-petronas/10 border border-petronas rounded-lg text-petronas text-sm">
+            <div class="mb-4 p-3 bg-petronas/10 border border-petronas rounded-lg text-slate-800 text-sm">
                 {{ session('success') }}
             </div>
         @endif

@@ -33,11 +33,11 @@
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
             <li>Settings</li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold">User Management</li>
+            <li class="text-slate-800 font-semibold">User Management</li>
         </ol>
     </nav>
 
@@ -45,14 +45,14 @@
 
     <header>
         <p class="text-xs uppercase tracking-widest text-muted">System Administration</p>
-        <h1 class="text-3xl font-extrabold text-petronas">User Management</h1>
+        <h1 class="text-3xl font-extrabold text-slate-800">User Management</h1>
         <p class="text-sm text-muted mt-1">Kelola akses pengguna, peran (role), dan keamanan akun.</p>
     </header>
 
     {{-- Form Section: Add/Edit User --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
         <div class="flex justify-between items-center">
-            <h2 class="text-lg font-bold text-petronas" id="formTitle">Add New User</h2>
+            <h2 class="text-lg font-bold text-slate-800" id="formTitle">Add New User</h2>
         </div>
 
         <form action="{{ route('settings.storeUser') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6"> 
@@ -94,7 +94,7 @@
                         <option value="production">Production</option>
                         <option value="accounting">Accounting</option>
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-petronas">
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-800">
                         <i class="bi bi-chevron-down text-xs"></i>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
             <div>
                 <label class="text-xs text-muted uppercase tracking-wide flex justify-between">
                     Password 
-                    <span id="passwordHint" class="text-[10px] text-petronas hidden italic">* Leave blank to keep current</span>
+                    <span id="passwordHint" class="text-[10px] text-slate-800 hidden italic">* Leave blank to keep current</span>
                 </label>
                 <input id="password" type="password" name="password" required
                     class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas transition placeholder-muted/50"
@@ -131,7 +131,7 @@
     {{-- User List --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-bold text-petronas">Registered Users</h2>
+            <h2 class="text-lg font-bold text-slate-800">Registered Users</h2>
             
             {{-- Search Bar Optional --}}
             <div class="relative">
@@ -157,7 +157,7 @@
                             {{-- User Info --}}
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-petronas/20 text-petronas flex items-center justify-center font-bold text-xs border border-petronas/30">
+                                    <div class="w-8 h-8 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center font-bold text-xs border border-petronas/30">
                                         {{ substr($user->name, 0, 1) }}
                                     </div>
                                     <div>
@@ -171,7 +171,7 @@
                             <td class="px-4 py-3 text-center">
                                 @php
                                     $roleColor = match($user->role) {
-                                        'admin'      => 'bg-petronas/20 text-petronas border-petronas/30',
+                                        'admin'      => 'bg-blue-200 text-blue-800 border-petronas/30',
                                         'sales'      => 'bg-warning/20 text-warning border-warning/30',
                                         'purchase'   => 'bg-blue-500/20 text-blue-400 border-blue-500/30',
                                         'inventory'  => 'bg-purple-500/20 text-purple-400 border-purple-500/30',
@@ -193,7 +193,7 @@
                             <td class="px-4 py-3 text-center">
                                 <div class="flex justify-center gap-2">
                                     <button type="button" onclick='editUser(@json($user))' 
-                                        class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-silver hover:border-petronas hover:text-petronas transition shadow-sm"
+                                        class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-silver hover:border-petronas hover:text-blue-600 transition shadow-sm"
                                         title="Edit User">
                                         <i class="bi bi-pencil-fill text-xs"></i>
                                     </button>
@@ -271,7 +271,7 @@
         // 4. Update UI Elements
         document.getElementById('formTitle').innerText = 'Edit User: ' + user.name;
         document.getElementById('formTitle').classList.add('text-warning'); // Visual feedback
-        document.getElementById('formTitle').classList.remove('text-petronas');
+        document.getElementById('formTitle').classList.remove('text-slate-800');
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.innerHTML = '<i class="bi bi-save mr-2"></i> Update User';
@@ -298,7 +298,7 @@
         // 3. Reset UI Elements
         document.getElementById('formTitle').innerText = 'Add New User';
         document.getElementById('formTitle').classList.remove('text-warning');
-        document.getElementById('formTitle').classList.add('text-petronas');
+        document.getElementById('formTitle').classList.add('text-slate-800');
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.innerHTML = '<i class="bi bi-person-plus-fill mr-2"></i> Save User';

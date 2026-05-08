@@ -44,11 +44,11 @@
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="text-xs text-muted">
         <ol class="flex items-center space-x-2">
-            <li><a href="{{ route('home.index') }}" class="hover:text-petronas transition-colors">Home</a></li>
+            <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
             <li class="opacity-40">/</li>
-            <li><a href="{{ route('production.index') }}" class="hover:text-petronas transition-colors">Production</a></li>
+            <li><a href="{{ route('production.index') }}" class="hover:text-blue-600 transition-colors">Production</a></li>
             <li class="opacity-40">/</li>
-            <li class="text-petronas font-semibold" aria-current="page">Plan-{{ $product->code }}</li>
+            <li class="text-slate-800 font-semibold" aria-current="page">Plan-{{ $product->code }}</li>
         </ol>
     </nav>
 
@@ -61,7 +61,7 @@
     <header class="flex justify-between items-end">
         <div>
             <p class="text-xs uppercase tracking-widest text-muted">Production Plans</p>
-            <h1 class="text-3xl font-extrabold text-petronas">{{ $product->name }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
             <p class="text-sm text-muted mt-1">
                 <span class="bg-carbon px-2 py-1 rounded text-xs font-mono mr-2 border border-carbonSoft">{{ $product->code }}</span>
                 {{ $product->packaging ?? 'No Packaging Info' }}
@@ -72,7 +72,7 @@
     {{-- SECTION 2: HISTORY TABLE --}}
     <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-petronas">History & Production Plans</h2>
+            <h2 class="text-lg font-bold text-slate-800">History & Production Plans</h2>
             <span class="text-xs bg-carbon px-3 py-1 rounded-full text-muted border border-carbon">Total: {{ $productionPlans->total() }}</span>
         </div>
 
@@ -114,14 +114,14 @@
 
                             {{-- Recommended --}}
                             <td class="px-4 py-3 text-right">
-                                <span class="font-bold font-mono {{ $plan->recommended_production_qty > 0 ? 'text-petronas text-base' : 'text-muted' }}">
+                                <span class="font-bold font-mono {{ $plan->recommended_production_qty > 0 ? 'text-slate-800 text-base' : 'text-muted' }}">
                                     {{ number_format($plan->recommended_production_qty) }}
                                 </span>
                             </td>
 
                             {{-- Approved --}}
                             <td class="px-4 py-3 text-right">
-                                <span class="font-bold font-mono {{ $plan->approved_production_qty > 0 ? 'text-petronas text-base' : 'text-muted' }}">
+                                <span class="font-bold font-mono {{ $plan->approved_production_qty > 0 ? 'text-slate-800 text-base' : 'text-muted' }}">
                                     {{ number_format($plan->approved_production_qty) }}
                                 </span>
                             </td>
@@ -131,7 +131,7 @@
                                 @php
                                     $status = $plan->status ?? 'pending';
                                     $badgeClass = match($status) {
-                                        'approved' => 'bg-petronas/10 text-petronas border-petronas/30',
+                                        'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
                                         'rejected' => 'bg-danger/10 text-danger border-danger/30',
                                         default    => 'bg-warning/10 text-warning border-warning/30',
                                     };
@@ -145,7 +145,7 @@
                             <td class="px-4 py-3 text-center">
                                 @if($plan)
                                     <a href="{{ route('production.showPlanDetails', ['productionPlan' => $plan->id]) }}" 
-                                       class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-petronas hover:border-petronas hover:bg-carbon transition shadow-sm"
+                                       class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-blue-600 hover:border-petronas hover:bg-carbon transition shadow-sm"
                                        title="Manage Batch & Realization">
                                         {{-- Icon Mata (View) SVG --}}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
