@@ -258,7 +258,7 @@
                         </div>
 
                         <div class="w-full md:w-auto">
-                            <button type="button" onclick="addItemToTable()" class="w-full md:w-auto bg-petronas text-blackBase font-bold px-6 py-3 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20 flex items-center justify-center gap-2"><span>+ Add</span></button>
+                            <button type="button" onclick="addItemToTable()" class="w-full md:w-auto bg-green-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-green-600/90 transition shadow-lg shadow-green-600/20 flex items-center justify-center gap-2"><span>+ Add</span></button>
                         </div>
                     </div>
                 </div>
@@ -370,11 +370,11 @@
             <div class="mt-6 pt-4 border-t border-carbon flex justify-end gap-3">
                 @if($salesOrder->status == 'draft')
                     <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Batalkan order?')">Cancel Order</button>
-                    <button type="submit" name="status" value="draft" class="bg-carbon text-silver border border-silver font-bold px-6 py-2 rounded-lg hover:bg-silver hover:text-blackBase transition">Save Draft</button>
+                    <button type="submit" name="status" value="draft" class="bg-yellow-50 text-yellow-600 border border-yellow-500 font-bold px-6 py-2 rounded-lg hover:bg-yellow-500 hover:text-white transition">Save Draft</button>
                     <button type="submit" name="status" value="confirmed" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/20" onclick="return confirm('Konfirmasi order?')">Confirm Order</button>
                 @elseif($salesOrder->status == 'confirmed')
                     <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Yakin ingin membatalkan order yang sudah dikonfirmasi? Stok reserved akan dikembalikan.')">Cancel Order</button>
-                    <button type="submit" name="status" value="shipped" class="bg-petronas text-blackBase font-bold px-6 py-2 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20" onclick="return confirm('Kirim Barang?')">Ship Order</button>
+                    <button type="submit" name="status" value="shipped" class="bg-green-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600/90 transition shadow-lg shadow-green-600/20" onclick="return confirm('Kirim Barang?')">Ship Order</button>
                 @endif
             </div>
         </section>

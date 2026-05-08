@@ -133,7 +133,7 @@
                                 
                                 {{-- Link ke halaman edit --}}
                                
-                                <a href="{{ route('products.edit', $product->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-petronas text-petronas hover:bg-petronas/10 transition">✏️</a>
+                                <a href="{{ route('products.edit', $product->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-yellow-500 text-yellow-600 hover:bg-yellow-100 transition">✏️</a>
                                 
                                 <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')

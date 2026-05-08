@@ -85,8 +85,8 @@
             {{-- 1. Product --}}
             <a href="{{ route('products.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 group">
+                <div class="text-blue-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-box-seam"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Product</h5>
@@ -96,8 +96,8 @@
             {{-- 2. Material --}}
             <a href="{{ route('materials.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/20 group">
+                <div class="text-green-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-layers-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Material</h5>
@@ -107,8 +107,8 @@
             {{-- 3. Partners --}}
             <a href="{{ route('partners.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/20 group">
+                <div class="text-yellow-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-people-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Partners</h5>
@@ -118,8 +118,8 @@
             {{-- 4. Sales --}}
             <a href="{{ route('sales.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-green-500 hover:shadow-lg hover:shadow-green-500/20 group">
+                <div class="text-green-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-cart-check-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Sales (SO)</h5>
@@ -129,8 +129,8 @@
             {{-- 5. Purchase --}}
             <a href="{{ route('purchases.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500 hover:shadow-lg hover:shadow-yellow-500/20 group">
+                <div class="text-yellow-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-bag-check-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Purchase (PO)</h5>
@@ -140,8 +140,8 @@
             {{-- 6. Production --}}
             <a href="{{ route('production.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-red-500 hover:shadow-lg hover:shadow-red-500/20 group">
+                <div class="text-red-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-gear-wide-connected"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Production</h5>
@@ -151,8 +151,8 @@
             {{-- 7. Reports --}}
             <a href="{{ route('reports.index') }}" 
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 group">
+                <div class="text-blue-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-file-earmark-bar-graph-fill"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Reports</h5>
@@ -162,8 +162,8 @@
             {{-- 8. Forecasting --}}
             <a href="{{ route('forecast.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-red-500 hover:shadow-lg hover:shadow-red-500/20 group">
+                <div class="text-red-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Forecasting</h5>
@@ -173,8 +173,8 @@
             {{-- 9. Settings --}}
             <a href="{{ route('settings.index') }}"
             class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center
-                    transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/10 group">
-                <div class="text-petronas group-hover:text-slate-800 transition-colors text-4xl mb-3">
+                    transform transition-all duration-300 hover:-translate-y-1 hover:border-slate-500 hover:shadow-lg hover:shadow-slate-500/20 group">
+                <div class="text-slate-500 group-hover:text-slate-800 transition-colors text-4xl mb-3">
                     <i class="bi bi-sliders"></i>
                 </div>
                 <h5 class="text-lg font-bold text-silver mb-1">Settings</h5>

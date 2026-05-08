@@ -172,7 +172,7 @@
                         </div>
                     </div>
                     <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full md:w-auto bg-petronas text-blackBase font-bold px-6 py-3 rounded-lg hover:bg-petronas/90 transition shadow-lg flex items-center justify-center gap-2"><span>+ Add</span></button>
+                        <button type="submit" class="w-full md:w-auto bg-green-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-green-600/90 transition shadow-lg flex items-center justify-center gap-2"><span>+ Add</span></button>
                     </div>
                 </div>
             </form>

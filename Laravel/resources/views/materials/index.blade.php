@@ -149,7 +149,7 @@
                                 <a href="{{ route('materials.show', $material->id) }}" class="inline-flex w-8 h-8 items-center justify-center bg-petronas text-blackBase rounded hover:bg-petronas/90 transition">👁️</a>
                                 
                                 {{-- Tombol Edit mengarah ke route baru --}}
-                                <a href="{{ route('materials.edit', $material->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-petronas text-petronas hover:bg-petronas/10 transition">✏️</a>
+                                <a href="{{ route('materials.edit', $material->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-yellow-500 text-yellow-600 hover:bg-yellow-100 transition">✏️</a>
                                 
                                 <form action="{{ route('materials.destroy', $material->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
