@@ -13,28 +13,47 @@ use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
+    // menampilkan list bahan baku yang tersedia di database
     public function index()
     {
         $materials = Material::orderBy('id', 'asc')->paginate(10);
         return view('materials.index',compact('materials'));
     }
 
+    // menampilkan form create bahan baku baru
     public function create()
     {
         return view('materials.form');
     }
 
+    // menampilkan form edit bahan baku yang sudah ada
     public function edit(Material $material)
     {
         return view('materials.form', compact('material'));
     }
 
-    /**
-     * Helper: Hitung Faktor Konversi
-     */
+    
+    // mengubah input menjadi konversi satuan dasar (gram, ml, pcs) untuk memudahkan perhitungan stok dan harga di sistem
+    // size: isi per kemasan beli (NETTO)
+    // packaging_unit: kg, liter, dozen, dll
+    // base_unit: satuan pemakaian (gram, ml, pcs)
+
+    // Contoh : 
+    // Beli 1 karung Tepung Terigu @20KG
+    // Wujud (category type): mass (padatan) -> category_type
+    // Satuan pemakaian: gram (karena padatan) -> unit or base_unit
+    // Satuan pembelian:  Karung @20KG -> purchase_unit
+    // Isi per kemasan beli NETTO: 20 -> packaging_size
+    // Packaging unit: kg (karena kita input 20) -> packaging_unit
+
+    // jadi input parameter calculateConversionFactor adalah:
+    // size = 20
+    // packagingUnit = kg
+    // baseUnit = gram
+    // maka hasilnya conversion factor nya adalah 
+    // 20 * 1000 (karena gram dan kg) = 20.000 (gram) 
+
     private function calculateConversionFactor($size, $packagingUnit, $baseUnit)
     {
         $size = (float) $size;
@@ -70,9 +89,9 @@ class MaterialController extends Controller
         return $size;
     }
 
-    /**
-     * Handle Create/Store Logic
-     */
+    
+    // simpan data dari form create bahan baku ke database
+    // menghitung conversionFactor menggunakan function calculateConversionFactor()
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -209,9 +228,8 @@ class MaterialController extends Controller
         }
     }
 
-    /**
-     * Handle Update Logic
-     */
+    
+    // update data bahan baku yang sudah ada di database
     public function update(Request $request, Material $material)
     {
         $user = Auth::user();
@@ -246,6 +264,8 @@ class MaterialController extends Controller
         );
 
         // 3. LOGIC PENGUNCIAN (GUARD)
+        // cek apakah material ini sudah ada riwayat transaksi (IN OUT) atau belum
+
         if ($hasTransaction) {
             // Cek Unit Dasar
             if ($request->unit != $material->unit) {
@@ -311,21 +331,7 @@ class MaterialController extends Controller
         return redirect()->route('materials.index')->with('success', 'Data material berhasil diperbarui.');
     }
 
-    /**
-     * Store Router (Create or Update)
-     */
-    // public function store(Request $request)
-    // {
-    //     if ($request->filled('material_id')) {
-    //         $material = Material::findOrFail($request->material_id);
-    //         return $this->handleUpdate($request, $material);
-    //     }
-    //     return $this->handleStore($request);
-    // }
-
-    /**
-     * Show Detail
-     */
+    // tampilkan detail bahan baku beserta riwayat mutasi/transaki (IN/OUT/ADJUSTMENT) nya
     public function show(Material $material)
     {
         $transactions = $material->transactions()
@@ -334,9 +340,9 @@ class MaterialController extends Controller
         return view('materials.show', compact('material', 'transactions'));
     }
 
-    /**
-     * Remove
-     */
+    // hapus data bahan baku dari database, 
+    // tapi hanya bisa dihapus jika belum pernah ada transaksi sama sekali 
+    // dan material ini tidak dipakai di resep produk manapun
     public function destroy(Material $material)
     {
         $user = Auth::user();
@@ -361,9 +367,9 @@ class MaterialController extends Controller
         return redirect()->route('materials.index')->with('success', 'Data material berhasil dihapus permanen.');
     }
 
-    /**
-     * Stock Opname / Adjustment
-     */
+    
+    // mengupdate stok opname bahan baku setelah dilakukan pengecekan fisik di gudang
+    // function ini juga bisa mengupdate harga menggunakan input estimasi harga awal barang
     public function storeAdjustment(Request $request)
     {
         $user = Auth::user();
@@ -458,13 +464,17 @@ class MaterialController extends Controller
         }
     }
 
-   public function updateMaterialLeadTimeSafetyStockROP() 
+    // function ini dijalankan secara manual oleh user untuk mengupdate lead time, safety stock dan ROP
+    // untuk semua bahan baku
+    // tombol update ini ada di halaman material.index
+    public function updateMaterialLeadTimeSafetyStockROP() 
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data lead time dan safety stok.')->withInput();
         }
         
+        // hanya menghitung material yang statusnya aktif saja
         $materials = Material::where('is_active', true)->get();
         DB::beginTransaction();
         try {
@@ -472,16 +482,17 @@ class MaterialController extends Controller
                 
                 // 1. Hitung Statistik Hari Tunggu (Lead Time Stats)
                 $leadTimeStats = $this->calculateLeadTimeStats($material);
-                $averageLeadTimeDays = $leadTimeStats['average'];
-                $minLeadTimeDays     = $leadTimeStats['min'];
-                $maxLeadTimeDays     = $leadTimeStats['max'];
+                $averageLeadTimeDays = $leadTimeStats['average']; // rata-rata hari lama waktu tungu
+                $minLeadTimeDays     = $leadTimeStats['min']; // waktu hari tunggu tercepat
+                $maxLeadTimeDays     = $leadTimeStats['max']; // waktu hari tunggu terlama
 
                 // 2. Hitung Penggunaan Harian (Daily Usage Qty) selama 30 Hari Terakhir
                 $usageStats = $this->calculateUsageStats($material);
-                $averageDailyUsage = $usageStats['average'];
-                $maxDailyUsage     = $usageStats['max'];
+                $averageDailyUsage = $usageStats['average']; // rata-rata pemakaian selama 30 hari terakhir
+                $maxDailyUsage     = $usageStats['max']; // pemakaian harian tertinggi selama 30 hari terakhir
 
                 // 3. Hitung Safety Stock (Kuantitas)
+                // maxDemand - averageLeadTimeDemand
                 // (Max Lead Time Days * Max Daily Usage Qty) - (Average Lead Time Days * Average Daily Usage Qty)
                 $maxDemand = $maxLeadTimeDays * $maxDailyUsage;
                 $averageLeadTimeDemand = $averageLeadTimeDays * $averageDailyUsage; // Lead Time Demand
@@ -489,6 +500,7 @@ class MaterialController extends Controller
                 $safetyStock = max(0, $maxDemand - $averageLeadTimeDemand);
 
                 // 4. Hitung ROP (Kuantitas)
+                // averageLeadTimeDemand + safetyStock
                 $rop = $averageLeadTimeDemand + $safetyStock;
 
                 // 5. Update data material termasuk Min dan Max Lead Time
@@ -508,6 +520,8 @@ class MaterialController extends Controller
         }
     }
 
+    // menghitung rata-rata hari tunggu barang tiba di gudang
+    // dihitung sejak PO dibuat sampai barang diterima di gudang (sesuai expected_arrival_date di tabel purchase_orders)
     private function calculateLeadTimeStats(Material $material) 
     {
         // Jika manual, langsung gunakan nilai dari database
@@ -520,6 +534,8 @@ class MaterialController extends Controller
         }
 
         // --- Logika Automatic ---
+        // ambil id PO dari tabel MaterialTransaction dengan tipe IN 
+        // ambil 30 PO terakhir yang sudah selesai diterima (status 'received') dan expected_arrival_date tidak kosong
         $recentPoIds = MaterialTransaction::where('material_id', $material->id)
             ->where('type', 'in')
             ->whereNotNull('purchase_order_id')
@@ -538,11 +554,13 @@ class MaterialController extends Controller
             ];
         }
 
+        // ambil list PO berdasarkan ID yang sudah difiltter diatas
         $purchaseOrders = PurchaseOrder::whereIn('id', $recentPoIds)
             ->where('status', 'received')
             ->whereNotNull('expected_arrival_date')
             ->get();
 
+        // array berapa hari selisih antara order_date dan expected_arrival_date untuk setiap PO    
         $leadTimes = [];
 
         foreach ($purchaseOrders as $po) {
@@ -562,7 +580,7 @@ class MaterialController extends Controller
             ];
         }
 
-        // Kembalikan rata-rata, nilai terendah, dan nilai tertinggi dari riwayat PO
+        // return rata-rata lama lead time, nilai lead time tercepat, dan nilai lead time terlama dari sebuah PO
         return [
             'average' => array_sum($leadTimes) / count($leadTimes),
             'min'     => min($leadTimes),
@@ -570,11 +588,15 @@ class MaterialController extends Controller
         ];
     }
 
+
+    // menghitung rata-rata pemakaian bahan baku harian selama 30 hari terakhir
+    // tipe bahan baku yang terpakai di tabel MaterialTransactionadalah OUT 
     private function calculateUsageStats(Material $material)
     {
         // Ambil data 30 hari ke belakang
         $thirtyDaysAgo = now()->subDays(30)->format('Y-m-d');
         
+        // ambil data transaksi dengan tipe OUT untuk material ini selama 30 hari terakhir
         $usages = MaterialTransaction::where('material_id', $material->id)
             ->where('type', 'out')
             ->where('transaction_date', '>=', $thirtyDaysAgo)
@@ -584,7 +606,7 @@ class MaterialController extends Controller
             return ['average' => 0, 'max' => 0];
         }
 
-        // Jumlahkan Qty berdasarkan hari (untuk mencari peak pemakaian per hari)
+        // grouping data berdasarkan tanggal transaksi atau harian nya lalu jumlahkan qty untuk setiap hari
         $dailyUsages = $usages->groupBy('transaction_date')->map(function ($dayTransactions) {
             return abs($dayTransactions->sum('qty')); 
         });

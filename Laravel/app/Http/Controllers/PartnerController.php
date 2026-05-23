@@ -9,20 +9,18 @@ use Illuminate\Support\Facades\Auth;
 
 class PartnerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // tampilkan list distributor dan supplier
+    // distributor: customer/pembeli produk berkaitan dengan data SO (sales order)
+    // supplier: pemasok bahan baku dan berkaitan dengan data PO ( purchase order)
     public function index()
     {
         $partners = Partner::orderBy('id', 'desc')->paginate(10);
         return view('partners.index', compact('partners'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * KARENA VIEW MENGGUNAKAN SATU FORM UNTUK CREATE & EDIT,
-     * KITA GUNAKAN LOGIKA "UPSERT" DI SINI.
-     */
+    // digunakan untuk menyimpan data supplier/distributor baru
+    // digunakan juga untuk update data supplier/distributor yang sudah ada
+    // karena form create dan edit menggunakan form yang sama
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -63,9 +61,7 @@ class PartnerController extends Controller
         return redirect()->route('partners.index')->with('success', $message);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // hapus data distributor atau supplier 
     public function destroy(Partner $partners)
     {
         $user = Auth::user();

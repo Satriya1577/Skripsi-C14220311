@@ -16,28 +16,26 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // tampilkan list produk yang dijual
     public function index()
     {
         $products = Product::orderBy('id', 'desc')->paginate(10);
         return view('products.index',compact('products'));
     }
 
+    // tampilkan form untuk membuat produk baru
     public function create()
     {
         return view('products.form');
     }
 
+    // tampilkan form untuk edit produk yang sudah ada
     public function edit(Product $product)
     {
         return view('products.form', compact('product'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // simpan data produk ke database 
     public function store(Request $request)
     {
         $user = Auth::user();

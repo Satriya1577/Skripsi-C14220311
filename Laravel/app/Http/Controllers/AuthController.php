@@ -14,6 +14,9 @@ class AuthController extends Controller
     }
 
     // Proses Login
+    // seed database awal
+    // email: admin@admin.com
+    // password: password
     public function login(Request $request)
     {
         $credentials = $request->validate([
