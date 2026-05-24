@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/forecasting', [SettingsController::class, 'forecasting'])->name('settings.forecast');
     Route::put('/settings/forecasting/update-sarima', [SettingsController::class, 'updateSarimaParameters'])->name('settings.updateSarima'); // admin [DONE]
     Route::post('/settings/forecasting/grid-search-all', [SettingsController::class, 'runGridSearchAll'])->name('settings.gridSearchAll'); // admin, production [DONE]
+    Route::delete('/settings/evaluations/clear', [SettingsController::class, 'clearEvaluations'])->name('settings.clearEvaluations');
+    Route::delete('/settings/evaluations/{id}', [SettingsController::class, 'deleteEvaluation'])->name('settings.deleteEvaluation');
     // Import Routes
     Route::get('/settings/imports', [SettingsController::class, 'import'])->name('settings.import'); 
     Route::post('/settings/import/products', [SettingsController::class, 'importProducts'])->name('products.import.excel'); // admin

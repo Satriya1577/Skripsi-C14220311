@@ -14,7 +14,8 @@
             carbonSoft: '#F8FAFC',
             silver: '#334155',
             petronas: '#2563EB',
-            muted: '#64748B'
+            muted: '#64748B',
+            danger: '#EF4444' // Menambahkan warna merah untuk tombol hapus
           }
         }
       }
@@ -50,13 +51,30 @@
       <p class="text-sm text-muted mt-1">Atur parameter SARIMA dan pantau akurasi model per produk</p>
     </div>
 
-    <div>
+    <div class="flex flex-wrap items-center gap-3">
+      
+      {{-- TOMBOL HAPUS SEMUA DATA (HANYA UNTUK C14220311) --}}
+      @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
+        <form action="{{ route('settings.clearEvaluations') }}" method="POST">
+          @csrf
+          @method('DELETE')
+          <button type="submit" onclick="return confirm('PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH record evaluasi?')" 
+                  class="group flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-red-100 border border-red-300 text-red-600 font-bold hover:bg-red-600 hover:text-white transition-all shadow-lg hover:shadow-red-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Clear Data
+          </button>
+        </form>
+      @endif
+
+      {{-- TOMBOL AUTO TUNE --}}
       <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
         @csrf
         <button type="submit" id="btn-tune-all"
           @if(isset($isGridSearchRunning) && $isGridSearchRunning) disabled @endif
           onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama. Lanjutkan?')"
-          class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-slate-800 font-bold hover:bg-petronas hover:text-blackBase transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
+          class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-slate-800 font-bold hover:bg-petronas hover:text-white transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
           
           @if(isset($isGridSearchRunning) && $isGridSearchRunning)
             <div class="flex items-center gap-2">
@@ -72,7 +90,7 @@
               </svg>
               <span>Auto-tune All Products</span>
             </div>
-            <div id="btn-text-loading" class="hidden">
+            <div id="btn-text-loading" class="hidden text-white">
               <span>Processing...</span>
             </div>
           @endif
@@ -81,7 +99,7 @@
     </div>
   </header>
 
-  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-sm">
     <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800">SARIMA Parameters & Performance</h2>
       <div class="text-xs text-slate-800 flex gap-4 bg-carbon px-3 py-1.5 rounded-lg border border-carbon">
@@ -105,6 +123,10 @@
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Box-Cox</th>
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
+            {{-- KOLOM AKSI (HANYA UNTUK C14220311) --}}
+            @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
+              <th rowspan="2" class="px-2 py-2 text-center text-black align-middle border-b border-carbonSoft border-l border-carbon">Aksi</th>
+            @endif
           </tr>
           <tr>
             <th class="px-1 py-2 text-center font-bold text-black border-l border-carbon">p</th>
@@ -164,9 +186,29 @@
               {{-- YJ --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->yj_rmse !== null ? number_format((float)$eval->yj_rmse, 2) : '-' }}</td>
               <td class="px-2 py-2 text-right text-xs">{{ $eval->yj_mape !== null ? number_format((float)$eval->yj_mape, 2).'%' : '-' }}</td>
+              
+              {{-- TOMBOL HAPUS BARIS (HANYA UNTUK C14220311) --}}
+              @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
+                <td class="px-2 py-2 text-center border-l border-carbon">
+                  <form action="{{ route('settings.deleteEvaluation', $eval->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus record evaluasi ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded transition-colors" title="Hapus Record">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </form>
+                </td>
+              @endif
+
             </tr>
           @empty
-            <tr><td colspan="18" class="px-3 py-6 text-center text-muted italic">Tidak ada data evaluasi SARIMA yang tersedia.</td></tr>
+            <tr>
+              <td colspan="{{ (Auth::check() && str_contains(Auth::user()->email, 'c14220311')) ? '19' : '18' }}" class="px-3 py-6 text-center text-muted italic">
+                Tidak ada data evaluasi SARIMA yang tersedia.
+              </td>
+            </tr>
           @endforelse
         </tbody>
       </table>
@@ -190,7 +232,7 @@
             <th class="px-1 py-3 text-center text-black font-bold">s</th> 
             <th class="px-3 py-3 text-right text-black border-l border-carbonSoft">RMSE</th>
             <th class="px-3 py-3 text-right text-black">MAPE</th>
-            <th class="px-3 py-3 text-left text-black">Last Trained</th>
+            <th class="px-3 py-3 text-left text-black border-l border-carbonSoft">Last Trained</th>
             <th class="px-3 py-3 text-center text-black">Actions</th>
           </tr>
         </thead>
@@ -236,10 +278,10 @@
                 {{ $product->mape !== null ? number_format($product->mape, 2) . '%' : '-' }}
               </td> 
 
-              <td class="px-3 py-2 text-xs text-muted">
+              <td class="px-3 py-2 text-xs text-muted border-l border-carbon">
                 @if($product->last_trained_at)
-                  <div>{{ \Carbon\Carbon::parse($product->last_trained_at)->format('d M Y') }}</div>
-                  <div class="opacity-50 text-[10px]">{{ \Carbon\Carbon::parse($product->last_trained_at)->format('H:i') }}</div>
+                  <div class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($product->last_trained_at)->format('d M Y') }}</div>
+                  <div class="text-[10px]">{{ \Carbon\Carbon::parse($product->last_trained_at)->format('H:i') }}</div>
                 @else
                   <span class="opacity-50 italic">Not trained</span>
                 @endif
@@ -260,7 +302,7 @@
           @endforeach
 
           @if(isset($products) && $products->isEmpty())
-            <tr><td colspan="13" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
+            <tr><td colspan="12" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
           @endif
         </tbody>
       </table>
@@ -297,9 +339,9 @@
       const inputs = document.querySelectorAll(`input[form="${formId}"], select[form="${formId}"]`);
       const saveBtn = document.querySelector(`button[form="${formId}"]`);
 
-      if(!saveBtn) return; // Prevent error if saveBtn doesn't exist in evaluation table
+      if(!saveBtn) return; 
 
-      const activeClasses = ['bg-petronas', 'text-blackBase', 'hover:bg-petronas/90', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
+      const activeClasses = ['bg-petronas', 'text-white', 'hover:bg-blue-700', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
       const inactiveClasses = ['bg-carbon', 'text-slate-800', 'cursor-not-allowed', 'opacity-50'];
 
       // Simpan nilai asli

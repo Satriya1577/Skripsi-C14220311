@@ -316,4 +316,14 @@ class SettingsController extends Controller
             return redirect()->back()->with('error', 'Gagal menghapus user: ' . $e->getMessage());
         }
     }
+
+    public function clearEvaluations()
+    {
+
+    }
+
+    public function deleteEvaluation($id)
+    {
+
+    }
 }
