@@ -68,34 +68,47 @@
         </form>
       @endif
 
-      {{-- TOMBOL AUTO TUNE --}}
+    {{-- TOMBOL AUTO TUNE & CANCEL --}}
+    @if(isset($isGridSearchRunning) && $isGridSearchRunning)
+      <div class="flex items-center gap-2">
+        {{-- Tombol disabled indikator processing --}}
+        <button disabled class="flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbon border border-petronas/30 text-white font-bold opacity-75 cursor-not-allowed shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Processing...</span>
+        </button>
+        
+        {{-- Tombol Cancel --}}
+        <form action="{{ route('settings.cancelGridSearch') }}" method="POST">
+          @csrf
+          <button type="submit" onclick="return confirm('PERINGATAN: Yakin ingin membatalkan dan menghapus antrean Grid Search?')" 
+                  class="flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-danger/10 border border-danger text-danger font-bold hover:bg-danger hover:text-white transition-all shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    @else
+      {{-- Tombol Normal --}}
       <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
         @csrf
         <button type="submit" id="btn-tune-all"
-          @if(isset($isGridSearchRunning) && $isGridSearchRunning) disabled @endif
           onclick="return confirm('PERINGATAN: Proses ini akan memakan waktu lama. Lanjutkan?')"
-          class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-slate-800 font-bold hover:bg-petronas hover:text-white transition-all shadow-lg hover:shadow-petronas/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-carbon">
-          
-          @if(isset($isGridSearchRunning) && $isGridSearchRunning)
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Processing in Background...</span>
-            </div>
-          @else
-            <div id="btn-text-normal" class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:animate-pulse" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
-              </svg>
-              <span>Auto-tune All Products</span>
-            </div>
-            <div id="btn-text-loading" class="hidden text-white">
-              <span>Processing...</span>
-            </div>
-          @endif
+          class="group min-w-[200px] flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbonSoft border border-petronas/30 text-slate-800 font-bold hover:bg-petronas hover:text-white transition-all shadow-lg hover:shadow-petronas/20">
+          <div id="btn-text-normal" class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+            </svg>
+            <span>Auto-tune All Products</span>
+          </div>
+          <div id="btn-text-loading" class="hidden text-white">
+            <span>Initializing...</span>
+          </div>
         </button>
       </form>
+    @endif
     </div>
   </header>
 

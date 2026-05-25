@@ -8,7 +8,9 @@ from scipy import stats
 from scipy.signal import savgol_filter
 import warnings
 import itertools 
-import time 
+import time
+
+from waitress import serve 
 
 # Bersihkan warning
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -96,8 +98,8 @@ def forecast():
         time_series = df['quantity_sold'].resample('MS').sum().fillna(0)
 
         # Check Length
-        if len(time_series) < 24:
-            return jsonify({"error": "Data too short (need min 24 months)"}), 400
+        # if len(time_series) < 24:
+        #     return jsonify({"error": "Data too short (need min 24 months)"}), 400
         
         # ==========================================
         # APPLY PREPROCESSING
@@ -223,8 +225,8 @@ def grid_search():
         # Resample Bulanan
         time_series = df['quantity_sold'].resample('MS').sum().fillna(0)
         
-        if len(time_series) < 24:
-             return jsonify({"error": "Data too short (need min 24 months)"}), 400
+        # if len(time_series) < 24:
+        #      return jsonify({"error": "Data too short (need min 24 months)"}), 400
 
         print(f"\n[GRID SEARCH START] Processing {len(time_series)} months data...")
 
@@ -240,12 +242,12 @@ def grid_search():
         # ==============================================================================
         
 
-        p = range(0, 6) 
+        p = range(0, 5) 
         d = range(0, 2) 
-        q = range(0, 6) 
-        P = range(0, 4) 
+        q = range(0, 5) 
+        P = range(0, 3) 
         D = range(0, 2) 
-        Q = range(0, 4) 
+        Q = range(0, 3) 
         s = [2, 3, 6, 12]
 
         pdq = list(itertools.product(p, d, q))
@@ -406,4 +408,7 @@ def grid_search():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True, threaded=True)
+    print("Memulai server Python dengan Waitress (Timeout 1 Jam)...")    
+    # channel_timeout=3600 memaksa Python untuk sabar menunggu hingga 1 jam
+    # threads=4 mengizinkan Python memproses beberapa request bersamaan
+    serve(app, host='127.0.0.1', port=5000, threads=4, channel_timeout=3600)

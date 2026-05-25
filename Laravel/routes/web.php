@@ -127,6 +127,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/forecasting/grid-search-all', [SettingsController::class, 'runGridSearchAll'])->name('settings.gridSearchAll'); // admin, production [DONE]
     Route::delete('/settings/evaluations/clear', [SettingsController::class, 'clearEvaluations'])->name('settings.clearEvaluations');
     Route::delete('/settings/evaluations/{id}', [SettingsController::class, 'deleteEvaluation'])->name('settings.deleteEvaluation');
+    Route::post('/settings/grid-search-all/cancel', [SettingsController::class, 'cancelGridSearch'])->name('settings.cancelGridSearch');
+    
     // Import Routes
     Route::get('/settings/imports', [SettingsController::class, 'import'])->name('settings.import'); 
     Route::post('/settings/import/products', [SettingsController::class, 'importProducts'])->name('products.import.excel'); // admin
