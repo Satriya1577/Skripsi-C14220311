@@ -100,6 +100,14 @@ class ForecastController extends Controller
             'approved_production_qty' => 'required|numeric|min:0',
         ]);
 
+        $batchQty = $productionPlan->product->batch_size; 
+
+        if ($validated['approved_production_qty'] < $batchQty) {
+            return redirect()->back()
+                ->with('error', "Jumlah produksi yang disetujui harus lebih besar dari jumlah produksi per batch untuk produk ini yaitu {$batchQty} per batch")
+                ->withInput();
+        }
+
         $productionPlan->update([
             'approved_production_qty' => $validated['approved_production_qty'],
             'status' => 'approved',

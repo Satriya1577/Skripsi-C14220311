@@ -15,7 +15,7 @@
             silver: '#334155',
             petronas: '#2563EB',
             muted: '#64748B',
-            danger: '#EF4444' // Menambahkan warna merah untuk tombol hapus
+            danger: '#EF4444' 
           }
         }
       }
@@ -125,10 +125,31 @@
     {{-- KONDISI 1: TABEL EVALUASI KHUSUS (c14220311@john.petra.ac.id) --}}
     {{-- ========================================================== --}}
     @isset($sarimaProductEvaluations)
+    
+    {{-- Fungsi Bantuan Inline untuk Memformat Angka Miliar ke Scientific --}}
+    @php
+      if (!function_exists('formatLargeNumber')) {
+          function formatLargeNumber($value, $isPercentage = false) {
+              if ($value === null) return '-';
+              
+              $floatVal = (float)$value;
+              // Jika angka >= 1 Miliar atau <= -1 Miliar, gunakan format Scientific (e+)
+              if ($floatVal >= 1000000000 || $floatVal <= -1000000000) {
+                  $formatted = sprintf('%.2e', $floatVal);
+              } else {
+                  $formatted = number_format($floatVal, 2);
+              }
+              
+              return $isPercentage ? $formatted . '%' : $formatted;
+          }
+      }
+    @endphp
+
     <div class="overflow-x-auto pb-4">
       <table class="w-full text-sm border-collapse">
         <thead class="bg-carbon text-xs uppercase tracking-wide">
           <tr>
+            <th rowspan="2" class="px-3 py-2 text-center text-black align-middle border-b border-carbonSoft">No</th>
             <th rowspan="2" class="px-3 py-2 text-left text-black align-middle border-b border-carbonSoft">Product Info</th>
             <th colspan="7" class="px-1 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Params (RAW)</th>
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Raw Data</th>
@@ -163,7 +184,44 @@
         </thead>
         <tbody class="divide-y divide-carbon/50">
           @forelse($sarimaProductEvaluations as $eval)
+            
+            {{-- BLOK PENCARIAN RMSE TERKECIL --}}
+            @php
+              $metrics = [
+                  'raw' => ['rmse' => $eval->raw_rmse !== null ? (float)$eval->raw_rmse : null, 'mape' => $eval->raw_mape !== null ? (float)$eval->raw_mape : null],
+                  'ma'  => ['rmse' => $eval->ma_rmse !== null ? (float)$eval->ma_rmse : null, 'mape' => $eval->ma_mape !== null ? (float)$eval->ma_mape : null],
+                  'sg'  => ['rmse' => $eval->sg_rmse !== null ? (float)$eval->sg_rmse : null, 'mape' => $eval->sg_mape !== null ? (float)$eval->sg_mape : null],
+                  'bc'  => ['rmse' => $eval->bc_rmse !== null ? (float)$eval->bc_rmse : null, 'mape' => $eval->bc_mape !== null ? (float)$eval->bc_mape : null],
+                  'yj'  => ['rmse' => $eval->yj_rmse !== null ? (float)$eval->yj_rmse : null, 'mape' => $eval->yj_mape !== null ? (float)$eval->yj_mape : null],
+              ];
+
+              // Buang yang nilainya null (jika ada error saat training)
+              $validMetrics = array_filter($metrics, function($item) {
+                  return $item['rmse'] !== null && $item['mape'] !== null;
+              });
+
+              $bestMethod = null;
+              if (!empty($validMetrics)) {
+                  // Sort menggunakan usort: Jika RMSE sama, cek MAPE
+                  uasort($validMetrics, function($a, $b) {
+                      if ($a['rmse'] === $b['rmse']) {
+                          return $a['mape'] <=> $b['mape']; // Tie-breaker: MAPE terkecil
+                      }
+                      return $a['rmse'] <=> $b['rmse']; // Utama: RMSE terkecil
+                  });
+                  
+                  // Ambil nama metode yang menang (raw, ma, sg, bc, atau yj)
+                  $bestMethod = array_key_first($validMetrics);
+              }
+
+              // Variabel class CSS untuk Highlight Hijau
+              $hl = 'bg-green-100 text-green-800 font-bold';
+            @endphp
+
             <tr class="hover:bg-carbon transition-colors">
+              {{-- Kolom Nomor --}}
+              <td class="px-3 py-2 text-center text-slate-800 font-medium">{{ $loop->iteration }}</td>
+              
               <td class="px-3 py-2">
                 <div class="flex flex-col">
                   <span class="font-semibold text-silver">{{ $eval->product_code }}</span>
@@ -181,24 +239,24 @@
               <td class="px-1 py-2 text-center text-silver">{{ $eval->raw_seasonal_s }}</td>
 
               {{-- RAW --}}
-              <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->raw_rmse !== null ? number_format((float)$eval->raw_rmse, 2) : '-' }}</td>
-              <td class="px-2 py-2 text-right text-xs">{{ $eval->raw_mape !== null ? number_format((float)$eval->raw_mape, 2).'%' : '-' }}</td>
+              <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'raw' ? $hl : '' }}">{{ formatLargeNumber($eval->raw_rmse) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'raw' ? $hl : '' }}">{{ formatLargeNumber($eval->raw_mape, true) }}</td>
 
               {{-- MA --}}
-              <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->ma_rmse !== null ? number_format((float)$eval->ma_rmse, 2) : '-' }}</td>
-              <td class="px-2 py-2 text-right text-xs">{{ $eval->ma_mape !== null ? number_format((float)$eval->ma_mape, 2).'%' : '-' }}</td>
+              <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'ma' ? $hl : '' }}">{{ formatLargeNumber($eval->ma_rmse) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'ma' ? $hl : '' }}">{{ formatLargeNumber($eval->ma_mape, true) }}</td>
 
               {{-- SG --}}
-              <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->sg_rmse !== null ? number_format((float)$eval->sg_rmse, 2) : '-' }}</td>
-              <td class="px-2 py-2 text-right text-xs">{{ $eval->sg_mape !== null ? number_format((float)$eval->sg_mape, 2).'%' : '-' }}</td>
+              <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'sg' ? $hl : '' }}">{{ formatLargeNumber($eval->sg_rmse) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'sg' ? $hl : '' }}">{{ formatLargeNumber($eval->sg_mape, true) }}</td>
 
               {{-- BC --}}
-              <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->bc_rmse !== null ? number_format((float)$eval->bc_rmse, 2) : '-' }}</td>
-              <td class="px-2 py-2 text-right text-xs">{{ $eval->bc_mape !== null ? number_format((float)$eval->bc_mape, 2).'%' : '-' }}</td>
+              <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'bc' ? $hl : '' }}">{{ formatLargeNumber($eval->bc_rmse) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'bc' ? $hl : '' }}">{{ formatLargeNumber($eval->bc_mape, true) }}</td>
 
               {{-- YJ --}}
-              <td class="px-2 py-2 text-right text-xs border-l border-carbon">{{ $eval->yj_rmse !== null ? number_format((float)$eval->yj_rmse, 2) : '-' }}</td>
-              <td class="px-2 py-2 text-right text-xs">{{ $eval->yj_mape !== null ? number_format((float)$eval->yj_mape, 2).'%' : '-' }}</td>
+              <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'yj' ? $hl : '' }}">{{ formatLargeNumber($eval->yj_rmse) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'yj' ? $hl : '' }}">{{ formatLargeNumber($eval->yj_mape, true) }}</td>
               
               {{-- TOMBOL HAPUS BARIS (HANYA UNTUK C14220311) --}}
               @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
@@ -218,7 +276,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="{{ (Auth::check() && str_contains(Auth::user()->email, 'c14220311')) ? '19' : '18' }}" class="px-3 py-6 text-center text-muted italic">
+              <td colspan="{{ (Auth::check() && str_contains(Auth::user()->email, 'c14220311')) ? '20' : '19' }}" class="px-3 py-6 text-center text-muted italic">
                 Tidak ada data evaluasi SARIMA yang tersedia.
               </td>
             </tr>
@@ -235,6 +293,7 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
+            <th class="px-3 py-3 text-center text-black">No</th>
             <th class="px-3 py-3 text-left text-black">Product Info</th>
             <th class="px-1 py-3 text-center text-black font-bold">p</th>
             <th class="px-1 py-3 text-center text-black font-bold">d</th>
@@ -258,6 +317,10 @@
             </form>
 
             <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
+              
+              {{-- Kolom Nomor --}}
+              <td class="px-3 py-2 text-center text-slate-800 font-medium">{{ $loop->iteration }}</td>
+
               <td class="px-3 py-2">
                 <div class="flex flex-col">
                   <span class="font-semibold text-silver">{{ $product->code }}</span>
@@ -315,7 +378,7 @@
           @endforeach
 
           @if(isset($products) && $products->isEmpty())
-            <tr><td colspan="12" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
+            <tr><td colspan="13" class="px-3 py-6 text-center text-muted italic">Tidak ada data konfigurasi yang tersedia.</td></tr>
           @endif
         </tbody>
       </table>
@@ -362,7 +425,7 @@
         input.dataset.original = input.value;
         
         input.addEventListener('input', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
-        input.addEventListener('change', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
+        input.addEventListener('change', () => checkិតirState(inputs, saveBtn, activeClasses, inactiveClasses));
       });
     });
 
