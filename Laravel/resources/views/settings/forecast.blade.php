@@ -21,6 +21,16 @@
       }
     }
   </script>
+  <style>
+    .sortable-col {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    .sortable-col:hover {
+      background-color: #94a3b8; 
+    }
+  </style>
 </head>
 
 <body class="bg-blackBase text-silver min-h-screen">
@@ -53,7 +63,6 @@
 
     <div class="flex flex-wrap items-center gap-3">
       
-      {{-- TOMBOL HAPUS SEMUA DATA (HANYA UNTUK C14220311) --}}
       @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
         <form action="{{ route('settings.clearEvaluations') }}" method="POST">
           @csrf
@@ -68,10 +77,8 @@
         </form>
       @endif
 
-    {{-- TOMBOL AUTO TUNE & CANCEL --}}
     @if(isset($isGridSearchRunning) && $isGridSearchRunning)
       <div class="flex items-center gap-2">
-        {{-- Tombol disabled indikator processing --}}
         <button disabled class="flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-carbon border border-petronas/30 text-white font-bold opacity-75 cursor-not-allowed shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -79,7 +86,6 @@
           <span>Processing...</span>
         </button>
         
-        {{-- Tombol Cancel --}}
         <form action="{{ route('settings.cancelGridSearch') }}" method="POST">
           @csrf
           <button type="submit" onclick="return confirm('PERINGATAN: Yakin ingin membatalkan dan menghapus antrean Grid Search?')" 
@@ -91,7 +97,6 @@
         </form>
       </div>
     @else
-      {{-- Tombol Normal --}}
       <form id="grid-all-form" action="{{ route('settings.gridSearchAll') }}" method="POST">
         @csrf
         <button type="submit" id="btn-tune-all"
@@ -126,14 +131,12 @@
     {{-- ========================================================== --}}
     @isset($sarimaProductEvaluations)
     
-    {{-- Fungsi Bantuan Inline untuk Memformat Angka Miliar ke Scientific --}}
     @php
       if (!function_exists('formatLargeNumber')) {
           function formatLargeNumber($value, $isPercentage = false) {
               if ($value === null) return '-';
               
               $floatVal = (float)$value;
-              // Jika angka >= 1 Miliar atau <= -1 Miliar, gunakan format Scientific (e+)
               if ($floatVal >= 1000000000 || $floatVal <= -1000000000) {
                   $formatted = sprintf('%.2e', $floatVal);
               } else {
@@ -145,8 +148,58 @@
       }
     @endphp
 
+    {{-- KOTAK SUMMARY --}}
+    <div class="bg-white border border-carbon rounded-xl p-4 mb-4 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 border-b border-carbon/50 pb-3 gap-3">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-petronas" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+          </svg>
+          Evaluation Insight <span id="summary-count" class="text-muted text-xs font-normal ml-1">(0 rows included)</span>
+        </h3>
+        
+        {{-- RADIO BUTTON FILTER --}}
+        <div class="flex items-center gap-4 text-xs font-medium text-slate-700 bg-carbonSoft px-3 py-1.5 rounded-lg border border-carbon">
+          <span class="text-muted mr-1">Filter Insight:</span>
+          <label class="flex items-center gap-1.5 cursor-pointer hover:text-petronas transition-colors">
+            <input type="radio" name="mape_filter" value="all" class="accent-petronas w-3.5 h-3.5" checked> Semua Data
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer hover:text-petronas transition-colors">
+            <input type="radio" name="mape_filter" value="1000" class="accent-petronas w-3.5 h-3.5"> MAPE 0-1000%
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer hover:text-petronas transition-colors">
+            <input type="radio" name="mape_filter" value="100" class="accent-petronas w-3.5 h-3.5"> MAPE 0-100%
+          </label>
+        </div>
+      </div>
+      
+      <div class="overflow-x-auto mb-3">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="bg-carbonSoft text-slate-700">
+            <tr>
+              <th class="py-1.5 px-2 border-b border-carbon">Method</th>
+              <th class="py-1.5 px-2 border-b border-carbon text-right">Avg RMSE</th>
+              <th class="py-1.5 px-2 border-b border-carbon text-right">Min RMSE</th>
+              <th class="py-1.5 px-2 border-b border-carbon text-right">Max RMSE</th>
+              <th class="py-1.5 px-2 border-b border-carbon border-l border-carbon/50 text-right">Avg MAPE</th>
+              <th class="py-1.5 px-2 border-b border-carbon text-right">Min MAPE</th>
+              <th class="py-1.5 px-2 border-b border-carbon text-right">Max MAPE</th>
+            </tr>
+          </thead>
+          <tbody id="summary-metrics-body" class="divide-y divide-carbon/50 text-silver font-medium">
+            </tbody>
+        </table>
+      </div>
+
+      <div class="bg-carbonSoft p-2 rounded-lg border border-carbon flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span class="text-xs font-bold text-slate-800">Most Frequent Parameters (Mode):</span>
+        <div id="summary-params" class="flex gap-2 text-xs">
+          </div>
+      </div>
+    </div>
+
     <div class="overflow-x-auto pb-4">
-      <table class="w-full text-sm border-collapse">
+      <table id="eval-table" class="w-full text-sm border-collapse" data-sort-dir="asc">
         <thead class="bg-carbon text-xs uppercase tracking-wide">
           <tr>
             <th rowspan="2" class="px-3 py-2 text-center text-black align-middle border-b border-carbonSoft">No</th>
@@ -157,7 +210,6 @@
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Savitzky-Golay</th>
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Box-Cox</th>
             <th colspan="2" class="px-2 py-2 text-center text-black border-b border-carbonSoft border-l border-carbon">Yeo-Johnson</th>
-            {{-- KOLOM AKSI (HANYA UNTUK C14220311) --}}
             @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
               <th rowspan="2" class="px-2 py-2 text-center text-black align-middle border-b border-carbonSoft border-l border-carbon">Aksi</th>
             @endif
@@ -170,22 +222,26 @@
             <th class="px-1 py-2 text-center font-bold text-black">D</th>
             <th class="px-1 py-2 text-center font-bold text-black">Q</th>
             <th class="px-1 py-2 text-center font-bold text-black">s</th>
-            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-black">MAPE</th>
-            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-black">MAPE</th>
-            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-black">MAPE</th>
-            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-black">MAPE</th>
-            <th class="px-2 py-2 text-right text-black border-l border-carbon">RMSE</th>
-            <th class="px-2 py-2 text-right text-black">MAPE</th>
+            
+            <th class="px-2 py-2 text-right text-black border-l border-carbon sortable-col" onclick="sortTable('eval-table', 8)" title="Sort by Raw RMSE">RMSE ↕</th>
+            <th class="px-2 py-2 text-right text-black sortable-col" onclick="sortTable('eval-table', 9)" title="Sort by Raw MAPE">MAPE ↕</th>
+            
+            <th class="px-2 py-2 text-right text-black border-l border-carbon sortable-col" onclick="sortTable('eval-table', 10)" title="Sort by MA RMSE">RMSE ↕</th>
+            <th class="px-2 py-2 text-right text-black sortable-col" onclick="sortTable('eval-table', 11)" title="Sort by MA MAPE">MAPE ↕</th>
+            
+            <th class="px-2 py-2 text-right text-black border-l border-carbon sortable-col" onclick="sortTable('eval-table', 12)" title="Sort by SG RMSE">RMSE ↕</th>
+            <th class="px-2 py-2 text-right text-black sortable-col" onclick="sortTable('eval-table', 13)" title="Sort by SG MAPE">MAPE ↕</th>
+            
+            <th class="px-2 py-2 text-right text-black border-l border-carbon sortable-col" onclick="sortTable('eval-table', 14)" title="Sort by BC RMSE">RMSE ↕</th>
+            <th class="px-2 py-2 text-right text-black sortable-col" onclick="sortTable('eval-table', 15)" title="Sort by BC MAPE">MAPE ↕</th>
+            
+            <th class="px-2 py-2 text-right text-black border-l border-carbon sortable-col" onclick="sortTable('eval-table', 16)" title="Sort by YJ RMSE">RMSE ↕</th>
+            <th class="px-2 py-2 text-right text-black sortable-col" onclick="sortTable('eval-table', 17)" title="Sort by YJ MAPE">MAPE ↕</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-carbon/50">
+        <tbody class="divide-y divide-carbon/50" id="eval-table-body">
           @forelse($sarimaProductEvaluations as $eval)
             
-            {{-- BLOK PENCARIAN RMSE TERKECIL --}}
             @php
               $metrics = [
                   'raw' => ['rmse' => $eval->raw_rmse !== null ? (float)$eval->raw_rmse : null, 'mape' => $eval->raw_mape !== null ? (float)$eval->raw_mape : null],
@@ -195,41 +251,47 @@
                   'yj'  => ['rmse' => $eval->yj_rmse !== null ? (float)$eval->yj_rmse : null, 'mape' => $eval->yj_mape !== null ? (float)$eval->yj_mape : null],
               ];
 
-              // Buang yang nilainya null (jika ada error saat training)
               $validMetrics = array_filter($metrics, function($item) {
                   return $item['rmse'] !== null && $item['mape'] !== null;
               });
 
               $bestMethod = null;
+              $bestMape = null;
               if (!empty($validMetrics)) {
-                  // Sort menggunakan usort: Jika RMSE sama, cek MAPE
                   uasort($validMetrics, function($a, $b) {
-                      if ($a['rmse'] === $b['rmse']) {
-                          return $a['mape'] <=> $b['mape']; // Tie-breaker: MAPE terkecil
-                      }
-                      return $a['rmse'] <=> $b['rmse']; // Utama: RMSE terkecil
+                      if ($a['rmse'] === $b['rmse']) return $a['mape'] <=> $b['mape'];
+                      return $a['rmse'] <=> $b['rmse']; 
                   });
-                  
-                  // Ambil nama metode yang menang (raw, ma, sg, bc, atau yj)
                   $bestMethod = array_key_first($validMetrics);
+                  $bestMape = $validMetrics[$bestMethod]['mape']; 
               }
 
-              // Variabel class CSS untuk Highlight Hijau
+              $isHighMape = $bestMape !== null && $bestMape > 1000;
+              $rowClass = $isHighMape ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-carbon transition-colors';
               $hl = 'bg-green-100 text-green-800 font-bold';
             @endphp
 
-            <tr class="hover:bg-carbon transition-colors">
-              {{-- Kolom Nomor --}}
+            <tr class="{{ $rowClass }} eval-data-row"
+                data-p="{{ $eval->raw_order_p }}" data-d="{{ $eval->raw_order_d }}" data-q="{{ $eval->raw_order_q }}"
+                data-sp="{{ $eval->raw_seasonal_P }}" data-sd="{{ $eval->raw_seasonal_D }}" data-sq="{{ $eval->raw_seasonal_Q }}" data-ss="{{ $eval->raw_seasonal_s }}"
+                data-raw-rmse="{{ $eval->raw_rmse }}" data-raw-mape="{{ $eval->raw_mape }}"
+                data-ma-rmse="{{ $eval->ma_rmse }}" data-ma-mape="{{ $eval->ma_mape }}"
+                data-sg-rmse="{{ $eval->sg_rmse }}" data-sg-mape="{{ $eval->sg_mape }}"
+                data-bc-rmse="{{ $eval->bc_rmse }}" data-bc-mape="{{ $eval->bc_mape }}"
+                data-yj-rmse="{{ $eval->yj_rmse }}" data-yj-mape="{{ $eval->yj_mape }}"
+            >
+              
               <td class="px-3 py-2 text-center text-slate-800 font-medium">{{ $loop->iteration }}</td>
               
               <td class="px-3 py-2">
                 <div class="flex flex-col">
-                  <span class="font-semibold text-silver">{{ $eval->product_code }}</span>
+                  <span class="font-semibold text-silver">
+                    {{ $eval->product_code }}
+                  </span>
                   <span class="text-xs text-muted truncate max-w-[150px]">{{ $eval->product_name }}</span>
                 </div>
               </td>
 
-              {{-- Parameters --}}
               <td class="px-1 py-2 text-center text-slate-800 border-l border-carbon">{{ $eval->raw_order_p }}</td>
               <td class="px-1 py-2 text-center text-slate-800">{{ $eval->raw_order_d }}</td>
               <td class="px-1 py-2 text-center text-slate-800">{{ $eval->raw_order_q }}</td>
@@ -238,27 +300,21 @@
               <td class="px-1 py-2 text-center text-silver">{{ $eval->raw_seasonal_Q }}</td>
               <td class="px-1 py-2 text-center text-silver">{{ $eval->raw_seasonal_s }}</td>
 
-              {{-- RAW --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'raw' ? $hl : '' }}">{{ formatLargeNumber($eval->raw_rmse) }}</td>
-              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'raw' ? $hl : '' }}">{{ formatLargeNumber($eval->raw_mape, true) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'raw' ? $hl : '' }} {{ $eval->raw_mape > 1000 ? 'text-red-600 font-bold' : '' }}">{{ formatLargeNumber($eval->raw_mape, true) }}</td>
 
-              {{-- MA --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'ma' ? $hl : '' }}">{{ formatLargeNumber($eval->ma_rmse) }}</td>
-              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'ma' ? $hl : '' }}">{{ formatLargeNumber($eval->ma_mape, true) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'ma' ? $hl : '' }} {{ $eval->ma_mape > 1000 ? 'text-red-600 font-bold' : '' }}">{{ formatLargeNumber($eval->ma_mape, true) }}</td>
 
-              {{-- SG --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'sg' ? $hl : '' }}">{{ formatLargeNumber($eval->sg_rmse) }}</td>
-              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'sg' ? $hl : '' }}">{{ formatLargeNumber($eval->sg_mape, true) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'sg' ? $hl : '' }} {{ $eval->sg_mape > 1000 ? 'text-red-600 font-bold' : '' }}">{{ formatLargeNumber($eval->sg_mape, true) }}</td>
 
-              {{-- BC --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'bc' ? $hl : '' }}">{{ formatLargeNumber($eval->bc_rmse) }}</td>
-              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'bc' ? $hl : '' }}">{{ formatLargeNumber($eval->bc_mape, true) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'bc' ? $hl : '' }} {{ $eval->bc_mape > 1000 ? 'text-red-600 font-bold' : '' }}">{{ formatLargeNumber($eval->bc_mape, true) }}</td>
 
-              {{-- YJ --}}
               <td class="px-2 py-2 text-right text-xs border-l border-carbon {{ $bestMethod === 'yj' ? $hl : '' }}">{{ formatLargeNumber($eval->yj_rmse) }}</td>
-              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'yj' ? $hl : '' }}">{{ formatLargeNumber($eval->yj_mape, true) }}</td>
+              <td class="px-2 py-2 text-right text-xs {{ $bestMethod === 'yj' ? $hl : '' }} {{ $eval->yj_mape > 1000 ? 'text-red-600 font-bold' : '' }}">{{ formatLargeNumber($eval->yj_mape, true) }}</td>
               
-              {{-- TOMBOL HAPUS BARIS (HANYA UNTUK C14220311) --}}
               @if(Auth::check() && str_contains(Auth::user()->email, 'c14220311'))
                 <td class="px-2 py-2 text-center border-l border-carbon">
                   <form action="{{ route('settings.deleteEvaluation', $eval->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus record evaluasi ini?');">
@@ -276,7 +332,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="{{ (Auth::check() && str_contains(Auth::user()->email, 'c14220311')) ? '20' : '19' }}" class="px-3 py-6 text-center text-muted italic">
+              <td colspan="{{ (Auth::check() && str_contains(Auth::user()->email, 'c14220311')) ? '19' : '18' }}" class="px-3 py-6 text-center text-muted italic">
                 Tidak ada data evaluasi SARIMA yang tersedia.
               </td>
             </tr>
@@ -290,7 +346,7 @@
     {{-- ========================================================== --}}
     @else
     <div class="overflow-x-auto pb-4"> 
-      <table class="w-full text-sm">
+      <table id="normal-table" class="w-full text-sm" data-sort-dir="asc">
         <thead class="bg-carbon">
           <tr>
             <th class="px-3 py-3 text-center text-black">No</th>
@@ -302,28 +358,39 @@
             <th class="px-1 py-3 text-center text-black font-bold">D</th>
             <th class="px-1 py-3 text-center text-black font-bold">Q</th>
             <th class="px-1 py-3 text-center text-black font-bold">s</th> 
-            <th class="px-3 py-3 text-right text-black border-l border-carbonSoft">RMSE</th>
-            <th class="px-3 py-3 text-right text-black">MAPE</th>
+            
+            <th class="px-3 py-3 text-right text-black border-l border-carbonSoft sortable-col" onclick="sortTable('normal-table', 9)">RMSE ↕</th>
+            <th class="px-3 py-3 text-right text-black sortable-col" onclick="sortTable('normal-table', 10)">MAPE ↕</th>
+            
             <th class="px-3 py-3 text-left text-black border-l border-carbonSoft">Last Trained</th>
             <th class="px-3 py-3 text-center text-black">Actions</th>
           </tr>
         </thead>
         <tbody>
           @foreach($products as $product)
+            @php
+              $isHighMape = $product->mape !== null && (float)$product->mape > 1000;
+              $rowClass = $isHighMape ? 'bg-red-50 hover:bg-red-100 group' : 'border-b border-carbon hover:bg-carbon transition-colors group';
+            @endphp
+            
             <form id="form-{{ $product->id }}" action="{{ route('settings.updateSarima') }}" method="POST">
               @csrf
               @method('PUT')
               <input type="hidden" name="product_id" value="{{ $product->id }}">
             </form>
 
-            <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
+            <tr class="{{ $rowClass }}">
               
-              {{-- Kolom Nomor --}}
               <td class="px-3 py-2 text-center text-slate-800 font-medium">{{ $loop->iteration }}</td>
 
               <td class="px-3 py-2">
                 <div class="flex flex-col">
-                  <span class="font-semibold text-silver">{{ $product->code }}</span>
+                  <span class="font-semibold text-silver">
+                    {{ $product->code }}
+                    @if($isHighMape)
+                      <span class="text-[10px] text-red-600 bg-red-200 px-1 rounded ml-1 font-bold inline-block" title="MAPE sangat tinggi/error">⚠️ High Error</span>
+                    @endif
+                  </span>
                   <span class="text-xs text-muted truncate max-w-[150px]">{{ $product->name }}</span>
                 </div>
               </td>
@@ -347,10 +414,10 @@
                 </select>
               </td>
 
-              <td class="px-3 py-2 text-right border-l border-carbon text-xs text-silver">
+              <td class="px-3 py-2 text-right border-l border-carbon text-xs {{ $isHighMape ? 'text-slate-800' : 'text-silver' }}">
                 {{ $product->rmse !== null ? number_format($product->rmse, 2) : '-' }}
               </td>
-              <td class="px-3 py-2 text-right text-xs text-silver">
+              <td class="px-3 py-2 text-right text-xs {{ $isHighMape ? 'text-red-700 font-bold' : 'text-silver' }}">
                 {{ $product->mape !== null ? number_format($product->mape, 2) . '%' : '-' }}
               </td> 
 
@@ -389,8 +456,176 @@
 </main>
 
 <script>
+  function formatJsLargeNumber(num, isPercentage = false) {
+    if (num === null || num === undefined || isNaN(num)) return '-';
+    let formatted;
+    if (num >= 1e9 || num <= -1e9) {
+      formatted = num.toExponential(2);
+    } else {
+      formatted = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    return isPercentage ? formatted + '%' : formatted;
+  }
+
+  function getMode(obj) {
+    if (Object.keys(obj).length === 0) return '-';
+    return Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b);
+  }
+
+  function updateSummary() {
+    const radio = document.querySelector('input[name="mape_filter"]:checked');
+    if(!radio) return;
+    
+    const filterVal = radio.value;
+    const allRows = document.querySelectorAll('.eval-data-row');
+    let includedCount = 0;
+
+    let metrics = {
+      raw: { rmse: [], mape: [] },
+      ma:  { rmse: [], mape: [] },
+      sg:  { rmse: [], mape: [] },
+      bc:  { rmse: [], mape: [] },
+      yj:  { rmse: [], mape: [] }
+    };
+    
+    let paramsCount = { p: {}, d: {}, q: {}, sp: {}, sd: {}, sq: {}, ss: {} };
+
+    allRows.forEach(tr => {
+      let include = false;
+      const methods = ['raw', 'ma', 'sg', 'bc', 'yj'];
+      
+      // LOGIKA FILTER KETAT: Cek kelima metode MAPE
+      if (filterVal === 'all') {
+        include = true;
+      } else {
+        let maxLimit = parseInt(filterVal);
+        let allValid = true;
+        
+        for (let m of methods) {
+          let mapeVal = parseFloat(tr.getAttribute(`data-${m}-mape`));
+          // Gugurkan baris jika ada satu nilai yang error/NaN, negatif, atau melebihi batas radio
+          if (isNaN(mapeVal) || mapeVal < 0 || mapeVal > maxLimit) {
+            allValid = false;
+            break; 
+          }
+        }
+        include = allValid;
+      }
+
+      if (include) {
+        tr.style.display = ''; // Tampilkan baris
+        includedCount++;
+
+        methods.forEach(m => {
+          let rmseVal = parseFloat(tr.getAttribute(`data-${m}-rmse`));
+          let mapeVal = parseFloat(tr.getAttribute(`data-${m}-mape`));
+          if (!isNaN(rmseVal)) metrics[m].rmse.push(rmseVal);
+          if (!isNaN(mapeVal)) metrics[m].mape.push(mapeVal);
+        });
+
+        ['p', 'd', 'q', 'sp', 'sd', 'sq', 'ss'].forEach(param => {
+          let pVal = tr.getAttribute(`data-${param}`);
+          if (pVal !== null && pVal !== '') {
+            paramsCount[param][pVal] = (paramsCount[param][pVal] || 0) + 1;
+          }
+        });
+      } else {
+        tr.style.display = 'none'; // Sembunyikan baris
+      }
+    });
+
+    const countEl = document.getElementById('summary-count');
+    if(countEl) countEl.innerText = `(${includedCount} rows included)`;
+
+    const calcStats = (arr) => {
+      if (arr.length === 0) return { avg: null, min: null, max: null };
+      let min = Math.min(...arr);
+      let max = Math.max(...arr);
+      let avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+      return { avg, min, max };
+    };
+
+    const tbody = document.getElementById('summary-metrics-body');
+    if (tbody) {
+      tbody.innerHTML = '';
+      const methodNames = { raw: 'Raw Data', ma: 'Moving Avg', sg: 'Savitzky-Golay', bc: 'Box-Cox', yj: 'Yeo-Johnson' };
+      
+      Object.keys(metrics).forEach(m => {
+        let rmseStats = calcStats(metrics[m].rmse);
+        let mapeStats = calcStats(metrics[m].mape);
+        
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-1.5 px-2">${methodNames[m]}</td>
+          <td class="py-1.5 px-2 text-right">${formatJsLargeNumber(rmseStats.avg)}</td>
+          <td class="py-1.5 px-2 text-right">${formatJsLargeNumber(rmseStats.min)}</td>
+          <td class="py-1.5 px-2 text-right">${formatJsLargeNumber(rmseStats.max)}</td>
+          <td class="py-1.5 px-2 border-l border-carbon/50 text-right">${formatJsLargeNumber(mapeStats.avg, true)}</td>
+          <td class="py-1.5 px-2 text-right">${formatJsLargeNumber(mapeStats.min, true)}</td>
+          <td class="py-1.5 px-2 text-right">${formatJsLargeNumber(mapeStats.max, true)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    const paramsDiv = document.getElementById('summary-params');
+    if (paramsDiv) {
+      const modeNames = { p:'p', d:'d', q:'q', sp:'P', sd:'D', sq:'Q', ss:'s' };
+      paramsDiv.innerHTML = '';
+      Object.keys(paramsCount).forEach(key => {
+        let mode = getMode(paramsCount[key]);
+        let span = document.createElement('span');
+        span.className = 'bg-white border border-carbon px-2 py-0.5 rounded shadow-sm text-slate-800';
+        span.innerHTML = `<span class="font-bold mr-1 text-petronas">${modeNames[key]}:</span>${mode}`;
+        paramsDiv.appendChild(span);
+      });
+    }
+  }
+
+
+  function sortTable(tableId, colIndex) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    if (rows.length === 0 || rows[0].querySelector('td[colspan]')) return;
+
+    const currentDir = table.getAttribute('data-sort-dir') || 'asc';
+    const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+    table.setAttribute('data-sort-dir', newDir);
+
+    rows.sort((a, b) => {
+      if(!a.cells[colIndex] || !b.cells[colIndex]) return 0;
+
+      let valA = a.cells[colIndex].innerText.trim().replace(/,/g, '').replace('%', '');
+      let valB = b.cells[colIndex].innerText.trim().replace(/,/g, '').replace('%', '');
+      
+      let numA = parseFloat(valA);
+      let numB = parseFloat(valB);
+
+      if (isNaN(numA)) numA = newDir === 'asc' ? 99999999999 : -99999999999;
+      if (isNaN(numB)) numB = newDir === 'asc' ? 99999999999 : -99999999999;
+
+      return newDir === 'asc' ? numA - numB : numB - numA;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     
+    // --- INIT RADIO BUTTON FILTER ---
+    const radioFilters = document.querySelectorAll('input[name="mape_filter"]');
+    if (radioFilters.length > 0) {
+      radioFilters.forEach(radio => {
+        radio.addEventListener('change', updateSummary);
+      });
+      // Hitung summary saat halaman pertama kali diload
+      updateSummary();
+    }
+
     // --- LOGIC TOMBOL AUTO TUNE ---
     const gridAllForm = document.getElementById('grid-all-form');
     const btnTuneAll = document.getElementById('btn-tune-all');
@@ -420,12 +655,11 @@
       const activeClasses = ['bg-petronas', 'text-white', 'hover:bg-blue-700', 'shadow-lg', 'shadow-petronas/20', 'cursor-pointer', 'opacity-100'];
       const inactiveClasses = ['bg-carbon', 'text-slate-800', 'cursor-not-allowed', 'opacity-50'];
 
-      // Simpan nilai asli
       inputs.forEach(input => {
         input.dataset.original = input.value;
         
         input.addEventListener('input', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
-        input.addEventListener('change', () => checkិតirState(inputs, saveBtn, activeClasses, inactiveClasses));
+        input.addEventListener('change', () => checkDirtyState(inputs, saveBtn, activeClasses, inactiveClasses));
       });
     });
 
