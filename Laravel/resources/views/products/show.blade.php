@@ -130,7 +130,6 @@
             <span class="text-xs text-muted block">Batch Size (Lot)</span>
             <span class=" text-lg font-bold text-silver">{{ number_format($product->batch_size, 0, ',', '.') }} Pcs</span>
           </div>
-          {{-- Placeholder untuk info lain jika ada, misal Machine Capacity --}}
         </div>
         <p class="text-[10px] text-muted mt-2">
           *Batch Size digunakan sebagai acuan jumlah produksi minimum per siklus.
@@ -218,62 +217,98 @@
             <tr><td colspan="6" class="px-4 py-8 text-center text-muted italic">No ingredients added yet.</td></tr>
           @endforelse
         </tbody>
+        <tfoot class="bg-carbon border-t border-carbonSoft">
+          <tr>
+            <td colspan="4" class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider font-bold">
+              Total Est. Cost
+            </td>
+            <td class="px-4 py-3 text-right font-bold text-slate-800 whitespace-nowrap">
+              @php
+                $totalEstCost = $product->productMaterials->sum(function($pm) {
+                    return $pm->amount_needed * $pm->material->price_per_unit;
+                });
+              @endphp
+              Rp {{ number_format($totalEstCost, 2, ',', '.') }}
+            </td>
+            <td class="px-4 py-3"></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </section>
 
-  {{-- SECTION 4: STOCK ADJUSTMENT --}}
+  {{-- SECTION 4: COST ADJUSTMENT (REVALUASI HPP) --}}
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
+    <h2 class="text-lg font-bold text-slate-800">Cost Adjustment (Revaluasi HPP)</h2>
+    <form action="{{ route('products.costAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      @csrf
+      <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+      <div>
+        <label class="text-xs text-muted uppercase tracking-wide">HPP Baru (Per Unit)</label>
+        <div class="relative mt-1">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span class="text-muted text-xs font-bold">Rp</span>
+          </div>
+          <input type="number" name="new_cost" value="{{ $product->cost_price }}" required
+            class="w-full pl-10 pr-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver font-bold">
+        </div>
+        <p class="text-xs text-muted mt-1">HPP saat ini: Rp {{ number_format($product->cost_price, 2, ',', '.') }}</p>
+      </div>
+
+      <div>
+        <label class="text-xs text-muted uppercase tracking-wide">Alasan Penyesuaian Harga</label>
+        <input type="text" name="reason" value="{{ old('reason') }}" placeholder="Contoh: Koreksi harga bahan baku bulan lalu..." required
+          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver">
+      </div>
+
+      <div class="md:col-span-2 flex justify-end">
+        <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
+          Simpan Revaluasi HPP
+        </button>
+      </div>
+    </form>
+  </section>
+
+  {{-- SECTION 5: STOCK ADJUSTMENT --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
     <h2 class="text-lg font-bold text-slate-800">Stock Adjustment (Opname)</h2>
-    <form action="{{ route('products.adjustment.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form action="{{ route('products.stockAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       @csrf
       <input type="hidden" name="product_id" value="{{ $product->id }}">
 
       <div>
         <label class="text-xs text-muted uppercase tracking-wide">Jumlah Stok Aktual</label>
         <div class="relative mt-1">
-          <input type="number" step="1" name="actual_qty" value="{{ old('actual_qty') }}" required
-            class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
+          <input type="number" name="actual_qty" value="{{ old('actual_qty') }}" required
+            class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver font-bold">
           <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <span class="text-muted text-xs uppercase">Pcs</span>
           </div>
         </div>
-        <p class="text-xs text-muted mt-1">Masukkan jumlah stok fisik real produk jadi saat ini.</p>
+        <p class="text-xs text-muted mt-1">Stok saat ini: <strong>{{ number_format($product->current_stock, 0) }} Pcs</strong></p>
       </div>
 
       <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Catatan</label>
-        <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian..."
+        <label class="text-xs text-muted uppercase tracking-wide">Catatan Opname</label>
+        <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian (contoh: Barang hilang/rusak)..." required
           class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
       </div>
 
-      @if($product->cost_price == 0)
-        <div class="md:col-span-2 bg-yellow-900/20 border border-yellow-700/50 p-4 rounded-lg">
-          <div class="flex items-start space-x-3">
-            <div class="text-yellow-500 mt-1">⚠️</div>
-            <div class="w-full">
-              <p class="text-sm text-yellow-500 font-bold">HPP Dasar Belum Ada</p>
-              <p class="text-xs text-muted mb-2">Mohon isi estimasi biaya produksi (HPP) per unit.</p>
-              <label class="text-xs text-muted uppercase tracking-wide">Estimasi HPP per Unit</label>
-              <input type="number" step="0.01" name="manual_price" 
-                class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-yellow-500 focus:outline-none text-silver">
-            </div>
-          </div>
-        </div>
-      @endif
-
       <div class="md:col-span-2 flex justify-end">
         <button type="submit" class="bg-yellow-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-700 transition shadow-lg shadow-yellow-900/20">
-          Simpan Adjustment
+          Simpan Adjustment Stok
         </button>
       </div>
     </form>
   </section>
 
-  {{-- SECTION 5: RIWAYAT TRANSAKSI --}}
+  
+
+  {{-- SECTION 6: RIWAYAT TRANSAKSI --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi</h2>
+      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi & Valuasi</h2>
       <div class="flex gap-2">
         <span class="text-xs bg-carbon px-3 py-1.5 rounded-lg text-slate-800 border border-carbon">
           Total Data: {{ $transactions->total() }}
@@ -290,7 +325,7 @@
             <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Ref. & Keterangan</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Masuk</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Keluar</th>
-            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo</th>
+            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo FIsik</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -319,13 +354,17 @@
                 @elseif($trx->type == 'adjustment')
                   @if($trx->qty >= 0)
                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-blue-400 bg-blue-400/10 border border-blue-400/30">
-                      ADJ IN
+                      STK ADJ IN
                     </span>
                   @else
                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-orange-400 bg-orange-400/10 border border-orange-400/30">
-                      ADJ OUT
+                      STK ADJ OUT
                     </span>
                   @endif
+                @elseif($trx->type == 'cost_adjustment')
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-indigo-500 bg-indigo-500/10 border border-indigo-500/30" title="Revaluasi HPP / Cost Adjustment">
+                    COST ADJ
+                  </span>
                 @endif
               </td>
 
@@ -339,7 +378,7 @@
               </td>
 
               <td class="px-4 py-3 text-right text-success">
-                @if($trx->qty > 0)
+                @if($trx->type != 'cost_adjustment' && $trx->qty > 0)
                   +{{ number_format($trx->qty, 0) }}
                 @else
                   <span class="text-carbonSoft">-</span>
@@ -347,7 +386,7 @@
               </td>
 
               <td class="px-4 py-3 text-right text-danger"> 
-                @if($trx->qty < 0)
+                @if($trx->type != 'cost_adjustment' && $trx->qty < 0)
                   {{ number_format(abs($trx->qty), 0) }} 
                 @else
                   <span class="text-carbonSoft">-</span>
@@ -363,7 +402,7 @@
               <td colspan="6" class="px-6 py-12 text-center text-muted italic bg-slate-100 rounded-b-lg">
                 <div class="flex flex-col items-center justify-center gap-2">
                   <span class="text-2xl">📦</span>
-                  <p>Belum ada pergerakan stok untuk produk ini.</p>
+                  <p>Belum ada pergerakan stok/harga untuk produk ini.</p>
                 </div>
               </td>
             </tr>

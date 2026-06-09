@@ -38,7 +38,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/products/update/{product}', [ProductController::class, 'update'])->name('products.update'); // admin, sales [DONE]
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); // admin, sales [DONE]
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); // admin, sales [DONE]
-    Route::post('/products/adjustment', [ProductController::class, 'storeAdjustment'])->name('products.adjustment.store'); // admin, inventory [DONE]
+    Route::post('/products/cost-adjustment', [ProductController::class, 'costAdjustment'])->name('products.costAdjustment'); // admin, produksi [DONE]
+    Route::post('/products/stock-adjustment', [ProductController::class, 'stockAdjustment'])->name('products.stockAdjustment'); // admin, inventory [DONE]
     Route::get('/products/update-product-lead-time-safety-stock', [ProductController::class, 'updateProductLeadTimeSafetyStock'])->name('products.updateProductLeadTimeSafetyStock'); // admin, inventory, production [DONE]
     // Product Material Routes, 
     Route::post('/product-materials/store', [ProductMaterialController::class, 'store'])->name('product_materials.store'); // admin, production [DONE]

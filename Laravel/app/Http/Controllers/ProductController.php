@@ -151,9 +151,7 @@ class ProductController extends Controller
     }
 
 
-    /**
-     * Helper Method untuk Menghitung Lead Time
-     */
+    // calculate lead time ini dipakai saat proses insert produk baru dan update produk
     private function calculateLeadTime(Request $request, ?Product $product)
     {
         // Jika Mode MANUAL
@@ -180,20 +178,20 @@ class ProductController extends Controller
                     ->get();
 
                 if ($batches->count() > 0) {
-                    $totalDays = 0;
+                    $leadTimes = [];
                     foreach ($batches as $batch) {
                         $start = Carbon::parse($batch->start_date);
                         $end   = Carbon::parse($batch->end_date);
-                        $days  = $start->diffInDays($end); 
-                        $totalDays += ($days == 0 ? 1 : $days);
+                        $days  = max(1, $start->diffInDays($end));
+                        $leadTimes[] = $days;
                     }
                     
-                    $avgDays = (float) ($totalDays / $batches->count());
+                    //$avgDays = (float) ($totalDays / $batches->count());
                     
                     return [
-                        'min' => (int) round($avgDays),
-                        'max' => (int) round($avgDays),
-                        'avg' => $avgDays
+                        'min'     => min($leadTimes),
+                        'max'     => max($leadTimes),
+                        'average' => array_sum($leadTimes) / count($leadTimes),
                     ];
                 }
             }
@@ -236,7 +234,52 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 
-    public function storeAdjustment(Request $request)
+
+    public function costAdjustment(Request $request)
+    {
+
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
+        }
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'new_cost'   => 'required|numeric',
+            'reason'     => 'required|string|max:255'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $product = Product::findOrFail($request->product_id);
+            $oldCost = $product->cost_price;
+            $newCost = $request->new_cost;
+
+            // 1. Update Master Product HPP
+            $product->update(['cost_price' => $newCost]);
+
+            // 2. Catat riwayat perubahan harga (Qty = 0, karena fisik barang tidak berubah)
+            ProductTransaction::create([
+                'product_id'            => $product->id,
+                'type'                  => 'cost_adjustment', // Tipe khusus revaluasi
+                'qty'                   => 0, 
+                'cost_price'            => $newCost,
+                'current_stock_balance' => $product->current_stock, // Stok tidak berubah
+                'product_name_snapshot' => $product->name,
+                'description'           => "Revaluasi HPP dari Rp" . number_format($oldCost) . " menjadi Rp" . number_format($newCost) . ". Alasan: " . $request->reason,
+                'transaction_date'      => now(),
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'HPP berhasil direvaluasi/diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal update HPP: ' . $e->getMessage());
+        }
+    }
+
+    public function stockAdjustment(Request $request)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory'])) {
@@ -372,7 +415,7 @@ class ProductController extends Controller
         }
     }
 
-    private function calculateLeadTimeStats(Product $product) 
+    public function calculateLeadTimeStats(Product $product) 
     {
         // Jika mode manual, gunakan data yang sudah ada di database
         if ($product->is_manual_lead_time === 'manual') {
