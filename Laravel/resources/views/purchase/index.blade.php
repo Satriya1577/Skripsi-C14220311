@@ -57,7 +57,7 @@
       {{-- ROW 1: INFORMASI PO --}}
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <label class="text-xs text-muted uppercase tracking-wide block mb-1">No. PO (Opsional)</label>
+          <label class="text-xs text-muted uppercase tracking-wide block mb-1">Kode PO (Opsional)</label>
           <input type="text" name="po_number" placeholder="(Auto Generated)"
             class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-muted/30 transition">
         </div>
@@ -160,13 +160,13 @@
       <table class="w-full text-sm border-collapse">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Date</th>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">PO No.</th>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Supplier</th>
-            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Status</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Tanggal Order</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Kode PO</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Nama Supplier</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Order Status</th>
             <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
             <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Total</th>
-            <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Balance</th>
+            <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Sisa Hutang</th>
             <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
           </tr>
         </thead>

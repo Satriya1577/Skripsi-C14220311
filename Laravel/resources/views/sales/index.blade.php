@@ -159,9 +159,9 @@
       <table class="w-full text-sm border-collapse">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Date</th>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">SO No.</th>
-            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Distributor</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Tanggal Transaksi</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Kode SO</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Nama Distributor</th>
             <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Order Status</th>
             <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Payment</th>
             <th class="px-4 py-3 text-right text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Total Tagihan</th>

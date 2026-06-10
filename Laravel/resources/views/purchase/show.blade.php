@@ -258,7 +258,7 @@
 
             {{-- COST INPUT --}}
             <div class="w-full md:w-1/5">
-              <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Cost (Rp)</label>
+              <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Harga Beli Per Satuan (Rp)</label>
               <input type="number" id="priceInput" placeholder="0" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
             </div>
 
@@ -286,7 +286,7 @@
               <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Material</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Satuan</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Qty</th>
-              <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Cost</th>
+              <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Harga Beli Per Satuan</th>
               {{-- HAPUS COLUMN DISC DI SINI --}}
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Subtotal</th>
               @if($purchaseOrder->status == 'draft') <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th> @endif

@@ -67,7 +67,6 @@
       </p>
     </div>
 
-    {{-- PERBAIKAN: Tombol Print hanya tampil jika status BUKAN draft --}}
     @if($salesOrder->status != 'draft' && $salesOrder->status != 'cancelled')
       <div>
         <a href="{{ route('sales.print', $salesOrder->id) }}" target="_blank" 
@@ -131,7 +130,6 @@
       <div class="flex justify-between items-center">
         <h2 class="text-lg font-bold text-slate-800">Shipping Information</h2>
         
-        {{-- Badge Indikator --}}
         @if($salesOrder->status == 'confirmed')
           <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
             Input Mode Active
@@ -143,7 +141,6 @@
         @endif
       </div>
 
-      {{-- KONDISI 1: DRAFT (Hidden) --}}
       @if($salesOrder->status == 'draft')
         <div class="p-8 text-center border-2 border-dashed border-carbon rounded-xl">
           <p class="text-muted text-sm italic">
@@ -151,10 +148,8 @@
           </p>
         </div>
 
-      {{-- KONDISI 2: CONFIRMED (Form Input Mode) --}}
       @elseif($salesOrder->status == 'confirmed')
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {{-- Input Tanggal --}}
           <div>
             <label class="text-xs text-muted uppercase tracking-wide block mb-1">Tanggal Pengiriman</label>
             <input type="date" name="shipping_date" 
@@ -163,7 +158,6 @@
               required>
           </div>
 
-          {{-- Input Tipe Ongkir --}}
           <div>
             <label class="text-xs text-muted uppercase tracking-wide block mb-1">Pengaturan Ongkir</label>
             <select name="shipping_payment_type" id="shippingTypeSelect" onchange="toggleShippingInput()"
@@ -173,7 +167,6 @@
             </select>
           </div>
 
-          {{-- Input Biaya --}}
           <div>
             <label class="text-xs text-muted uppercase tracking-wide block mb-1">Nominal Biaya</label>
             <div class="relative">
@@ -187,10 +180,8 @@
           </div>
         </div>
 
-      {{-- KONDISI 3: SHIPPED / CANCELLED (Card View Mode) --}}
       @else
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-          {{-- Card Tanggal --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Tanggal Pengiriman</p>
             <p class="text-lg font-bold text-silver">
@@ -198,7 +189,6 @@
             </p>
           </div>
 
-          {{-- Card Tipe Ongkir --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Pengaturan Ongkir</p>
             <p class="text-lg font-bold text-silver">
@@ -210,7 +200,6 @@
             </p>
           </div>
 
-          {{-- Card Biaya --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Biaya Realisasi</p>
             <p class="text-lg font-bold text-silver">
@@ -252,9 +241,13 @@
               <input type="number" id="qtyInput" placeholder="1" min="1" value="1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
             </div>
 
-            <div class="w-full md:w-1/6">
-              <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Disc (%)</label>
-              <input type="number" id="discInput" placeholder="0" min="0" max="100" value="0" step="0.1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
+            {{-- DIGANTI MENJADI INPUT HARGA JUAL --}}
+            <div class="w-full md:w-1/4">
+              <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Harga Jual / Unit</label>
+              <div class="relative">
+                <span class="absolute left-3 top-3 text-muted text-sm font-bold">Rp</span>
+                <input type="number" id="priceInput" placeholder="0" min="0" step="0.01" class="block w-full pl-10 pr-3 p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition font-bold">
+              </div>
             </div>
 
             <div class="w-full md:w-auto">
@@ -279,7 +272,7 @@
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Kemasan</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Qty</th>
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Price</th>
-              <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Disc (%)</th>
+              <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Diskon (%)</th>
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Subtotal</th>
               @if($salesOrder->status == 'draft') <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th> @endif
             </tr>
@@ -294,7 +287,6 @@
               </td>
               <td class="px-4 py-3 text-center text-silver text-xs">{{ $item->product_packaging_snapshot ?? $item->product->packaging ?? '-' }}</td>
               
-              {{-- KOLOM QTY (EDITABLE SAAT DRAFT) --}}
               <td class="px-4 py-3 text-center">
                 @if($salesOrder->status == 'draft')
                   <input type="number" 
@@ -310,7 +302,6 @@
 
               <td class="px-4 py-3 text-right text-muted ">Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
               
-              {{-- KOLOM DISKON (EDITABLE SAAT DRAFT) --}}
               <td class="px-4 py-3 text-center">
                 @if($salesOrder->status == 'draft')
                   <input type="number" 
@@ -407,6 +398,26 @@
     }
   }
 
+  // EVENT LISTENER HARGA AUTO-FILL
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleShippingInput();
+    
+    const productSelect = document.getElementById('productSelect');
+    const priceInput = document.getElementById('priceInput');
+
+    if (productSelect && priceInput) {
+        productSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const defaultPrice = selectedOption.getAttribute('data-price');
+            if (defaultPrice) {
+                priceInput.value = parseFloat(defaultPrice);
+            } else {
+                priceInput.value = 0;
+            }
+        });
+    }
+  });
+
   let addedItemsCount = 0;
 
   function deleteExistingItem(btn, itemId, subtotal) {
@@ -424,29 +435,30 @@
   function addItemToTable() {
     const productSelect = document.getElementById('productSelect');
     const qtyInput = document.getElementById('qtyInput');
-    const discInput = document.getElementById('discInput');
+    const priceInput = document.getElementById('priceInput'); // Mengambil input harga jual
     const tableBody = document.getElementById('itemsTableBody');
     const itemsContainer = document.getElementById('newItemsContainer');
 
     if (productSelect.value === "") { alert("Silakan pilih produk."); return; }
     if (qtyInput.value <= 0) { alert("Jumlah harus lebih dari 0."); return; }
+    if (priceInput.value === "" || parseFloat(priceInput.value) < 0) { alert("Harga jual tidak valid."); return; }
 
     const selectedOption = productSelect.options[productSelect.selectedIndex];
     const productId = productSelect.value;
     const productName = selectedOption.getAttribute('data-name');
     const productCode = selectedOption.getAttribute('data-code');
     const productPackaging = selectedOption.getAttribute('data-packaging') || '-';
-    const price = parseFloat(selectedOption.getAttribute('data-price'));
+    
     const qty = parseInt(qtyInput.value);
-    const discount = parseFloat(discInput.value) || 0;
+    const price = parseFloat(priceInput.value);
+    const discount = 0; // Set default diskon 0 di form atas
 
     const grossTotal = price * qty;
-    const discountAmount = grossTotal * (discount / 100);
-    const subtotal = grossTotal - discountAmount;
+    const subtotal = grossTotal; // Karena diskon 0
 
     const uniqueId = Date.now() + '_' + addedItemsCount; 
 
-    // -- PERBAIKAN: Input Qty dan Diskon dibuat bisa diedit langsung --
+    // BAGIAN TABEL BAWAH TETAP SAMA SEPERTI KODE ASLI ANDA
     const row = document.createElement('tr');
     row.id = 'row_' + uniqueId;
     row.className = 'hover:bg-carbon transition-colors bg-petronas/5'; 
@@ -457,7 +469,6 @@
       </td>
       <td class="px-4 py-3 text-center text-silver text-xs">${productPackaging}</td>
       
-      {{-- KOLOM QTY BARU (INPUT) --}}
       <td class="px-4 py-3 text-center">
         <input type="number" 
             name="new_items[${addedItemsCount}][quantity]" 
@@ -469,7 +480,6 @@
 
       <td class="px-4 py-3 text-right text-muted ">Rp ${formatRupiah(price)}</td>
       
-      {{-- KOLOM DISKON BARU (INPUT) --}}
       <td class="px-4 py-3 text-center">
         <input type="number" 
             name="new_items[${addedItemsCount}][discount_percent]" 
@@ -486,18 +496,19 @@
     `;
     tableBody.appendChild(row);
 
-    // -- PERBAIKAN: Input hidden hanya untuk Product ID saja --
-    // Qty dan Diskon sudah ditangani oleh input di dalam tabel
+    // Menyisipkan hidden input tambahan untuk `unit_price` yang didapat dari form `Harga Jual`
+    // sehingga form tetap tersubmit tanpa mengubah struktur tabel
     const inputDiv = document.createElement('div');
     inputDiv.id = 'input_' + uniqueId;
     inputDiv.innerHTML = `
       <input type="hidden" name="new_items[${addedItemsCount}][product_id]" value="${productId}">
+      <input type="hidden" name="new_items[${addedItemsCount}][unit_price]" value="${price}">
     `;
     itemsContainer.appendChild(inputDiv);
     
     productSelect.value = "";
     qtyInput.value = 1;
-    discInput.value = 0;
+    priceInput.value = ""; // Bersihkan nilai harga
     addedItemsCount++;
   }
 
@@ -512,10 +523,6 @@
   function formatRupiah(angka) {
     return new Intl.NumberFormat('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(angka);
   }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    toggleShippingInput();
-  });
 </script>
 
 </body>
