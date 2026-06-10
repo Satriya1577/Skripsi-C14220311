@@ -335,7 +335,6 @@ class MaterialController extends Controller
     public function show(Material $material)
     {
         $transactions = $material->transactions()
-            ->orderBy('transaction_date', 'asc')
             ->paginate(5);
         return view('materials.show', compact('material', 'transactions'));
     }
@@ -368,99 +367,136 @@ class MaterialController extends Controller
     }
 
     
-    // mengupdate stok opname bahan baku setelah dilakukan pengecekan fisik di gudang
-    // function ini juga bisa mengupdate harga menggunakan input estimasi harga awal barang
-    public function storeAdjustment(Request $request)
+  
+
+    public function stockAdjustment(Request $request)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
         }
+
         $request->validate([
             'material_id'  => 'required|exists:materials,id',
             'actual_qty'   => 'required|numeric|min:0', 
-            'notes'        => 'nullable|string',
-            'manual_price' => 'nullable|numeric|min:0.01' 
+            'notes'        => 'required|string|max:255',
         ]);
 
         try {
             DB::beginTransaction();
 
             $material = Material::findOrFail($request->material_id);
-            
-            // 1. SIAPKAN KONVERSI
             $faktor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
 
-            // 2. HITUNG SELISIH (DELTA)
             // Input User (Satuan Beli) -> Konversi ke Base Unit
             $inputQtyPurchaseUnit = $request->actual_qty;
             $actualQtyInBase      = $inputQtyPurchaseUnit * $faktor;
-
-            // Stok Sistem saat ini (Base Unit)
-            $systemQty = $material->current_stock; 
+            $systemQty            = $material->current_stock; 
             
-            // Selisih (+ berarti Surplus/Masuk, - berarti Loss/Keluar)
             $diffQty = $actualQtyInBase - $systemQty;
 
             if (abs($diffQty) < 0.0001) { 
                 return back()->with('info', "Stok fisik sudah sesuai dengan sistem.");
             }
 
-            // 3. LOGIC HARGA & HPP
+            // FILTER PERLINDUNGAN: Cek harga dasar jika terjadi surplus persediaan
             $transactionPrice = $material->price_per_unit;
-
-            if ($diffQty > 0) {
-                // SURPLUS
-                if ($transactionPrice == 0) {
-                    if ($request->filled('manual_price')) {
-                        $transactionPrice = $request->manual_price / $faktor;
-                        $material->update(['price_per_unit' => $transactionPrice]);
-                    } else {
-                        throw new \Exception("Harga sistem saat ini Rp 0. Wajib mengisi 'Harga Estimasi'.");
-                    }
-                }
-            } else {
-                // LOSS: Wajib pakai harga sistem
-                $transactionPrice = $material->price_per_unit;
+            if ($diffQty > 0 && $transactionPrice == 0) {
+                throw new \Exception("Harga dasar material saat ini Rp 0. Silakan lakukan 'Cost Adjustment' (Update Harga) terlebih dahulu sebelum menambah stok baru.");
             }
 
-            // 4. EKSEKUSI UPDATE DATABASE
+            // Eksekusi Update Stok Fisik
             $material->update(['current_stock' => $actualQtyInBase]);
 
             $typeLabel = $diffQty > 0 ? "Surplus (Found)" : "Loss (Usage)";
             $desc      = "Opname: {$typeLabel}. Fisik: {$inputQtyPurchaseUnit} {$material->purchase_unit}. " . $request->notes;
 
-            // --- PERBAIKAN DI SINI: SESUAI SKEMA BARU ---
             MaterialTransaction::create([
                 'material_id'           => $material->id,
-                'type'                  => 'adjustment', // Enum: 'in', 'out', 'adjustment'
+                'type'                  => 'adjustment', 
                 'qty'                   => $diffQty, 
-                
-                // Harga
                 'price_per_unit'        => $transactionPrice,
                 'total_price'           => abs($diffQty) * $transactionPrice,
-                
                 'transaction_date'      => now(),
                 'description'           => $desc,
 
-                // Snapshot Wajib
+                // Snapshots
                 'material_name_snapshot' => $material->name,
                 'material_packaging_size_snapshot' => $material->packaging_size,
                 'material_packaging_unit_snapshot' => $material->packaging_unit,
                 'material_conversion_factor_snapshot' => $material->conversion_factor,
                 'purchase_unit_snapshot' => $material->purchase_unit,
                 'material_unit_snapshot' => $material->unit,
-                'current_stock_balance'  => $actualQtyInBase, // Saldo setelah update
+                'current_stock_balance'  => $actualQtyInBase,
             ]);
 
             DB::commit();
             
             $diffInPurchUnit = $diffQty / $faktor;
-            return back()->with('success', "Stock Adjustment berhasil. Selisih: " . number_format($diffInPurchUnit, 2) . " " . $material->purchase_unit);
+            return back()->with('success', "Stock Adjustment berhasil. Selisih: " . ($diffInPurchUnit > 0 ? '+' : '') . number_format($diffInPurchUnit, 2) . " " . $material->purchase_unit);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function costAdjustment(Request $request)
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengubah harga dasar material.')->withInput();
+        }
+
+        $request->validate([
+            'material_id' => 'required|exists:materials,id',
+            'new_price'   => 'required|numeric|min:0.01', // Harga Baru per Purchase Unit (misal per Sak/Box)
+            'reason'      => 'required|string|max:255'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $material = Material::findOrFail($request->material_id);
+            $faktor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+
+            $oldPriceInPurchaseUnit = $material->price_per_unit * $faktor;
+            $newPriceInPurchaseUnit = $request->new_price;
+
+            // Konversi Harga per Purchase Unit menjadi Harga per Base Unit untuk Database
+            $newPriceInBaseUnit = $newPriceInPurchaseUnit / $faktor;
+
+            // Update Master Harga
+            $material->update(['price_per_unit' => $newPriceInBaseUnit]);
+
+            // Catat transaksi Revaluasi Nilai (Qty = 0 karena kuantitas fisik tidak berubah)
+            $desc = "Cost Adjustment: Penyesuaian harga dari Rp " . number_format($oldPriceInPurchaseUnit, 2, ',', '.') . " menjadi Rp " . number_format($newPriceInPurchaseUnit, 2, ',', '.') . " per " . $material->purchase_unit . ". Alasan: " . $request->reason;
+
+            MaterialTransaction::create([
+                'material_id'           => $material->id,
+                'type'                  => 'cost_adjustment', 
+                'qty'                   => 0, // Kuantitas fisik tidak bergeser
+                'price_per_unit'        => $newPriceInBaseUnit,
+                'total_price'           => 0,
+                'transaction_date'      => now(),
+                'description'           => $desc,
+
+                // Snapshots
+                'material_name_snapshot' => $material->name,
+                'material_packaging_size_snapshot' => $material->packaging_size,
+                'material_packaging_unit_snapshot' => $material->packaging_unit,
+                'material_conversion_factor_snapshot' => $material->conversion_factor,
+                'purchase_unit_snapshot' => $material->purchase_unit,
+                'material_unit_snapshot' => $material->unit,
+                'current_stock_balance'  => $material->current_stock, // Saldo stok tetap sama
+            ]);
+
+            DB::commit();
+            return back()->with('success', "Harga dasar material berhasil diperbarui.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal update harga: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -587,7 +623,6 @@ class MaterialController extends Controller
             'max'     => max($leadTimes),
         ];
     }
-
 
     // menghitung rata-rata pemakaian bahan baku harian selama 30 hari terakhir
     // tipe bahan baku yang terpakai di tabel MaterialTransactionadalah OUT 

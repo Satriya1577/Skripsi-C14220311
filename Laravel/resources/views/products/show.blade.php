@@ -246,7 +246,7 @@
         Stock Adjustment (Opname)
       </button>
       <button onclick="switchTab('cost')" id="tab-btn-cost" class="pb-3 text-sm font-bold border-b-2 border-transparent text-muted hover:text-silver transition-colors">
-        Cost Adjustment (Revaluasi HPP)
+        Cost Adjustment (Update HPP)
       </button>
     </div>
 
@@ -308,7 +308,7 @@
 
         <div class="md:col-span-2 flex justify-end">
           <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
-            Simpan Revaluasi HPP
+            Simpan Update HPP
           </button>
         </div>
       </form>

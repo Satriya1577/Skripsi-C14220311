@@ -14,7 +14,10 @@
             carbonSoft: '#F8FAFC',
             silver: '#334155',
             petronas: '#2563EB',
-            muted: '#64748B'
+            muted: '#64748B',
+            warning: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444'
           }
         }
       }
@@ -63,7 +66,8 @@
       <h1 class="text-3xl font-extrabold text-slate-800">{{ $material->name }}</h1>
       
       <span class="px-3 py-1 rounded-full text-xs font-bold uppercase border
-        {{ $material->is_active ? 'bg-green-900/30 text-green-400 border-green-500/30' : 'bg-red-900/30 text-red-400 border-red-500/30' }}">
+      bg-success/10
+        {{ $material->is_active ? 'bg-green-900/10 text-green-400 border-green-500/10' : 'bg-red-900/30 text-red-400 border-red-500/30' }}">
         {{ $material->is_active ? 'Active' : 'Non-Active' }}
       </span>
     </div>
@@ -147,66 +151,95 @@
     </div>
   </section>
 
-  {{-- SECTION 2: STOCK ADJUSTMENT --}}
-  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-    <h2 class="text-lg font-bold text-slate-800">Stock Adjustment (Opname)</h2>
+  {{-- SECTION 2: ADJUSTMENTS (TABBED SYSTEM) --}}
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-4">
+    
+    {{-- NAVIGATION TABS --}}
+    <div class="flex border-b border-carbon/50 gap-6">
+      <button onclick="switchTab('stock')" id="tab-btn-stock" class="pb-3 text-sm font-bold border-b-2 border-petronas text-petronas hover:text-petronas transition-colors">
+        Stock Adjustment (Opname)
+      </button>
+      <button onclick="switchTab('cost')" id="tab-btn-cost" class="pb-3 text-sm font-bold border-b-2 border-transparent text-muted hover:text-silver transition-colors">
+        Cost Adjustment (Update HPP)
+      </button>
+    </div>
 
     @if($material->is_active)
-      <form action="{{ route('materials.adjustment.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        @csrf
-        <input type="hidden" name="material_id" value="{{ $material->id }}">
+      {{-- CONTENT TAB 1: STOCK ADJUSTMENT --}}
+      <div id="tab-content-stock" class="block pt-2">
+        <form action="{{ route('materials.stockAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          @csrf
+          <input type="hidden" name="material_id" value="{{ $material->id }}">
 
-        <div>
-          <label class="text-xs text-muted uppercase tracking-wide">Jumlah Stok Aktual ({{ $pUnit }})</label>
-          <div class="relative mt-1">
-            <input type="number" step="0.01" name="actual_qty" value="{{ old('actual_qty') }}" required
-              class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <span class="text-muted text-xs uppercase">{{ $pUnit }}</span>
-            </div>
-          </div>
-          <p class="text-xs text-muted mt-1">Masukkan jumlah stok fisik real saat ini.</p>
-        </div>
-
-        <div>
-          <label class="text-xs text-muted uppercase tracking-wide">Catatan</label>
-          <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian..."
-            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
-        </div>
-
-        @if($material->price_per_unit == 0)
-          <div class="md:col-span-2 bg-yellow-900/20 border border-yellow-700/50 p-4 rounded-lg">
-            <div class="flex items-start space-x-3">
-              <div class="text-yellow-500 mt-1">⚠️</div>
-              <div class="w-full">
-                <p class="text-sm text-yellow-500 font-bold">Harga Dasar Belum Ada</p>
-                <p class="text-xs text-muted mb-2">Mohon isi estimasi harga pasar per {{ $pUnit }}.</p>
-                <label class="text-xs text-muted uppercase tracking-wide">Harga Estimasi per {{ $pUnit }}</label>
-                <input type="number" name="manual_price" 
-                  class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-yellow-500 focus:outline-none text-silver">
+          <div>
+            <label class="text-xs text-muted uppercase tracking-wide">Jumlah Stok Aktual ({{ $pUnit }})</label>
+            <div class="relative mt-1">
+              <input type="number" step="0.01" name="actual_qty" value="{{ old('actual_qty') }}" required
+                class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver font-bold">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <span class="text-muted text-xs uppercase">{{ $pUnit }}</span>
               </div>
             </div>
+            <p class="text-xs text-muted mt-1">Stok sistem saat ini: <strong>{{ number_format($material->current_stock / $factor, 2) }} {{ $pUnit }}</strong></p>
           </div>
-        @endif
 
-        <div class="md:col-span-2 flex justify-end">
-          <button type="submit" class="bg-yellow-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-700 transition shadow-lg shadow-yellow-900/20">
-            Simpan Adjustment
-          </button>
-        </div>
-      </form>
+          <div>
+            <label class="text-xs text-muted uppercase tracking-wide">Catatan Opname</label>
+            <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian kuantitas fisik..." required
+              class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
+          </div>
+
+          <div class="md:col-span-2 flex justify-end">
+            <button type="submit" class="bg-yellow-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-700 transition shadow-lg shadow-yellow-900/20">
+              Simpan Adjustment Stok
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {{-- CONTENT TAB 2: COST ADJUSTMENT --}}
+      <div id="tab-content-cost" class="hidden pt-2">
+        <form action="{{ route('materials.costAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          @csrf
+          <input type="hidden" name="material_id" value="{{ $material->id }}">
+
+          <div>
+            <label class="text-xs text-muted uppercase tracking-wide">Estimasi Harga Baru per {{ $pUnit }}</label>
+            <div class="relative mt-1">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span class="text-muted text-xs font-bold">Rp</span>
+              </div>
+              <input type="number" step="0.01" name="new_price" value="{{ $material->price_per_unit * $factor }}" required
+                class="w-full pl-10 pr-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver font-bold">
+            </div>
+            <p class="text-xs text-muted mt-1">Harga saat ini: Rp {{ number_format($material->price_per_unit * $factor, 2, ',', '.') }}</p>
+          </div>
+
+          <div>
+            <label class="text-xs text-muted uppercase tracking-wide">Alasan Penyesuaian Harga</label>
+            <input type="text" name="reason" value="{{ old('reason') }}" placeholder="Contoh: Kenaikan harga kontrak vendor supplier..." required
+              class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver">
+          </div>
+
+          <div class="md:col-span-2 flex justify-end">
+            <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
+              Simpan Update HPP
+            </button>
+          </div>
+        </form>
+      </div>
     @else
        <div class="p-4 bg-carbon rounded-lg border border-red-900/30 flex items-center gap-3">
-        <span class="text-red-500 text-xl">🔒</span>
-        <p class="text-sm text-muted">Form adjustment dikunci karena material ini berstatus <strong>Non-Active</strong>.</p>
+        <span class="text-danger text-xl">🔒</span>
+        <p class="text-sm text-muted">Panel adjustment dikunci karena material ini berstatus <strong>Non-Active</strong>.</p>
       </div>
     @endif
   </section>
 
-  {{-- SECTION 3: RIWAYAT TRANSAKSI --}}
+  <!-- {{-- SECTION 3: RIWAYAT TRANSAKSI --}}
   <section class="bg-carbonSoft rounded-xl p-6">
     <div class="flex justify-between items-end mb-4">
-      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi</h2>
+      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi & Valuasi</h2>
       <span class="text-xs text-muted italic">Semua angka ditampilkan dalam satuan {{ $pUnit }}</span>
     </div>
 
@@ -225,34 +258,45 @@
         <tbody>
           @forelse ($transactions as $transaction)
             <tr class="border-b border-carbon hover:bg-carbon transition-colors">
-              <td class="px-3 py-2 font-semibold text-silver">
+              <td class="px-3 py-2 font-semibold text-silver text-xs">
                 {{ $transaction->transaction_date?->format('d M Y') ?? '-' }}
+                <span class="block text-[10px] text-muted font-normal">
+                  {{ $transaction->created_at->format('H:i') }}
+                </span>
               </td>
 
               <td class="px-3 py-2">
                 @if($transaction->type == 'in')
-                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-green-900/30 text-green-400 border border-green-500/30">
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-success/10 text-success border border-success/30">
                     PURCHASE IN
                   </span>
                 @elseif($transaction->type == 'out')
-                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-red-900/30 text-red-400 border border-red-500/30">
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-danger/10 text-danger border border-danger/30">
                     USAGE OUT
                   </span>
                 @elseif($transaction->type == 'adjustment')
                   @if($transaction->qty >= 0)
-                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-900/30 text-blue-400 border border-blue-500/30">
-                      ADJ IN
+                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-900/30 text-blue-400 border border-blue-400/30">
+                      STK ADJ IN
                     </span>
                   @else
-                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-900/30 text-orange-400 border border-orange-500/30">
-                      ADJ OUT
+                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-900/30 text-orange-400 border border-orange-400/30">
+                      STK ADJ OUT
                     </span>
                   @endif
+                @elseif($transaction->type == 'cost_adjustment')
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/30" title="Revaluasi Nilai Harga Material">
+                    COST ADJ
+                  </span>
                 @endif
               </td>
 
-              <td class="px-3 py-2 font-semibold text-right {{ $transaction->qty > 0 ? 'text-green-400' : 'text-red-400' }}">
-                {{ $transaction->qty > 0 ? '+' : '' }}{{ number_format($transaction->qty / $factor, 2) }}
+              <td class="px-3 py-2 font-semibold text-right {{ $transaction->type == 'cost_adjustment' ? 'text-silver' : ($transaction->qty > 0 ? 'text-success' : 'text-danger') }}">
+                @if($transaction->type == 'cost_adjustment')
+                  -
+                @else
+                  {{ $transaction->qty > 0 ? '+' : '' }}{{ number_format($transaction->qty / $factor, 2) }}
+                @endif
               </td>
 
               <td class="px-3 py-2 text-right text-muted">
@@ -260,7 +304,11 @@
               </td>
 
               <td class="px-3 py-2 font-semibold text-silver text-right">
-                Rp {{ $transaction->total_price ? number_format($transaction->total_price, 2, ',', '.') : '-' }}
+                @if($transaction->type == 'cost_adjustment')
+                  -
+                @else
+                  Rp {{ $transaction->total_price ? number_format($transaction->total_price, 2, ',', '.') : '-' }}
+                @endif
               </td>
 
               <td class="px-3 py-2 text-muted text-xs max-w-xs truncate">
@@ -282,9 +330,178 @@
         {{ $transactions->links('pagination::tailwind') }}
       </div>
     @endif
+  </section> -->
+
+  {{-- SECTION 3: RIWAYAT TRANSAKSI & VALUASI --}}
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi & Valuasi</h2>
+      <div class="flex gap-2">
+        <span class="text-xs bg-carbon px-3 py-1.5 rounded-lg text-slate-800 border border-carbon">
+          Satuan: <strong>{{ $pUnit }}</strong>
+        </span>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-carbon">
+      <table class="w-full text-sm">
+        <thead class="bg-carbon text-xs uppercase tracking-wide">
+          <tr>
+            <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Tanggal</th>
+            <th class="px-4 py-3 text-center text-black border-b border-carbonSoft">Tipe</th>
+            <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Ref. & Keterangan</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Masuk</th>
+            <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Keluar</th>
+            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo Fisik</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-carbon/50">
+          @forelse($transactions as $trx)
+            <tr class="hover:bg-carbon transition-colors group">
+              {{-- KOLOM 1: TANGGAL & WAKTU --}}
+              <td class="px-4 py-3 text-silver text-xs whitespace-nowrap">
+                {{ $trx->transaction_date?->format('d/m/Y') ?? '-' }}
+                <span class="block text-[10px] text-muted">
+                  {{ $trx->created_at->format('H:i') }} WIB
+                </span>
+              </td>
+
+              {{-- KOLOM 2: TIPE BADGES --}}
+              <td class="px-4 py-3 text-center">
+                @if($trx->type == 'in')
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-green-600 bg-success/10 border border-success/30">
+                    PURCHASE IN
+                  </span>
+                @elseif($trx->type == 'out')
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-danger bg-danger/10 border border-danger/30">
+                    USAGE OUT
+                  </span>
+                @elseif($trx->type == 'adjustment')
+                  @if($trx->qty >= 0)
+                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-blue-500 bg-blue-500/10 border border-blue-500/30">
+                      STK ADJ IN
+                    </span>
+                  @else
+                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-orange-500 bg-orange-500/10 border border-orange-500/30">
+                      STK ADJ OUT
+                    </span>
+                  @endif
+                @elseif($trx->type == 'cost_adjustment')
+                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-indigo-500 bg-indigo-500/10 border border-indigo-500/30" title="Revaluasi Nilai Harga Material">
+                    COST ADJ
+                  </span>
+                @endif
+              </td>
+
+              {{-- KOLOM 3: REFERENSI, KETERANGAN & HARGA --}}
+              <td class="px-4 py-3">
+                <div class="text-slate-800 text-sm font-bold">
+                  @if($trx->purchase_order_id)
+                    PO #{{ $trx->purchase_order_id }}
+                  @elseif($trx->production_realization_id)
+                    Pemakaian Produksi
+                  @else
+                    Manual / Opname System
+                  @endif
+                </div>
+                <div class="text-xs text-muted mt-0.5 truncate max-w-xs md:max-w-md" title="{{ $trx->description }}">
+                  {{ $trx->description ?? '-' }}
+                </div>
+              </td>
+
+              {{-- KOLOM 4: MASUK (+) --}}
+              <td class="px-4 py-3 text-right text-success font-semibold">
+                @if($trx->type != 'cost_adjustment' && $trx->qty > 0)
+                  +{{ number_format($trx->qty / $factor, 2, ',', '.') }}
+                @else
+                  <span class="text-carbonSoft">-</span>
+                @endif
+              </td>
+
+              {{-- KOLOM 5: KELUAR (-) --}}
+              <td class="px-4 py-3 text-right text-danger font-semibold"> 
+                @if($trx->type != 'cost_adjustment' && $trx->qty < 0)
+                  {{ number_format(abs($trx->qty) / $factor, 2, ',', '.') }} 
+                @else
+                  <span class="text-carbonSoft">-</span>
+                @endif
+              </td>
+
+              {{-- KOLOM 6: SALDO FISIK AKHIR (HIGHLIGHTED) --}}
+              <td class="px-4 py-3 text-right font-bold text-slate-800 bg-slate-100">
+                {{ number_format($trx->current_stock_balance / $factor, 2, ',', '.') }}
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="6" class="px-6 py-12 text-center text-muted italic bg-slate-100 rounded-b-lg">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <span class="text-2xl">📦</span>
+                  <p>Belum ada rekaman pergerakan stok maupun harga untuk material ini.</p>
+                </div>
+              </td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+
+    {{-- PAGINATION LINK AREA --}}
+    @if ($transactions->hasPages())
+      <div class="mt-4">
+        {{ $transactions->links('pagination::tailwind') }}
+      </div>
+    @endif
   </section>
 
 </main>
+
+<script>
+  // Control Material Unit Label Input
+  document.addEventListener('DOMContentLoaded', function() {
+    const materialSelect = document.getElementById('materialSelect');
+    const unitLabel = document.getElementById('unitLabel');
+
+    function updateUnitLabel() {
+      if(!materialSelect) return;
+      const selectedOption = materialSelect.options[materialSelect.selectedIndex];
+      const unit = selectedOption.getAttribute('data-unit');
+      unitLabel.innerText = unit ? unit : 'Qty';
+    }
+
+    if(materialSelect) {
+      materialSelect.addEventListener('change', updateUnitLabel);
+    }
+  });
+
+  // Control Tab Navigation Adjustments
+  function switchTab(tab) {
+    const btnStock = document.getElementById('tab-btn-stock');
+    const btnCost = document.getElementById('tab-btn-cost');
+    const contentStock = document.getElementById('tab-content-stock');
+    const contentCost = document.getElementById('tab-content-cost');
+
+    if (tab === 'stock') {
+      btnStock.classList.replace('border-transparent', 'border-petronas');
+      btnStock.classList.replace('text-muted', 'text-petronas');
+      
+      btnCost.classList.replace('border-petronas', 'border-transparent');
+      btnCost.classList.replace('text-petronas', 'text-muted');
+
+      contentStock.classList.remove('hidden');
+      contentCost.classList.add('hidden');
+    } else {
+      btnCost.classList.replace('border-transparent', 'border-petronas');
+      btnCost.classList.replace('text-muted', 'text-petronas');
+
+      btnStock.classList.replace('border-petronas', 'border-transparent');
+      btnStock.classList.replace('text-petronas', 'text-muted');
+
+      contentCost.classList.remove('hidden');
+      contentStock.classList.add('hidden');
+    }
+  }
+</script>
 
 </body>
 </html>

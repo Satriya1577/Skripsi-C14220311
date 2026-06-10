@@ -118,7 +118,7 @@
 
               <td class="px-3 py-2 text-center">
                 <span class="px-2 py-1 rounded text-[10px] font-bold uppercase
-                  {{ $material->is_active ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400' }}">
+                  {{ $material->is_active ? 'bg-green-300/50 text-green-600' : 'bg-red-300/50 text-red-600' }}">
                   {{ $material->is_active ? 'Active' : 'Non-Active' }}
                 </span>
               </td>
