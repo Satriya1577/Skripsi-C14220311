@@ -366,9 +366,6 @@ class MaterialController extends Controller
         return redirect()->route('materials.index')->with('success', 'Data material berhasil dihapus permanen.');
     }
 
-    
-  
-
     public function stockAdjustment(Request $request)
     {
         $user = Auth::user();
@@ -444,7 +441,7 @@ class MaterialController extends Controller
     public function costAdjustment(Request $request)
     {
         $user = Auth::user();
-        if (!in_array($user->role, ['admin', 'inventory'])) {
+        if (!in_array($user->role, ['admin', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengubah harga dasar material.')->withInput();
         }
 
