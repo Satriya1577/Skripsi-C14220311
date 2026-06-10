@@ -271,7 +271,7 @@
               <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Product</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Kemasan</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Qty</th>
-              <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Price</th>
+              <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Harga Jual / Unit</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Diskon (%)</th>
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Subtotal</th>
               @if($salesOrder->status == 'draft') <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th> @endif
