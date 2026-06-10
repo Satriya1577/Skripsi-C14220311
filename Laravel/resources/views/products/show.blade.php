@@ -192,7 +192,7 @@
             <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Material Name</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Qty Usage</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Unit</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Est. Cost</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Est. Cost (HPP)</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Actions</th>
           </tr>
         </thead>
@@ -220,7 +220,7 @@
         <tfoot class="bg-carbon border-t border-carbonSoft">
           <tr>
             <td colspan="4" class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider font-bold">
-              Total Est. Cost
+              Total Est. Cost (HPP)
             </td>
             <td class="px-4 py-3 text-right font-bold text-slate-800 whitespace-nowrap">
               @php
@@ -237,75 +237,85 @@
     </div>
   </section>
 
-  {{-- SECTION 4: COST ADJUSTMENT (REVALUASI HPP) --}}
-  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-    <h2 class="text-lg font-bold text-slate-800">Cost Adjustment (Revaluasi HPP)</h2>
-    <form action="{{ route('products.costAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @csrf
-      <input type="hidden" name="product_id" value="{{ $product->id }}">
+  {{-- SECTION 4: ADJUSTMENTS (TABBED) --}}
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-4">
+    
+    {{-- TAB HEADERS --}}
+    <div class="flex border-b border-carbon/50 gap-6">
+      <button onclick="switchTab('stock')" id="tab-btn-stock" class="pb-3 text-sm font-bold border-b-2 border-petronas text-petronas hover:text-petronas transition-colors">
+        Stock Adjustment (Opname)
+      </button>
+      <button onclick="switchTab('cost')" id="tab-btn-cost" class="pb-3 text-sm font-bold border-b-2 border-transparent text-muted hover:text-silver transition-colors">
+        Cost Adjustment (Revaluasi HPP)
+      </button>
+    </div>
 
-      <div>
-        <label class="text-xs text-muted uppercase tracking-wide">HPP Baru (Per Unit)</label>
-        <div class="relative mt-1">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span class="text-muted text-xs font-bold">Rp</span>
+    {{-- TAB CONTENT 1: STOCK ADJUSTMENT --}}
+    <div id="tab-content-stock" class="block pt-2">
+      <form action="{{ route('products.stockAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+        <div>
+          <label class="text-xs text-muted uppercase tracking-wide">Jumlah Stok Aktual</label>
+          <div class="relative mt-1">
+            <input type="number" name="actual_qty" value="{{ old('actual_qty') }}" required
+              class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver font-bold">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <span class="text-muted text-xs uppercase">Pcs</span>
+            </div>
           </div>
-          <input type="number" name="new_cost" value="{{ $product->cost_price }}" required
-            class="w-full pl-10 pr-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver font-bold">
+          <p class="text-xs text-muted mt-1">Stok saat ini: <strong>{{ number_format($product->current_stock, 0) }} Pcs</strong></p>
         </div>
-        <p class="text-xs text-muted mt-1">HPP saat ini: Rp {{ number_format($product->cost_price, 2, ',', '.') }}</p>
-      </div>
 
-      <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Alasan Penyesuaian Harga</label>
-        <input type="text" name="reason" value="{{ old('reason') }}" placeholder="Contoh: Koreksi harga bahan baku bulan lalu..." required
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver">
-      </div>
+        <div>
+          <label class="text-xs text-muted uppercase tracking-wide">Catatan Opname</label>
+          <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian (contoh: Barang hilang/rusak)..." required
+            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
+        </div>
 
-      <div class="md:col-span-2 flex justify-end">
-        <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
-          Simpan Revaluasi HPP
-        </button>
-      </div>
-    </form>
+        <div class="md:col-span-2 flex justify-end">
+          <button type="submit" class="bg-yellow-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-700 transition shadow-lg shadow-yellow-900/20">
+            Simpan Adjustment Stok
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {{-- TAB CONTENT 2: COST ADJUSTMENT --}}
+    <div id="tab-content-cost" class="hidden pt-2">
+      <form action="{{ route('products.costAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+        <div>
+          <label class="text-xs text-muted uppercase tracking-wide">HPP Baru (Per Unit)</label>
+          <div class="relative mt-1">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <span class="text-muted text-xs font-bold">Rp</span>
+            </div>
+            <input type="number" step="0.01" name="new_cost" value="{{ $product->cost_price }}" required
+              class="w-full pl-10 pr-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver font-bold">
+          </div>
+          <p class="text-xs text-muted mt-1">HPP saat ini: Rp {{ number_format($product->cost_price, 2, ',', '.') }}</p>
+        </div>
+
+        <div>
+          <label class="text-xs text-muted uppercase tracking-wide">Alasan Penyesuaian Harga</label>
+          <input type="text" name="reason" value="{{ old('reason') }}" placeholder="Contoh: Koreksi harga bahan baku bulan lalu..." required
+            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-blue-500 focus:outline-none text-silver">
+        </div>
+
+        <div class="md:col-span-2 flex justify-end">
+          <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-900/20">
+            Simpan Revaluasi HPP
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 
-  {{-- SECTION 5: STOCK ADJUSTMENT --}}
-  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6">
-    <h2 class="text-lg font-bold text-slate-800">Stock Adjustment (Opname)</h2>
-    <form action="{{ route('products.stockAdjustment') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      @csrf
-      <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-      <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Jumlah Stok Aktual</label>
-        <div class="relative mt-1">
-          <input type="number" name="actual_qty" value="{{ old('actual_qty') }}" required
-            class="w-full pl-4 pr-12 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver font-bold">
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <span class="text-muted text-xs uppercase">Pcs</span>
-          </div>
-        </div>
-        <p class="text-xs text-muted mt-1">Stok saat ini: <strong>{{ number_format($product->current_stock, 0) }} Pcs</strong></p>
-      </div>
-
-      <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Catatan Opname</label>
-        <input type="text" name="notes" value="{{ old('notes') }}" placeholder="Alasan penyesuaian (contoh: Barang hilang/rusak)..." required
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon focus:border-petronas focus:outline-none text-silver">
-      </div>
-
-      <div class="md:col-span-2 flex justify-end">
-        <button type="submit" class="bg-yellow-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-yellow-700 transition shadow-lg shadow-yellow-900/20">
-          Simpan Adjustment Stok
-        </button>
-      </div>
-    </form>
-  </section>
-
-  
-
-  {{-- SECTION 6: RIWAYAT TRANSAKSI --}}
+  {{-- SECTION 5: RIWAYAT TRANSAKSI --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi & Valuasi</h2>
@@ -325,7 +335,7 @@
             <th class="px-4 py-3 text-left text-black border-b border-carbonSoft">Ref. & Keterangan</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Masuk</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Keluar</th>
-            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo FIsik</th>
+            <th class="px-4 py-3 text-right text-black font-bold border-b border-carbonSoft bg-carbon/50">Saldo Fisik</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -419,6 +429,7 @@
 </main>
 
 <script>
+  // Script untuk Material Unit Label
   document.addEventListener('DOMContentLoaded', function() {
     const materialSelect = document.getElementById('materialSelect');
     const unitLabel = document.getElementById('unitLabel');
@@ -434,6 +445,40 @@
       materialSelect.addEventListener('change', updateUnitLabel);
     }
   });
+
+  // Script untuk Tab Adjustments
+  function switchTab(tab) {
+    const btnStock = document.getElementById('tab-btn-stock');
+    const btnCost = document.getElementById('tab-btn-cost');
+    const contentStock = document.getElementById('tab-content-stock');
+    const contentCost = document.getElementById('tab-content-cost');
+
+    if (tab === 'stock') {
+      // Aktifkan Tab Stock
+      btnStock.classList.replace('border-transparent', 'border-petronas');
+      btnStock.classList.replace('text-muted', 'text-petronas');
+      
+      // Nonaktifkan Tab Cost
+      btnCost.classList.replace('border-petronas', 'border-transparent');
+      btnCost.classList.replace('text-petronas', 'text-muted');
+
+      // Tampilkan Konten
+      contentStock.classList.remove('hidden');
+      contentCost.classList.add('hidden');
+    } else {
+      // Aktifkan Tab Cost
+      btnCost.classList.replace('border-transparent', 'border-petronas');
+      btnCost.classList.replace('text-muted', 'text-petronas');
+
+      // Nonaktifkan Tab Stock
+      btnStock.classList.replace('border-petronas', 'border-transparent');
+      btnStock.classList.replace('text-petronas', 'text-muted');
+
+      // Tampilkan Konten
+      contentCost.classList.remove('hidden');
+      contentStock.classList.add('hidden');
+    }
+  }
 </script>
 
 </body>

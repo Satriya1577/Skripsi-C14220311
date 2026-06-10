@@ -152,7 +152,7 @@ class ProductController extends Controller
 
 
     // calculate lead time ini dipakai saat proses insert produk baru dan update produk
-    private function calculateLeadTime(Request $request, ?Product $product)
+    public function calculateLeadTime(Request $request, ?Product $product)
     {
         // Jika Mode MANUAL
         if ($request->is_manual_lead_time === 'manual') {
@@ -286,11 +286,11 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
         }
 
+        // VALIDASI: manual_price sudah dihapus karena fungsi ini murni untuk fisik
         $request->validate([
             'product_id'   => 'required|exists:products,id',
-            'actual_qty'   => 'required|integer|min:0', // Stok fisik (Satuan Unit)
-            'notes'        => 'nullable|string|max:255',
-            'manual_price' => 'nullable|numeric|min:0.01' // Hanya dipakai jika HPP sistem 0
+            'actual_qty'   => 'required|integer|min:0', 
+            'notes'        => 'required|string|max:255', 
         ]);
 
         try {
@@ -299,11 +299,9 @@ class ProductController extends Controller
             $product = Product::findOrFail($request->product_id);
 
             // 1. HITUNG SELISIH (DELTA)
-            // Product tidak punya satuan beli, jadi langsung pakai input user
             $systemQty = $product->current_stock;
             $actualQty = $request->actual_qty;
             
-            // Selisih (+ berarti Surplus, - berarti Loss)
             $deltaQty = $actualQty - $systemQty;
 
             if ($deltaQty == 0) {
@@ -311,27 +309,17 @@ class ProductController extends Controller
             }
 
             // 2. LOGIC HARGA & HPP (COST PRICE)
-            // Gunakan Cost Price (HPP), BUKAN Selling Price
             $transactionCost = $product->cost_price;
 
             if ($deltaQty > 0) {
                 // --- KASUS SURPLUS (+) ---
-                // Jika HPP sistem 0, cek input manual
                 if ($transactionCost == 0) {
-                    if ($request->filled('manual_price')) {
-                        $transactionCost = $request->manual_price;
-                        
-                        // Update Master Product (Initial HPP)
-                        $product->update(['cost_price' => $transactionCost]);
-                    } else {
-                        throw new \Exception("HPP sistem saat ini Rp 0. Wajib mengisi 'Estimasi HPP' untuk mencatat surplus stok.");
-                    }
+                    // Blokir surplus jika HPP 0. Arahkan user untuk set HPP dulu di form Cost Adjustment.
+                    throw new \Exception("HPP sistem saat ini Rp 0. Silakan lakukan 'Cost Adjustment' (Revaluasi HPP) terlebih dahulu sebelum mencatat penambahan stok (Surplus).");
                 }
-                // Jika HPP ada, pakai HPP sistem (Standard Opname tidak mengubah HPP)
-            
             } else {
                 // --- KASUS LOSS (-) ---
-                // WAJIB pakai HPP sistem saat ini.
+                // Jika loss (stok berkurang) dan HPP 0, biarkan saja karena tidak merusak penambahan nilai aset.
                 $transactionCost = $product->cost_price;
             }
 
@@ -345,15 +333,15 @@ class ProductController extends Controller
             $desc      = "Opname: {$typeLabel}. Fisik: {$actualQty} Unit. " . $request->notes;
 
             ProductTransaction::create([
-                'product_id'            => $product->id,
-                'type'                  => 'adjustment',
-                'qty'                   => $deltaQty, // Simpan +/-
-                'cost_price'            => $transactionCost, // HPP saat transaksi
-                'current_stock_balance' => $actualQty, // Saldo akhir setelah adjustment
-                'product_name_snapshot'   => $product->name,
+                'product_id'                 => $product->id,
+                'type'                       => 'adjustment',
+                'qty'                        => $deltaQty, 
+                'cost_price'                 => $transactionCost, 
+                'current_stock_balance'      => $actualQty, 
+                'product_name_snapshot'      => $product->name,
                 'product_packaging_snapshot' => $product->packaging,
-                'transaction_date'      => now(),
-                'description'           => $desc,
+                'transaction_date'           => now(),
+                'description'                => $desc,
             ]);
 
             DB::commit();
