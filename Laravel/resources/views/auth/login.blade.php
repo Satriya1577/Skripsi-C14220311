@@ -70,7 +70,7 @@
     </form>
 
     <div class="mt-6 text-center">
-      <p class="text-xs text-muted">Protected by Production Security</p>
+      <p class="text-xs text-muted">Login ke sistem menggunakan email dan password terdaftar</p>
     </div>
   </div>
 

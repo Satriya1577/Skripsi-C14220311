@@ -75,9 +75,27 @@
   {{-- KONTEN UTAMA --}}
   <main class="max-w-6xl mx-auto px-6 py-8 flex flex-col justify-between min-h-screen relative">
 
+    @php
+      // Mengambil jam saat ini berdasarkan zona waktu WIB (Surabaya)
+      $hour = \Carbon\Carbon::now('Asia/Jakarta')->format('H');
+      $year = \Carbon\Carbon::now('Asia/Jakarta')->format('Y');
+
+      if ($hour >= 5 && $hour < 12) {
+          $greeting = 'Good Morning';
+      } elseif ($hour >= 12 && $hour < 18) {
+          $greeting = 'Good Afternoon';
+      } else {
+          $greeting = 'Good Evening';
+      }
+
+      $userName = Auth::user()->name ?? 'Administrator';
+    @endphp
+
     <header class="text-center mb-10 pt-12 pb-4">
       <h1 class="text-3xl font-extrabold text-slate-800">Production Planning System</h1>
-      <p class="text-muted mt-2 text-sm">Integrated Inventory, Procurement, and Forecasting System</p>
+      <p class="text-muted mt-2 text-sm">
+        <span>{{ $greeting }}, {{ $userName }} 👋</span> 
+      </p>
     </header>
 
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-1 content-start">
@@ -184,7 +202,7 @@
     </section>
 
     <footer class="text-center text-xs text-muted mt-8 mb-4">
-      © 2025 Production Planning System – Academic Prototype
+      © {{ $year}} C14220311 Final Project Informatics Department Petra Christian University
     </footer>
 
   </main>
