@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Forecast: {{ $product->name }} | Production Planning</title>
+  <title>Plan-{{ $product->code }} | Production Planning</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -53,12 +53,11 @@
   </nav>
 
   <div id="js-alert-container">
-    {{-- Alert bawaan PHP (Session) tetap ada di sini --}}
     <x-alert-messages />
   </div>
 
   {{-- Header --}}
-  <header class="flex justify-between items-end">
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
     <div>
       <p class="text-xs uppercase tracking-widest text-muted">Production Plans</p>
       <h1 class="text-3xl font-extrabold text-slate-800">{{ $product->name }}</h1>
@@ -67,18 +66,37 @@
         {{ $product->packaging ?? 'No Packaging Info' }}
       </p>
     </div>
+
+     {{-- Sisi Kanan: Tombol Action (Warna konstan, tanpa efek hover) --}}
+    <div class="flex items-center">
+      <a href="{{ route('forecast.show', $product->id) }}" 
+      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-petronas text-blackBase font-bold shadow-lg shadow-petronas/20 border border-petronas cursor-pointer transition-none hover:bg-petronas hover:text-blackBase">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span>Create New Plan (View Forecast)</span>
+      </a>
+    </div>
+    
+    <!-- <a href="{{ route('forecast.show', $product->id) }}" class="bg-petronas text-blackBase font-bold px-6 py-2.5 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20 flex items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+      </svg>
+      <span>Create New Plan (View Forecast)</span>
+    </a> -->
   </header>
 
   {{-- SECTION 2: HISTORY TABLE --}}
+  {{-- Section ini sudah otomatis berjarak karena 'space-y-8' pada main --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon shadow-lg shadow-slate-200/60">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold text-slate-800">History & Production Plans</h2>
       <span class="text-xs bg-carbon px-3 py-1 rounded-full text-slate-800 border border-carbon">Total: {{ $productionPlans->total() }}</span>
     </div>
 
-    <div class="overflow-x-auto rounded-lg border border-carbon h-125"> {{-- Fixed Height Scroll --}}
+    <div class="overflow-x-auto rounded-lg border border-carbon h-125">
       <table class="w-full text-sm relative">
-        <thead class="bg-carbon sticky top-0 z-10"> {{-- Sticky Header --}}
+        <thead class="bg-carbon sticky top-0 z-10">
           <tr>
             <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Period</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Forecast</th>
@@ -277,54 +295,55 @@
   }
 
   // --- MAIN HANDLER ---
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Bersihkan alert lama jika ada
-    const existingAlert = document.getElementById('js-dynamic-alert');
-    if(existingAlert) existingAlert.remove();
+  if(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Bersihkan alert lama jika ada
+      const existingAlert = document.getElementById('js-dynamic-alert');
+      if(existingAlert) existingAlert.remove();
 
-    setBtnLoading(true);
+      setBtnLoading(true);
 
-    const formData = new FormData(form);
-    fetch(form.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest', // Penting agar Laravel tahu ini AJAX
-        'Accept': 'application/json'
-      }
-    })
-    .then(response => {
-      // Jika status code bukan 200 (misal 422 Unprocessable Entity atau 403 Forbidden)
-      if (!response.ok) {
-        return response.json().then(err => { throw err; });
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("Job started:", data);
-      startPolling();
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setBtnLoading(false);
-      
-      let msg = "An unexpected error occurred.";
-      
-      // Ambil pesan error dari JSON Laravel
-      if(error.error) {
-        msg = error.error;
-      } else if (error.message) {
-        msg = error.message;
-      }
-      
-      // TAMPILKAN CUSTOM ALERT (Bukan alert browser)
-      renderErrorAlert(msg);
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest', // Penting agar Laravel tahu ini AJAX
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        // Jika status code bukan 200 (misal 422 Unprocessable Entity atau 403 Forbidden)
+        if (!response.ok) {
+          return response.json().then(err => { throw err; });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Job started:", data);
+        startPolling();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setBtnLoading(false);
+        
+        let msg = "An unexpected error occurred.";
+        
+        // Ambil pesan error dari JSON Laravel
+        if(error.error) {
+          msg = error.error;
+        } else if (error.message) {
+          msg = error.message;
+        }
+        
+        // TAMPILKAN CUSTOM ALERT (Bukan alert browser)
+        renderErrorAlert(msg);
+      });
     });
-  });
+  }
 </script>
 
 </body>
 </html>
-
