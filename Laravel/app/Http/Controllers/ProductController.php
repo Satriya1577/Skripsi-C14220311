@@ -37,7 +37,7 @@ class ProductController extends Controller
     }
 
     // simpan data produk ke database 
-    public function store(Request $request)
+    public function store(Request $request, ProductService $productService)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'sales'])) {
@@ -58,9 +58,15 @@ class ProductController extends Controller
             'cost_price'          => 'nullable|numeric|min:0', 
         ]);
 
-        // 2. HITUNG LEAD TIME
-        // Passing null karena produk belum memiliki ID / belum ada di database
-        $leadTime = $this->calculateLeadTime($request, null);
+        // 2. HITUNG LEAD TIME VIA SERVICE
+        // Buat objek dummy Product di memori agar bisa dibaca oleh Service
+        $dummyProduct = new Product();
+        $dummyProduct->is_manual_lead_time = $request->is_manual_lead_time;
+        $dummyProduct->min_lead_time_days  = $request->min_lead_time_days ?? 1;
+        $dummyProduct->max_lead_time_days  = $request->max_lead_time_days ?? 3;
+
+        // Panggil service yang sudah di-inject pada parameter fungsi
+        $leadTime = $productService->calculateLeadTimeStatsFromHistory($dummyProduct);
 
         // 3. PROSES SIMPAN KE DATABASE
         try {
@@ -73,7 +79,8 @@ class ProductController extends Controller
                 'is_manual_lead_time' => $request->is_manual_lead_time,
                 'min_lead_time_days'  => $leadTime['min'],
                 'max_lead_time_days'  => $leadTime['max'],
-                'lead_time_average'   => $leadTime['avg'],
+                // Perhatikan: key array dari ProductService adalah 'average', bukan 'avg'
+                'lead_time_average'   => $leadTime['average'], 
                 'batch_size'          => $request->batch_size,
                 'price'               => $request->price ?? 0,
                 'current_stock'       => $request->current_stock ?? 0,
@@ -112,14 +119,14 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $product, ProductService $productService)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'sales'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data produk.')->withInput();
         }
 
-        // 1. VALIDASI INPUT (Abaikan unique code untuk ID produk ini sendiri)
+        // 1. VALIDASI INPUT
         $request->validate([
             'code'                => 'required|string|max:50|unique:products,code,' . $product->id, 
             'name'                => 'required|string|max:255',
@@ -129,13 +136,17 @@ class ProductController extends Controller
             'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days', 
             'batch_size'          => 'required|integer|min:1',
             'price'               => 'nullable|numeric|min:0', 
-            // Note: current_stock & cost_price dihilangkan karena Stock Opname biasanya tidak diizinkan diubah via update produk.
         ]);
 
-        // 2. HITUNG LEAD TIME (Sertakan object product untuk mengecek history batch)
-        $leadTime = $this->calculateLeadTime($request, $product);
+        $product->is_manual_lead_time = $request->is_manual_lead_time;
+        $product->min_lead_time_days  = $request->min_lead_time_days ?? 1;
+        $product->max_lead_time_days  = $request->max_lead_time_days ?? 3;
 
-        // 3. PROSES UPDATE
+        // 3. HITUNG LEAD TIME VIA SERVICE
+        // Panggil service yang sudah di-inject pada parameter fungsi update
+        $leadTime = $productService->calculateLeadTimeStatsFromHistory($product);
+
+        // 4. PROSES UPDATE KE DATABASE
         $product->update([
             'code'                => $request->code,
             'name'                => $request->name,
@@ -143,67 +154,13 @@ class ProductController extends Controller
             'is_manual_lead_time' => $request->is_manual_lead_time,
             'min_lead_time_days'  => $leadTime['min'],
             'max_lead_time_days'  => $leadTime['max'],
-            'lead_time_average'   => $leadTime['avg'],
+            // Perhatikan: key array dari ProductService adalah 'average', bukan 'avg'
+            'lead_time_average'   => $leadTime['average'], 
             'batch_size'          => $request->batch_size,
             'price'               => $request->price ?? 0,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-    }
-
-
-    // calculate lead time ini dipakai saat proses insert produk baru dan update produk
-    public function calculateLeadTime(Request $request, ?Product $product)
-    {
-        // Jika Mode MANUAL
-        if ($request->is_manual_lead_time === 'manual') {
-            $min = $request->min_lead_time_days ?? 1;
-            $max = $request->max_lead_time_days ?? 3;
-            
-            return [
-                'min' => $min,
-                'max' => $max,
-                'avg' => ($min + $max) / 2
-            ];
-        } 
-        
-        // Jika Mode AUTOMATIC
-        else {
-            // Jika product dikirim (Kasus Update)
-            if ($product) {
-                $batches = ProductionBatch::where('product_id', $product->id)
-                    ->whereNotNull('start_date')
-                    ->whereNotNull('end_date')
-                    ->orderBy('end_date', 'desc')
-                    ->take(30)
-                    ->get();
-
-                if ($batches->count() > 0) {
-                    $leadTimes = [];
-                    foreach ($batches as $batch) {
-                        $start = Carbon::parse($batch->start_date);
-                        $end   = Carbon::parse($batch->end_date);
-                        $days  = max(1, $start->diffInDays($end));
-                        $leadTimes[] = $days;
-                    }
-                    
-                    //$avgDays = (float) ($totalDays / $batches->count());
-                    
-                    return [
-                        'min'     => min($leadTimes),
-                        'max'     => max($leadTimes),
-                        'average' => array_sum($leadTimes) / count($leadTimes),
-                    ];
-                }
-            }
-
-            // Fallback: Jika insert produk baru (belum ada histori) ATAU histori 0
-            return [
-                'min' => 1,
-                'max' => 1,
-                'avg' => 1
-            ];
-        }
     }
 
     /**

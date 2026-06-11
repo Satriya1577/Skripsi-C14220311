@@ -7,6 +7,7 @@ use App\Models\ProductionBatch;
 use App\Models\ProductTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductService
 {
@@ -21,13 +22,13 @@ class ProductService
             foreach ($products as $product) {
                 
                 // 1. Hitung Statistik Lead Time Produksi (Min, Max, Average)
-                $leadTimeStats = $this->calculateLeadTimeStats($product);
+                $leadTimeStats = $this->calculateLeadTimeStatsFromHistory($product);
                 $minLeadTime = $leadTimeStats['min'];
                 $maxLeadTime = $leadTimeStats['max'];
                 $avgLeadTime = $leadTimeStats['average'];
 
                 // 2. Hitung Statistik Demand/Penjualan (Daily Average & Max)
-                $demandStats = $this->calculateDemandStats($product);
+                $demandStats = $this->calculateDemandStatsFromHistory($product);
                 $avgDailyDemand = $demandStats['average'];
                 $maxDailyDemand = $demandStats['max'];
 
@@ -55,7 +56,7 @@ class ProductService
         }
     }
 
-    public function calculateDemandStats(Product $product) 
+    public function calculateDemandStatsFromHistory(Product $product) 
     {
         // Ambil data 30 hari ke belakang dari hari ini
         $thirtyDaysAgo = now()->subDays(30)->format('Y-m-d');
@@ -82,8 +83,9 @@ class ProductService
         ];
     }
 
-    public function calculateLeadTimeStats(Product $product) 
+    public function calculateLeadTimeStatsFromHistory(Product $product) 
     {
+        Log::info("[ProducrtService] calculateLeadTimeStatsFromHistory called for Product ID: {$product->id}, with is_manual_lead_time: {$product->is_manual_lead_time}, min_lead_time_days: {$product->min_lead_time_days}, max_lead_time_days: {$product->max_lead_time_days}");
         // Jika mode manual, gunakan data yang sudah ada di database
         if ($product->is_manual_lead_time === 'manual') {
             return [
@@ -127,4 +129,6 @@ class ProductService
             'average' => array_sum($leadTimes) / count($leadTimes),
         ];
     }
+
+    
 }
