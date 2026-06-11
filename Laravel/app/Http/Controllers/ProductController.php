@@ -361,45 +361,11 @@ class ProductController extends Controller
         if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data lead time dan safety stok.')->withInput();
         }
-        // Ambil semua produk (Bisa juga difilter hanya yang aktif jika ada status aktif)
-        $products = Product::all();
 
-        DB::beginTransaction();
         try {
-            foreach ($products as $product) {
-                
-                // 1. Hitung Statistik Lead Time Produksi (Min, Max, Average)
-                $leadTimeStats = $productService->calculateLeadTimeStats($product);
-                $minLeadTime = $leadTimeStats['min'];
-                $maxLeadTime = $leadTimeStats['max'];
-                $avgLeadTime = $leadTimeStats['average'];
-
-                // 2. Hitung Statistik Demand/Penjualan (Daily Average & Max)
-                $demandStats = $productService->calculateDemandStats($product);
-                $avgDailyDemand = $demandStats['average'];
-                $maxDailyDemand = $demandStats['max'];
-
-                // 3. Hitung Safety Stock (Kuantitas)
-                // Rumus: (Max Lead Time * Max Daily Demand) - (Average Lead Time * Average Daily Demand)
-                $maxExpectedDemand = $maxLeadTime * $maxDailyDemand;
-                $averageExpectedDemand = $avgLeadTime * $avgDailyDemand;
-
-                $safetyStock = max(0, $maxExpectedDemand - $averageExpectedDemand);
-
-                // 4. Update data produk
-                $product->update([
-                    'min_lead_time_days' => $minLeadTime,
-                    'max_lead_time_days' => $maxLeadTime,
-                    'lead_time_average'  => $avgLeadTime,
-                    'safety_stock'       => ceil($safetyStock), // Dibulatkan ke atas agar aman
-                ]);
-            }
-            
-            DB::commit();
+            $productService->updateAllProductLeadTimeSafetyStock();
             return redirect()->back()->with('success', 'Lead Time dan Safety Stock seluruh produk berhasil diperbarui.');
-            
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }

@@ -10,6 +10,51 @@ use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
+
+    public function updateAllProductLeadTimeSafetyStock() 
+    {
+        // Ambil semua produk (Bisa juga difilter hanya yang aktif jika ada status aktif)
+        $products = Product::all();
+
+        DB::beginTransaction();
+        try {
+            foreach ($products as $product) {
+                
+                // 1. Hitung Statistik Lead Time Produksi (Min, Max, Average)
+                $leadTimeStats = $this->calculateLeadTimeStats($product);
+                $minLeadTime = $leadTimeStats['min'];
+                $maxLeadTime = $leadTimeStats['max'];
+                $avgLeadTime = $leadTimeStats['average'];
+
+                // 2. Hitung Statistik Demand/Penjualan (Daily Average & Max)
+                $demandStats = $this->calculateDemandStats($product);
+                $avgDailyDemand = $demandStats['average'];
+                $maxDailyDemand = $demandStats['max'];
+
+                // 3. Hitung Safety Stock (Kuantitas)
+                // Rumus: (Max Lead Time * Max Daily Demand) - (Average Lead Time * Average Daily Demand)
+                $maxExpectedDemand = $maxLeadTime * $maxDailyDemand;
+                $averageExpectedDemand = $avgLeadTime * $avgDailyDemand;
+
+                $safetyStock = max(0, $maxExpectedDemand - $averageExpectedDemand);
+
+                // 4. Update data produk
+                $product->update([
+                    'min_lead_time_days' => $minLeadTime,
+                    'max_lead_time_days' => $maxLeadTime,
+                    'lead_time_average'  => $avgLeadTime,
+                    'safety_stock'       => ceil($safetyStock), // Dibulatkan ke atas agar aman
+                ]);
+            }
+            
+            DB::commit();
+            return true;            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e; 
+        }
+    }
+
     public function calculateDemandStats(Product $product) 
     {
         // Ambil data 30 hari ke belakang dari hari ini
