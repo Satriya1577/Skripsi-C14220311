@@ -441,7 +441,7 @@ class MaterialController extends Controller
     public function costAdjustment(Request $request)
     {
         $user = Auth::user();
-        if (!in_array($user->role, ['admin', 'production'])) {
+        if (!in_array($user->role, ['admin', 'purchase'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengubah harga dasar material.')->withInput();
         }
 
