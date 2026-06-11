@@ -94,18 +94,14 @@
             @endphp
             <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
               
-              {{-- CLICKABLE CODE --}}
-              <td class="px-3 py-3 text-center font-semibold whitespace-nowrap">
-                <a href="{{ route('materials.show', $material->id) }}" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors block">
-                  {{ $material->code }}
-                </a>
+              {{-- MATERIAL CODE --}}
+              <td class="px-3 py-3 text-center font-semibold text-slate-800 whitespace-nowrap">
+                {{ $material->code }}
               </td>
               
-              {{-- CLICKABLE NAME --}}
+              {{-- MATERIAL NAME --}}
               <td class="px-3 py-3 text-left whitespace-nowrap">
-                <a href="{{ route('materials.show', $material->id) }}" class="block">
-                  <div class="font-bold text-silver group-hover:text-blue-600 transition-colors">{{ $material->name }}</div>
-                </a>
+                <div class="font-bold text-slate-800">{{ $material->name }}</div>
               </td>
 
               <td class="px-3 py-3 text-center whitespace-nowrap">
