@@ -95,7 +95,7 @@
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Selling Price</p>
         <p class=" text-2xl font-bold text-silver">Rp {{ number_format($product->price, 2, ',', '.') }}</p>
         <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-          HPP: Rp {{ number_format($product->cost_price, 2, ',', '.') }}
+          HPP Produksi : Rp {{ number_format($product->cost_price, 2, ',', '.') }}
         </p>
       </div>
     </div>
@@ -104,7 +104,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <div class="flex justify-between items-start mb-2">
-          <p class="text-xs text-muted uppercase tracking-wide">Lead Time Management</p>
+          <p class="text-xs text-muted uppercase tracking-wide">Lead Time Information</p>
           <span class="text-[10px] uppercase px-2 py-0.5 rounded border 
             {{ $product->is_manual_lead_time === 'manual' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-blue-100 text-blue-700 border-petronas/30' }}">
             {{ $product->is_manual_lead_time === 'manual' ? 'Manual' : 'Automatic' }}
@@ -127,13 +127,10 @@
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Production Config</p>
         <div class="flex gap-6 items-center">
           <div>
-            <span class="text-xs text-muted block">Batch Size (Lot)</span>
+            <span class="text-xs text-muted block">Quantity per Batch</span>
             <span class=" text-lg font-bold text-silver">{{ number_format($product->batch_size, 0, ',', '.') }} Pcs</span>
           </div>
         </div>
-        <p class="text-[10px] text-muted mt-2">
-          *Batch Size digunakan sebagai acuan jumlah produksi minimum per siklus.
-        </p>
       </div>
     </div>
   </section>
@@ -152,7 +149,7 @@
         <div class="flex flex-col md:flex-row gap-4 items-end">
           <div class="grow w-full md:w-3/5">
             <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Select Material</label>
-            <select name="material_id" id="materialSelect" required class="w-full appearance-none bg-carbon border border-muted/30 text-silver text-sm rounded-lg focus:ring-petronas focus:border-petronas block w-full p-3 pr-10">
+            <select name="material_id" id="materialSelect" required class="w-full appearance-none bg-carbon border border-muted/30 text-silver text-sm rounded-lg focus:ring-petronas focus:border-petronas block p-3 pr-10">
               <option value="" disabled selected>-- Choose Material --</option>
               @foreach($materials as $material)
                 <option value="{{ $material->id }}" data-unit="{{ $material->unit }}">
@@ -192,7 +189,9 @@
             <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Material Name</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Qty Usage</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Unit</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Est. Cost (HPP)</th>
+            {{-- KOLOM BARU HARGA PER UNIT --}}
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Price / Unit</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Est. Material Cost</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Actions</th>
           </tr>
         </thead>
@@ -203,6 +202,10 @@
               <td class="px-4 py-3 text-silver">{{ $pm->material->name }}</td>
               <td class=" px-4 py-3 text-right font-bold text-slate-800">{{ number_format($pm->amount_needed, 1, ',', '.') }}</td>
               <td class="px-4 py-3 text-center text-muted">{{ $pm->material->unit }}</td>
+              {{-- DATA KOLOM BARU HARGA PER UNIT --}}
+              <td class="px-4 py-3 text-right text-muted text-xs">
+                Rp {{ number_format($pm->material->price_per_unit, 2, ',', '.') }}
+              </td>
               <td class="px-4 py-3 text-right text-muted text-xs">
                 Rp {{ number_format($pm->amount_needed * $pm->material->price_per_unit, 2, ',', '.') }}
               </td>
@@ -214,13 +217,14 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="6" class="px-4 py-8 text-center text-muted italic">No ingredients added yet.</td></tr>
+            <tr><td colspan="7" class="px-4 py-8 text-center text-muted italic">No ingredients added yet.</td></tr>
           @endforelse
         </tbody>
         <tfoot class="bg-carbon border-t border-carbonSoft">
           <tr>
-            <td colspan="4" class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider font-bold">
-              Total Est. Cost (HPP)
+            {{-- COLSPAN DIUBAH DARI 4 MENJADI 5 KARENA ADA TAMBAHAN KOLOM BARU --}}
+            <td colspan="5" class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider font-bold">
+              Total Est. Cost (HPP Produksi)
             </td>
             <td class="px-4 py-3 text-right font-bold text-slate-800 whitespace-nowrap">
               @php

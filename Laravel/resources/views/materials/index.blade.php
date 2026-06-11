@@ -107,7 +107,7 @@
                     @endif
                     <span class="text-muted mx-1">|</span>
                     <span class="{{ $material->lead_time_average ? 'text-silver' : 'text-muted' }} font-bold">
-                      Avg {{ number_format($material->lead_time_average ?? 0, 1) }}d
+                      Avg {{ number_format($material->lead_time_average ?? 0, 1) }} days
                     </span>
                     @if($material->is_manual_lead_time === 'manual')
                       <span class="text-[9px] text-muted ml-1">({{ $material->min_lead_time_days }}-{{ $material->max_lead_time_days }})</span>

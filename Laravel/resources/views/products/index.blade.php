@@ -55,17 +55,18 @@
   {{-- Product List --}}
   <section class="bg-carbonSoft rounded-xl p-6">
     
-    {{-- BUNGKUSAN FLEXBOX BARU UNTUK JUDUL & TOMBOL UPDATE --}}
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800">Product List</h2>
       
-      {{-- TOMBOL UPDATE BARU --}}
-      <a href="{{ route('products.updateProductLeadTimeSafetyStock') }}" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-petronas/10 transition shadow-sm flex items-center justify-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-        </svg>
-        <span class="whitespace-nowrap">Update Lead Time & Safety Stock</span>
-      </a>
+      <form action="{{ route('products.updateProductLeadTimeSafetyStock') }}" method="POST" onsubmit="return confirm('Kalkulasi ulang Lead Time & Safety Stock seluruh produk?');">
+        @csrf
+        <button type="submit" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          <span class="whitespace-nowrap">Update Lead Time & Safety Stock</span>
+        </button>
+      </form>
     </div>
 
     <div class="overflow-x-auto">
@@ -73,11 +74,11 @@
         <thead class="bg-carbon">
           <tr>
             <th class="px-3 py-2 text-center text-black">Code</th>
-            <th class="px-3 py-2 text-left text-black">Name / Specs</th> 
-            <th class="px-3 py-2 text-center text-black">On Hand</th> 
-            <th class="px-3 py-2 text-center text-black font-semibold">Reserved</th> 
-            <th class="px-3 py-2 text-center text-black font-bold border-l border-carbon">Available</th> 
-            <th class="px-3 py-2 text-center text-black">Safety</th>
+            <th class="px-3 py-2 text-left text-black">Product Name</th> 
+            <th class="px-3 py-2 text-center text-black">On Hand Stock</th> 
+            <th class="px-3 py-2 text-center text-black font-semibold">Reserved Stock</th> 
+            <th class="px-3 py-2 text-center text-black font-bold border-l border-carbon">Available Stock</th> 
+            <th class="px-3 py-2 text-center text-black">Safety Stock</th>
             <th class="px-3 py-2 text-center text-black">HPP</th>
             <th class="px-3 py-2 text-center text-black">Selling Price</th>
             <th class="px-3 py-2 text-center text-black">Actions</th>
@@ -85,39 +86,32 @@
         </thead>
         <tbody>
           @foreach ($products as $product)
-            <tr class="border-b border-carbon hover:bg-carbon transition-colors">
-              <td class="px-3 py-2 text-center font-semibold">{{ $product->code }}</td>
+            <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
               
+              {{-- CLICKABLE CODE --}}
+              <td class="px-3 py-2 text-center font-semibold">
+                <a href="{{ route('products.show', $product->id) }}" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors block">
+                  {{ $product->code }}
+                </a>
+              </td>
+              
+              {{-- CLICKABLE NAME --}}
               <td class="px-3 py-2 text-left">
-                <div class="font-medium text-silver">{{ $product->name }}</div>
-                <div class="flex flex-wrap gap-2 text-[10px] text-muted mt-1">
-                  @if($product->packaging)
-                    <span class="bg-carbon px-1.5 py-0.5 rounded border border-carbon/50">{{ $product->packaging }}</span>
-                  @endif
-                  
-                  {{-- Tampilkan Info Lead Time sesuai Mode --}}
-                  <span class="flex items-center gap-1 border border-carbon/50 px-1.5 py-0.5 rounded" title="Lead Time Settings">
-                    @if($product->is_manual_lead_time === 'manual')
-                      <span class="text-silver">⏱ Manual</span>
-                    @else
-                      <span class="text-slate-800">⏱ Auto</span>
-                    @endif
+                <a href="{{ route('products.show', $product->id) }}" class="block">
+                  <div class="font-bold text-silver group-hover:text-blue-600 transition-colors">{{ $product->name }}</div>
+                  <div class="flex flex-col gap-1 text-[10px] text-muted mt-1">
                     
-                    <span class="text-muted mx-1">|</span>
-                    
-                    <span class="{{ $product->lead_time_average ? 'text-silver' : 'text-muted' }} font-bold">
-                      Avg {{ number_format($product->lead_time_average ?? 0, 1) }}d
-                    </span>
+                    {{-- Baris 1: Kemasan (Lead Time Dihapus) --}}
+                    <div class="flex flex-wrap items-center gap-2">
+                      @if($product->packaging)
+                        <span class="bg-carbon px-1.5 py-0.5 rounded border border-carbon/50 text-slate-800">{{ $product->packaging }}</span>
+                      @endif
+                    </div>
 
-                    @if($product->is_manual_lead_time === 'manual')
-                      <span class="text-[9px] text-muted ml-1">({{ $product->min_lead_time_days }}-{{ $product->max_lead_time_days }})</span>
-                    @endif
-                  </span>
+                    {{-- Baris 2: Qty per Batch Dihapus --}}
 
-                  <span class="flex items-center gap-1" title="Batch Size">
-                    📦 Batch: {{ $product->batch_size }}
-                  </span>
-                </div>
+                  </div>
+                </a>
               </td>
 
               <td class="px-3 py-2 text-center">{{ $product->current_stock }}</td>
@@ -126,28 +120,47 @@
                 {{ $product->current_stock - $product->committed_stock }}
               </td>
               <td class="px-3 py-2 text-center text-muted text-xs">{{ $product->safety_stock }}</td>
-              <td class=" px-3 py-2 text-center">Rp {{ number_format($product->cost_price, 2, ',', '.') }}</td>
-              <td class=" px-3 py-2 text-center">Rp {{ number_format($product->price, 2, ',', '.') }}</td>
-              <td class="px-3 py-2 text-center space-x-2">
-                <a href="{{ route('products.show', $product->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-blackBase hover:bg-petronas/90 transition">👁️</a>
-                
-                {{-- Link ke halaman edit --}}
-                
-                <a href="{{ route('products.edit', $product->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded border border-yellow-500 text-yellow-600 hover:bg-yellow-100 transition">✏️</a>
+              
+              {{-- HPP (Rata Kiri Kanan) --}}
+              <td class="px-3 py-2">
+                <div class="flex justify-between items-center min-w-[90px]">
+                  <span class="text-muted text-xs">Rp</span>
+                  <span class="text-right">{{ number_format($product->cost_price, 2, ',', '.') }}</span>
+                </div>
+              </td>
+              
+              {{-- Selling Price (Rata Kiri Kanan) --}}
+              <td class="px-3 py-2">
+                <div class="flex justify-between items-center min-w-[90px]">
+                  <span class="text-muted text-xs">Rp</span>
+                  <span class="text-right">{{ number_format($product->price, 2, ',', '.') }}</span>
+                </div>
+              </td>
+              
+              {{-- ACTIONS --}}
+              <td class="px-3 py-2 text-center space-x-1 whitespace-nowrap">
+                <a href="{{ route('products.edit', $product->id) }}" class="inline-block px-3 py-1 rounded border border-yellow-500 text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700 transition font-semibold text-xs">
+                  Edit
+                </a>
                 
                 <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
                   @csrf @method('DELETE')
-                  <button type="button" onclick="openDeleteModal(this)" class="inline-flex items-center justify-center w-8 h-8 rounded border border-danger text-danger hover:bg-danger hover:text-blackBase transition">🗑️</button>
+                  <button type="button" onclick="openDeleteModal(this)" class="inline-block px-3 py-1 rounded border border-danger text-danger hover:bg-red-50 hover:text-red-700 transition font-semibold text-xs">
+                    Delete
+                  </button>
                 </form>
               </td>
+
             </tr>
           @endforeach
+
           @if ($products->count() === 0)
             <tr><td colspan="9" class="px-3 py-8 text-center text-muted italic">No products available</td></tr>
           @endif
         </tbody>
       </table>
     </div>
+    
     @if ($products->hasPages())
       <div class="mt-4">{{ $products->links('pagination::tailwind') }}</div>
     @endif
@@ -160,8 +173,8 @@
     <h3 class="text-lg font-bold text-danger mb-2">Confirm Deletion</h3>
     <p class="text-sm text-muted mb-6">Are you sure? <span class="text-red-400 font-semibold">Cannot be undone.</span></p>
     <div class="flex justify-end gap-3">
-      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">Cancel</button>
-      <button onclick="confirmDelete()" class="px-5 py-2 rounded-lg bg-danger text-blackBase font-bold hover:bg-red-600 transition">Delete</button>
+      <button onclick="closeDeleteModal()" class="px-5 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition font-bold">Cancel</button>
+      <button onclick="confirmDelete()" class="px-5 py-2 rounded-lg bg-danger text-white font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/30">Delete</button>
     </div>
   </div>
 </div>

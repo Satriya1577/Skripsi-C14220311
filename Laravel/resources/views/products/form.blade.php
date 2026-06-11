@@ -55,7 +55,7 @@
   <header class="pb-4">
     <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
     <h1 class="text-3xl font-extrabold text-slate-800">
-      {{ isset($product) ? 'Edit Product: ' . $product->code : 'Create New Product' }}
+      {{ isset($product) ? 'Edit Product: ' . $product->name : 'Create New Product' }}
     </h1>
     <p class="text-sm text-muted mt-1">
       {{ isset($product) ? 'Perbarui informasi dan parameter produk ini.' : 'Tambahkan produk baru ke dalam sistem.' }}
