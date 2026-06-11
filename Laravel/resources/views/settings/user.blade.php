@@ -145,10 +145,10 @@
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">User Info</th>
-            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Role</th>
-            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Joined At</th>
-            <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">User Info</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Role</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Joined At</th>
+            <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -171,12 +171,14 @@
               <td class="px-4 py-3 text-center">
                 @php
                   $roleColor = match($user->role) {
-                    'admin'   => 'bg-blue-200 text-blue-800 border-petronas/30',
-                    'sales'   => 'bg-warning/20 text-warning border-warning/30',
-                    'purchase'  => 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-                    'inventory' => 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-                    'none'    => 'bg-carbon text-slate-800 border-carbon',
-                    default   => 'bg-gray-700 text-silver border-gray-600',
+                    'admin'      => 'bg-blue-200 text-blue-800 border-blue-400',
+                    'sales'      => 'bg-yellow-200 text-yellow-800 border-yellow-400',
+                    'purchase'   => 'bg-green-200 text-green-800 border-green-400',
+                    'inventory'  => 'bg-purple-200 text-purple-800 border-purple-400',
+                    'production' => 'bg-indigo-200 text-indigo-800 border-indigo-400',
+                    'accounting' => 'bg-pink-200 text-pink-800 border-pink-400',
+                    'none'       => 'bg-carbon text-slate-800 border-carbon',
+                    default      => 'bg-gray-200 text-gray-800 border-gray-400',
                   };
                 @endphp
                 <span class="px-2.5 py-1 rounded text-[10px] font-bold uppercase border {{ $roleColor }}">
@@ -193,18 +195,22 @@
               <td class="px-4 py-3 text-center">
                 <div class="flex justify-center gap-2">
                   <button type="button" onclick='editUser(@json($user))' 
-                    class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-silver hover:border-petronas hover:text-blue-600 transition shadow-sm"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition"
                     title="Edit User">
-                    <i class="bi bi-pencil-fill text-xs"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
                   </button>
                   
                   {{-- Prevent deleting self if needed, handled in backend usually --}}
                   <form action="{{ route('settings.destroyUser', $user->id) }}" method="POST" class="inline">
                     @csrf @method('DELETE')
                     <button type="button" onclick="openDeleteModal(this)" 
-                      class="w-8 h-8 flex items-center justify-center rounded bg-carbon border border-muted/30 text-slate-800 hover:border-danger hover:text-danger hover:bg-danger/10 transition shadow-sm"
+                      class="inline-flex items-center justify-center w-8 h-8 rounded bg-danger text-white hover:bg-red-600 transition"
                       title="Delete User">
-                      <i class="bi bi-trash-fill text-xs"></i>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
                     </button>
                   </form>
                 </div>

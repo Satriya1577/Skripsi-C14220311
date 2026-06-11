@@ -79,7 +79,6 @@ class ProductController extends Controller
                 'is_manual_lead_time' => $request->is_manual_lead_time,
                 'min_lead_time_days'  => $leadTime['min'],
                 'max_lead_time_days'  => $leadTime['max'],
-                // Perhatikan: key array dari ProductService adalah 'average', bukan 'avg'
                 'lead_time_average'   => $leadTime['average'], 
                 'batch_size'          => $request->batch_size,
                 'price'               => $request->price ?? 0,
@@ -154,7 +153,6 @@ class ProductController extends Controller
             'is_manual_lead_time' => $request->is_manual_lead_time,
             'min_lead_time_days'  => $leadTime['min'],
             'max_lead_time_days'  => $leadTime['max'],
-            // Perhatikan: key array dari ProductService adalah 'average', bukan 'avg'
             'lead_time_average'   => $leadTime['average'], 
             'batch_size'          => $request->batch_size,
             'price'               => $request->price ?? 0,

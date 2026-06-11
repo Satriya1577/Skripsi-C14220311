@@ -54,7 +54,7 @@
   <header class="pb-4">
     <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
     <h1 class="text-3xl font-extrabold text-slate-800">
-      {{ isset($material) ? 'Edit Material: ' . $material->code : 'Create New Material' }}
+      {{ isset($material) ? 'Edit Material: ' . $material->name : 'Create New Material' }}
     </h1>
     <p class="text-sm text-muted mt-1">
       {{ isset($material) ? 'Perbarui informasi dan parameter bahan baku ini.' : 'Tambahkan bahan baku baru ke dalam sistem.' }}

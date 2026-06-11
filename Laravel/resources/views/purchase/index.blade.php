@@ -59,19 +59,19 @@
         <div>
           <label class="text-xs text-muted uppercase tracking-wide block mb-1">Kode PO (Opsional)</label>
           <input type="text" name="po_number" placeholder="(Auto Generated)"
-            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-muted/30 transition">
+            class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-muted/30 transition">
         </div>
 
         <div>
           <label class="text-xs text-muted uppercase tracking-wide block mb-1">Tanggal Order</label>
           <input type="date" name="order_date" value="{{ date('Y-m-d') }}" required
-            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
+            class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
         </div>
 
         <div>
           <label class="text-xs text-muted uppercase tracking-wide block mb-1">Jatuh Tempo</label>
           <input type="date" name="due_date" 
-            class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
+            class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none transition">
         </div>
       </div>
 
@@ -88,7 +88,7 @@
           <label class="text-xs text-muted uppercase tracking-wide mb-1 block">Pilih Supplier</label>
           <div class="relative">
             <select name="partner_id" id="partnerSelect" onchange="fillPartnerDetails()" required
-              class="w-full px-4 py-2 rounded-lg bg-carbon border border-petronas/30 text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas appearance-none cursor-pointer transition">
+              class="w-full px-4 py-3 rounded-lg bg-carbon border border-petronas/30 text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas appearance-none cursor-pointer transition">
               <option value="" disabled selected>-- Klik untuk memilih --</option>
               @foreach($partners as $partner)
                 <option value="{{ $partner->id }}" 
@@ -115,22 +115,22 @@
           <div>
             <label class="text-[10px] text-muted uppercase block mb-1">Contact Person</label>
             <input type="text" name="person_name" id="snap_person" readonly
-              class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+              class="w-full px-3 py-3 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
           </div>
           <div>
             <label class="text-[10px] text-muted uppercase block mb-1">Phone</label>
             <input type="text" name="phone" id="snap_phone" readonly
-              class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+              class="w-full px-3 py-3 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
           </div>
           <div>
             <label class="text-[10px] text-muted uppercase block mb-1">Email</label>
             <input type="email" name="email" id="snap_email" readonly
-              class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+              class="w-full px-3 py-3 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
           </div>
           <div class="md:col-span-3">
             <label class="text-[10px] text-muted uppercase block mb-1">Alamat Lengkap</label>
             <input type="text" name="address" id="snap_address" readonly
-              class="w-full px-3 py-2 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
+              class="w-full px-3 py-3 rounded bg-blackBase/50 border border-carbon text-muted text-sm focus:outline-none cursor-not-allowed">
           </div>
         </div>
       </div>
@@ -151,13 +151,13 @@
       
       <form action="{{ route('purchases.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
         <input type="text" name="search" placeholder="Search PO No. or Supplier..." value="{{ request('search') }}"
-          class="w-full md:w-64 px-4 py-2 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
-        <button type="submit" class="px-4 py-2 bg-carbon border border-muted text-xs rounded-lg hover:text-blue-600 transition">Search</button>
+          class="w-full md:w-64 px-4 py-3 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
+        <button type="submit" class="px-4 py-3 bg-carbon border border-muted text-xs rounded-lg hover:text-blue-600 transition">Search</button>
       </form>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm border-collapse">
+    <div class="overflow-x-auto rounded-lg border border-carbon">
+      <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
             <th class="px-4 py-3 text-left text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Tanggal Order</th>
@@ -233,19 +233,23 @@
               {{-- Action --}}
               <td class="px-4 py-3 text-center">
                 <div class="flex justify-center items-center gap-2">
+                  {{-- View / Show Icon --}}
                   <a href="{{ route('purchases.show', $po->id) }}" 
-                    class="w-8 h-8 flex items-center justify-center rounded bg-blue-100 text-blue-700 border border-petronas/30 hover:bg-petronas hover:text-blackBase transition"
-                    title="View Detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-white hover:bg-blue-700 transition"
+                    title="View Details">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
                   </a>
 
+                  {{-- Payment History Icon --}}
                   <a href="{{ route('purchases.showPayments', $po->id) }}" 
-                    class="w-8 h-8 flex items-center justify-center rounded bg-carbon text-silver border border-muted/30 hover:border-petronas hover:text-blue-600 transition"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded bg-green-500 text-white hover:bg-green-600 transition"
                     title="Payment History">
-                    <span class="text-sm">💸</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
                   </a>
                 </div>
               </td>

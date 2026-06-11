@@ -56,7 +56,7 @@
       <div class="md:col-span-2">
         <label class="text-xs text-muted uppercase tracking-wide">Company Name</label>
         <input id="company_name" type="text" name="company_name" required
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-gray-600"
+          class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas placeholder-gray-600"
           placeholder="Contoh: PT. Sumber Makmur">
       </div>
 
@@ -64,7 +64,7 @@
       <div>
         <label class="text-xs text-muted uppercase tracking-wide">Contact Person (PIC)</label>
         <input id="person_name" type="text" name="person_name" 
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
+          class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
           placeholder="Nama Kontak">
       </div>
 
@@ -73,7 +73,7 @@
         <label class="text-xs text-muted uppercase tracking-wide">Partner Type</label>
         <div class="relative mt-1">
           <select id="type" name="type" required
-            class="w-full px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none cursor-pointer">
+            class="w-full px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas appearance-none cursor-pointer">
             <option value="distributor">Distributor</option>
             <option value="supplier">Supplier</option>
             <option value="both">Both (Dist & Supp)</option>
@@ -88,7 +88,7 @@
       <div class="md:col-span-2">
         <label class="text-xs text-muted uppercase tracking-wide">Phone Number</label>
         <input id="phone" type="text" name="phone" 
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
+          class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
           placeholder="081xxx">
       </div>
 
@@ -96,7 +96,7 @@
       <div class="md:col-span-2">
         <label class="text-xs text-muted uppercase tracking-wide">Email Address</label>
         <input id="email" type="email" name="email" 
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
+          class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
           placeholder="email@company.com">
       </div>
 
@@ -104,7 +104,7 @@
       <div class="md:col-span-4">
         <label class="text-xs text-muted uppercase tracking-wide">Full Address</label>
         <textarea id="address" name="address" rows="2"
-          class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
+          class="w-full mt-1 px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas"
           placeholder="Alamat lengkap perusahaan..."></textarea>
       </div>
 
@@ -126,16 +126,16 @@
   {{-- List Section --}}
   <section class="bg-carbonSoft rounded-xl p-6">
     <h2 class="text-lg font-bold text-slate-800 mb-4">Partner List</h2>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-lg border border-carbon">
       <table class="w-full text-sm">
         <thead class="bg-carbon">
           <tr>
-            <th class="px-3 py-2 text-left text-black">Company</th>
-            <th class="px-3 py-2 text-left text-black">Contact Person</th>
-            <th class="px-3 py-2 text-center text-black">Type</th> 
-            <th class="px-3 py-2 text-left text-black">Contact Info</th> 
-            <th class="px-3 py-2 text-left text-black">Address</th>
-            <th class="px-3 py-2 text-center text-black">Actions</th>
+            <th class="px-3 py-3 text-left text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Company</th>
+            <th class="px-3 py-3 text-left text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Contact Person</th>
+            <th class="px-3 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Type</th> 
+            <th class="px-3 py-3 text-left text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Contact Info</th> 
+            <th class="px-3 py-3 text-left text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Address</th>
+            <th class="px-3 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -188,15 +188,22 @@
 
               {{-- Actions --}}
               <td class="px-3 py-3 text-center space-x-2">
+                {{-- Edit Icon --}}
                 <button type="button" onclick='editPartner(@json($partner))' 
-                  class="inline-flex items-center justify-center w-8 h-8 rounded border border-blue-600 text-blue-600 hover:bg-petronas/10 transition">
-                  ✏️
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition" title="Edit">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg>
                 </button>
+                
+                {{-- Delete Icon --}}
                 <form action="{{ route('partners.destroy', $partner->id) }}" method="POST" class="inline">
                   @csrf @method('DELETE')
                   <button type="button" onclick="openDeleteModal(this)" 
-                    class="inline-flex items-center justify-center w-8 h-8 rounded border border-danger text-danger hover:bg-danger hover:text-blackBase transition">
-                    🗑️
+                    class="inline-flex items-center justify-center w-8 h-8 rounded bg-danger text-white hover:bg-red-600 transition" title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
                   </button>
                 </form>
               </td>
