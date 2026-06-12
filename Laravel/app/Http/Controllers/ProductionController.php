@@ -153,7 +153,9 @@ class ProductionController extends Controller
         ));
     }
 
-    public function storeRealization(Request $request) {
+    public function storeRealization(Request $request) 
+    {
+        // Cek apakah jumlah material mencukupi untuk produksi sejumlah qty_produced yang diinput
         // Kurangi qty material sejumlah qty * qty_need_bom untuk setiap material yang terlibat di produk ini (back-flushing)
         // Masukkan data material transaction untuk setiap material yang terlibat di produk ini
         // Tambahkan stok produk jadi
@@ -179,6 +181,31 @@ class ProductionController extends Controller
             $qtyProduced = $request->qty_produced;
             $today = now()->format('Y-m-d');
 
+            // 0. Pengecekan Ketersediaan Material
+            $shortageMaterials = [];
+            foreach ($product->productMaterials as $pm) {
+                $material = $pm->material;
+                $totalNeeded = $qtyProduced * $pm->amount_needed;
+
+                // testing 
+                $totalNeeded = 9999999999999;
+                // Konversi stok ke format riilnya jika menggunakan conversion factor di tampilan
+                if ($material->current_stock < $totalNeeded) {
+                    $shortage = $totalNeeded - $material->current_stock;
+                    
+                    // Format angka yang kurang agar lebih mudah dibaca user
+                    $formattedShortage = number_format($shortage, 2, ',', '.');
+                    $shortageMaterials[] = "- {$material->name}: Kurang {$formattedShortage} {$material->unit} (Dibutuhkan: " . number_format($totalNeeded, 2, ',', '.') . " {$material->unit})";
+                }
+            }
+
+            // Jika ada satu saja material yang kurang, gagalkan proses
+            if (!empty($shortageMaterials)) {
+                DB::rollBack(); // transaksi dibatalkan 
+                $errorMessage = "Stok material tidak mencukupi untuk memproduksi {$qtyProduced} pcs. Berikut rinciannya:<br>" . implode("<br>", $shortageMaterials) . "<br><br>Silahkan buat PO terlebih dahulu.";
+                return redirect()->back()->with('error', $errorMessage)->withInput();
+            }
+
             // 1. Buat Data Realisasi Produksi
             $realization = ProductionRealization::create([
                 'production_batch_id' => $batch->id,
@@ -191,7 +218,7 @@ class ProductionController extends Controller
             foreach ($product->productMaterials as  $pm) {
                 $material = $pm->material;
 
-                // Hitung kebutuhan material: (Qty Produksi * Kebutuhan BOM per produk)
+                // 2. Hitung kebutuhan material: (Qty Produksi * Kebutuhan BOM per produk)
                 $totalNeeded = $qtyProduced * $pm->amount_needed;
                 
                 // Kurangi stok material (Back-flushing)
@@ -202,7 +229,7 @@ class ProductionController extends Controller
                 $totalCostForThisMaterial = $totalNeeded * $material->price_per_unit;
                 $totalProductionCost += $totalCostForThisMaterial;
 
-                // Catat history pemakaian material (Tipe: OUT)
+                // 3. Catat history pemakaian material (Tipe: OUT)
                 MaterialTransaction::create([
                     'material_id'               => $material->id,
                     'transaction_date'          => $today,
