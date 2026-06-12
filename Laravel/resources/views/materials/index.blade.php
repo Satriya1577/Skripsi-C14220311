@@ -111,19 +111,24 @@
                 </span>
               </td>
 
+              {{-- ON HAND STOCK --}}
               <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
-                {{ number_format($material->current_stock / $factor, 0) }} 
+                {{ number_format($material->current_stock / $factor, 0, '', '') }} 
               </td>
 
+              {{-- ORDERED STOCK --}}
               <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
-                {{ number_format($material->ordered_stock / $factor, 0) }} 
+                {{ number_format($material->ordered_stock / $factor, 0, '', '') }} 
               </td>
 
+              {{-- SAFETY STOCK --}}
               <td class="px-3 py-3 text-center text-muted border-l border-carbon whitespace-nowrap">
-                {{ number_format($material->safety_stock / $factor) }}
+                {{ number_format($material->safety_stock / $factor, 0, '', '') }}
               </td>
+
+              {{-- ROP --}}
               <td class="px-3 py-3 text-center text-slate-800 font-bold whitespace-nowrap">
-                {{ number_format($material->reorder_point / $factor) }}
+                {{ number_format($material->reorder_point / $factor, 0, '', '') }}
               </td>
 
               <td class="px-3 py-3 text-center text-muted whitespace-nowrap">{{ $material->purchase_unit }}</td>

@@ -56,6 +56,7 @@
             $statusClass = match($productionPlan->status) {
               'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
               'rejected' => 'bg-danger/10 text-danger border-danger/30',
+              'completed' => 'bg-success/10 text-success border-success/30',
               default  => 'bg-warning/10 text-warning border-warning/30',
             };
           @endphp
@@ -79,19 +80,17 @@
       {{-- Card 1: Target --}}
       <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
         <div>
-          <p class="text-xs text-muted uppercase tracking-wide">Approved Qty</p>
+          <p class="text-xs text-muted uppercase tracking-wide">Approved Plan Qty</p>
           <p class=" text-2xl font-bold text-slate-800">{{ number_format($targetQty, 0, ',', '.') }}</p>
         </div>
-        <div class="p-3 bg-carbon rounded-lg text-slate-800">🎯</div>
       </div>
       
       {{-- Card 2: Total Batched --}}
       <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
         <div>
-          <p class="text-xs text-muted uppercase tracking-wide">Total Produced</p>
+          <p class="text-xs text-muted uppercase tracking-wide">Total Realization Produced</p>
           <p class=" text-2xl font-bold text-slate-800">{{ number_format($totalProduced, 0, ',', '.') }}</p>
         </div>
-        <div class="p-3 bg-petronas/10 rounded-lg text-slate-800">⚙️</div>
       </div>
       
       {{-- Card 3: Remaining Target --}}
@@ -101,9 +100,6 @@
           <p class="text-2xl font-bold {{ $remainingQty > 0 ? 'text-warning' : 'text-success' }}">
             {{ number_format($remainingQty, 0, ',', '.') }}
           </p>
-        </div>
-        <div class="p-3 bg-carbon rounded-lg {{ $remainingQty > 0 ? 'text-warning' : 'text-success' }}">
-          {{ $remainingQty > 0 ? '⚠️' : '✅' }}
         </div>
       </div>
     </div>
@@ -144,7 +140,7 @@
               </div>
             </div>
 
-            @if($productionPlan->status == 'approved')
+            @if($productionPlan->status == 'approved' || $productionPlan->status == 'completed')
               <div class="bg-petronas/10 rounded-lg p-4 border border-petronas min-w-45">
                 <p class="text-[10px] text-slate-800 uppercase tracking-wide mb-1 font-bold">Final Approved</p>
                 <div class="flex items-baseline gap-1">
@@ -184,7 +180,7 @@
               </div>
               <p class="text-[10px] text-muted mt-2 italic text-right">* This will generate material request.</p>
             </form>
-          @elseif($productionPlan->status == 'approved')
+          @elseif($productionPlan->status == 'approved' || $productionPlan->status == 'completed')
             <div class="flex flex-col items-end justify-end h-full pb-2">
               <div class="flex items-center gap-2 text-slate-800">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">

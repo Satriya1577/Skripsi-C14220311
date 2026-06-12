@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use Carbon\Carbon;
 use function Symfony\Component\Clock\now;
 
 class ProductionController extends Controller
@@ -49,11 +49,11 @@ class ProductionController extends Controller
         $remainingQty = max(0, $targetQty - $totalProduced);
 
 
-          // 5. Query Material Recommendations (BOM & Stock Status)
+        // 5. Query Material Recommendations (BOM & Stock Status)
         // Tentukan jumlah produksi yang akan jadi patokan
         // Gunakan 'approved_production_qty' jika sudah di-approve, 
         // jika belum gunakan 'recommended_production_qty'
-        $targetQty = $productionPlan->status === 'approved' 
+        $targetQty = $productionPlan->status === 'approved' || $productionPlan->status === 'completed'
                         ? $productionPlan->approved_production_qty 
                         : $productionPlan->recommended_production_qty;
 
@@ -99,7 +99,8 @@ class ProductionController extends Controller
         if (!in_array($user->role, ['admin', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk membuat batch produksi yang baru.')->withInput();
         }
-        // 1. Validasi input (hanya butuh ID Plan karena data lain sudah otomatis)
+
+        // Validasi input (hanya butuh ID Plan karena data lain sudah otomatis)
         $request->validate([
             'production_plan_id' => 'required|exists:production_plans,id',
         ]);
@@ -107,7 +108,24 @@ class ProductionController extends Controller
         // Ambil data Production Plan beserta relasi Product-nya
         $plan = ProductionPlan::with('product')->findOrFail($request->production_plan_id);
 
-        // 2. PENGECEKAN: Apakah masih ada batch yang belum selesai (end_date NULL)?
+        // 1. Pengecekan: Apakah batch dibuat di periode yang benar sesuai dengan plan?
+        // Kenapa kok masih bisa bikin batch walaupun sudah mencapai target plan produksi?
+        // karena bisa aja demand nya meleset dan tidak sesuai dengan plan yang sudah disetujui diawal
+
+        $currentPeriod = now()->format('Y-m');
+        //$currentPeriod = '2026-08'; // Example value, replace with actual current period
+        $planPeriod    = Carbon::parse($plan->period)->format('Y-m');
+
+        if ($currentPeriod !== $planPeriod) {
+            $currentMonthName = now()->format('F Y');
+            //$currentMonthName = 'August 2026';
+            $planMonthName    = \Carbon\Carbon::parse($plan->period)->format('F Y');
+
+            return redirect()->back()->with('error', "GAGAL: Tidak dapat membuat batch baru. Plan ini diperuntukkan untuk periode {$planMonthName}, sedangkan saat ini Anda berada di bulan {$currentMonthName}.");
+        }
+
+
+        // 2. Pengecekan: Apakah masih ada batch yang belum selesai (end_date NULL)?
         $unfinishedBatchExists = ProductionBatch::where('production_plan_id', $plan->id)
             ->whereNull('end_date')
             ->exists();
@@ -155,14 +173,15 @@ class ProductionController extends Controller
 
     public function storeRealization(Request $request) 
     {
-        // Cek apakah jumlah material mencukupi untuk produksi sejumlah qty_produced yang diinput
+        // Cek apakah input realisasi produksi lebih besar dari plan dan jumlah material mencukupi untuk produksi sejumlah qty_produced yang diinput
         // Kurangi qty material sejumlah qty * qty_need_bom untuk setiap material yang terlibat di produk ini (back-flushing)
         // Masukkan data material transaction untuk setiap material yang terlibat di produk ini
         // Tambahkan stok produk jadi
         // Masukkan data product transaction untuk produksi ini
         // Update harga hpp produk menggunakan moving average
         // Cek apakah batch sudah selesai (qty_produced >= target), jika ya update end_date di batch menjadi hari ini, jika belum biarkan end_date tetap null (In Progress)
-
+        // Cek apakah total realisasi produksi untuk plan ini sudah mencapai target, jika ya update status plan menjadi completed, jika belum biarkan status tetap (draft/approved)
+       
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk membuat riwayat realisasi produksi baru.')->withInput();
@@ -181,28 +200,41 @@ class ProductionController extends Controller
             $qtyProduced = $request->qty_produced;
             $today = now()->format('Y-m-d');
 
-            // 0. Pengecekan Ketersediaan Material
+            // 0. Pengecekan Apakah Input Realisasi < sisa per Batch & Cek Ketersediaan Material
+
+            $realizations = $batch->productionRealizations()->orderBy('production_date', 'desc')->get();
+            $totalRealized = $realizations->sum('qty_produced');
+            $remainingBatchQty = $batch->qty_produced - $totalRealized;
+
+            if ($qtyProduced > $remainingBatchQty) {
+                DB::rollBack(); // transaksi dibatalkan 
+                return redirect()->back()->with('error', "Gagal: Qty Produksi ({$qtyProduced} pcs) melebihi sisa batch ({$remainingBatchQty} pcs).")->withInput();
+            }
+
+            // Cek Ketersediaan Material
             $shortageMaterials = [];
             foreach ($product->productMaterials as $pm) {
                 $material = $pm->material;
                 $totalNeeded = $qtyProduced * $pm->amount_needed;
 
                 // testing 
-                $totalNeeded = 9999999999999;
+                // $totalNeeded = 9999999999999;
                 // Konversi stok ke format riilnya jika menggunakan conversion factor di tampilan
                 if ($material->current_stock < $totalNeeded) {
                     $shortage = $totalNeeded - $material->current_stock;
                     
                     // Format angka yang kurang agar lebih mudah dibaca user
-                    $formattedShortage = number_format($shortage, 2, ',', '.');
-                    $shortageMaterials[] = "- {$material->name}: Kurang {$formattedShortage} {$material->unit} (Dibutuhkan: " . number_format($totalNeeded, 2, ',', '.') . " {$material->unit})";
+                    $materialConversionFactor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+                    $formattedShortage = number_format($shortage / $materialConversionFactor, 2, ',', '.');
+                    $totalNeededFormatted = number_format($totalNeeded / $materialConversionFactor, 2, ',', '.');
+                    $shortageMaterials[] = "- {$material->name}: Kurang {$formattedShortage} {$material->purchase_unit} (Dibutuhkan: " . $totalNeededFormatted . " {$material->purchase_unit}) \n";
                 }
             }
 
             // Jika ada satu saja material yang kurang, gagalkan proses
             if (!empty($shortageMaterials)) {
                 DB::rollBack(); // transaksi dibatalkan 
-                $errorMessage = "Stok material tidak mencukupi untuk memproduksi {$qtyProduced} pcs. Berikut rinciannya:<br>" . implode("<br>", $shortageMaterials) . "<br><br>Silahkan buat PO terlebih dahulu.";
+                $errorMessage = "Stok material tidak mencukupi untuk memproduksi {$qtyProduced} pcs. Berikut rinciannya:\n" . implode("\n", $shortageMaterials) . "\n\nSilahkan buat PO terlebih dahulu.";
                 return redirect()->back()->with('error', $errorMessage)->withInput();
             }
 
@@ -295,6 +327,22 @@ class ProductionController extends Controller
             if ($totalRealizedForBatch >= $batch->qty_produced) {
                 $batch->end_date = $today;
                 $batch->save();
+            }
+
+            // 8. Cek apakah plan sudah selesai
+            $plan = ProductionPlan::find($batch->production_plan_id);
+            if ($plan) {
+                // Ambil semua ID batch yang berada di bawah plan ini
+                $allBatchIds = ProductionBatch::where('production_plan_id', $plan->id)->pluck('id');
+                
+                // Hitung total akumulasi realisasi dari semua batch tersebut
+                $totalRealizedForPlan = ProductionRealization::whereIn('production_batch_id', $allBatchIds)->sum('qty_produced');
+
+                // Jika total realisasi mencapai atau melampaui plan yang disetujui, update status
+                if ($totalRealizedForPlan >= $plan->approved_production_qty) {
+                    $plan->status = 'completed';
+                    $plan->save();
+                }
             }
 
             // Jika semua berjalan lancar, commit (simpan permanen) ke database

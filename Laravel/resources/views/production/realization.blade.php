@@ -96,7 +96,6 @@
           <p class="text-xs text-muted uppercase tracking-wide">Target Batch Qty</p>
           <p class=" text-2xl font-bold text-slate-800">{{ number_format($batch->qty_produced, 0, ',', '.') }}</p>
         </div>
-        <div class="p-3 bg-carbon rounded-lg text-slate-800">🎯</div>
       </div>
       
       <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
@@ -104,7 +103,6 @@
           <p class="text-xs text-muted uppercase tracking-wide">Realized Qty</p>
           <p class=" text-2xl font-bold text-slate-800">{{ number_format($totalRealized ?? 0, 0, ',', '.') }}</p>
         </div>
-        <div class="p-3 bg-petronas/10 rounded-lg text-slate-800">⚙️</div>
       </div>
       
       <div class="bg-carbonSoft border border-carbon rounded-xl p-4 flex justify-between items-center">
@@ -113,9 +111,6 @@
           <p class="text-2xl font-bold {{ ($remainingBatchQty ?? 0) > 0 ? 'text-warning' : 'text-success' }}">
             {{ number_format(max(0, $remainingBatchQty ?? 0), 0, ',', '.') }}
           </p>
-        </div>
-        <div class="p-3 bg-carbon rounded-lg {{ ($remainingBatchQty ?? 0) > 0 ? 'text-warning' : 'text-success' }}">
-          {{ ($remainingBatchQty ?? 0) > 0 ? '⚠️' : '✅' }}
         </div>
       </div>
     </div>

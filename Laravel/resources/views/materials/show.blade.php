@@ -90,22 +90,22 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Stok Fisik ({{ $pUnit }})</p>
-        <p class=" text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor) }}</p>
+        <p class=" text-2xl font-bold text-silver">{{ number_format($material->current_stock / $factor, 0, '', '') }}</p>
       </div>
       
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Incoming Order</p>
-        <p class=" text-2xl font-bold text-blue-400">{{ number_format($material->ordered_stock / $factor) }} <span class=" text-xs text-muted font-normal">{{ $pUnit }}</span></p>
+        <p class=" text-2xl font-bold text-silver">{{ number_format($material->ordered_stock / $factor, 0, '', '') }} <span class=" text-xs text-muted font-normal">{{ $pUnit }}</span></p>
       </div>
 
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Safety Stock</p>
         <div class="flex items-end gap-1">
-          <p class=" text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor) }}</p>
+          <p class=" text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor, 0, '', '') }}</p>
           <span class="text-xs text-muted mb-1">{{ $pUnit }}</span>
         </div>
         <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
-          ROP: {{ number_format($material->reorder_point / $factor) }} {{ $pUnit }}
+          ROP: {{ number_format($material->reorder_point / $factor, 0, '', '') }} {{ $pUnit }}
         </p>
       </div>
 
@@ -236,102 +236,6 @@
     @endif
   </section>
 
-  <!-- {{-- SECTION 3: RIWAYAT TRANSAKSI --}}
-  <section class="bg-carbonSoft rounded-xl p-6">
-    <div class="flex justify-between items-end mb-4">
-      <h2 class="text-lg font-bold text-slate-800">Riwayat Transaksi & Valuasi</h2>
-      <span class="text-xs text-muted italic">Semua angka ditampilkan dalam satuan {{ $pUnit }}</span>
-    </div>
-
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="bg-carbon">
-          <tr>
-            <th class="px-3 py-2 text-left text-black">Date</th>
-            <th class="px-3 py-2 text-left text-black">Type</th>
-            <th class="px-3 py-2 text-right text-black">Qty ({{ $pUnit }})</th>
-            <th class="px-3 py-2 text-right text-black">Buy Price / {{ $pUnit }}</th>
-            <th class="px-3 py-2 text-right text-black">Total</th>
-            <th class="px-3 py-2 text-left text-black">Desc</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse ($transactions as $transaction)
-            <tr class="border-b border-carbon hover:bg-carbon transition-colors">
-              <td class="px-3 py-2 font-semibold text-silver text-xs">
-                {{ $transaction->transaction_date?->format('d M Y') ?? '-' }}
-                <span class="block text-[10px] text-muted font-normal">
-                  {{ $transaction->created_at->format('H:i') }}
-                </span>
-              </td>
-
-              <td class="px-3 py-2">
-                @if($transaction->type == 'in')
-                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-success/10 text-success border border-success/30">
-                    PURCHASE IN
-                  </span>
-                @elseif($transaction->type == 'out')
-                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-danger/10 text-danger border border-danger/30">
-                    USAGE OUT
-                  </span>
-                @elseif($transaction->type == 'adjustment')
-                  @if($transaction->qty >= 0)
-                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-blue-900/30 text-blue-400 border border-blue-400/30">
-                      STK ADJ IN
-                    </span>
-                  @else
-                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-orange-900/30 text-orange-400 border border-orange-400/30">
-                      STK ADJ OUT
-                    </span>
-                  @endif
-                @elseif($transaction->type == 'cost_adjustment')
-                  <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/30" title="Revaluasi Nilai Harga Material">
-                    COST ADJ
-                  </span>
-                @endif
-              </td>
-
-              <td class="px-3 py-2 font-semibold text-right {{ $transaction->type == 'cost_adjustment' ? 'text-silver' : ($transaction->qty > 0 ? 'text-success' : 'text-danger') }}">
-                @if($transaction->type == 'cost_adjustment')
-                  -
-                @else
-                  {{ $transaction->qty > 0 ? '+' : '' }}{{ number_format($transaction->qty / $factor, 2) }}
-                @endif
-              </td>
-
-              <td class="px-3 py-2 text-right text-muted">
-                Rp {{ $transaction->price_per_unit ? number_format($transaction->price_per_unit * $factor, 2, ',', '.') : '-' }}
-              </td>
-
-              <td class="px-3 py-2 font-semibold text-silver text-right">
-                @if($transaction->type == 'cost_adjustment')
-                  -
-                @else
-                  Rp {{ $transaction->total_price ? number_format($transaction->total_price, 2, ',', '.') : '-' }}
-                @endif
-              </td>
-
-              <td class="px-3 py-2 text-muted text-xs max-w-xs truncate">
-                {{ $transaction->description ?? '-' }}
-              </td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="6" class="text-center text-muted py-4">Belum ada riwayat transaksi</td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-
-    @if ($transactions->hasPages())
-      <div class="mt-4 flex justify-between text-sm text-muted">
-        <div>Showing {{ $transactions->firstItem() ?? 0 }} to {{ $transactions->lastItem() ?? 0 }} of {{ $transactions->total() ?? 0 }} transactions</div>
-        {{ $transactions->links('pagination::tailwind') }}
-      </div>
-    @endif
-  </section> -->
-
   {{-- SECTION 3: RIWAYAT TRANSAKSI & VALUASI --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     <div class="flex items-center justify-between mb-4">
@@ -379,11 +283,11 @@
                 @elseif($trx->type == 'adjustment')
                   @if($trx->qty >= 0)
                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-blue-500 bg-blue-500/10 border border-blue-500/30">
-                      STK ADJ IN
+                      STOCK ADJ IN
                     </span>
                   @else
                     <span class="px-2 py-1 rounded text-[10px] font-bold uppercase text-orange-500 bg-orange-500/10 border border-orange-500/30">
-                      STK ADJ OUT
+                      STOCK ADJ OUT
                     </span>
                   @endif
                 @elseif($trx->type == 'cost_adjustment')
@@ -412,7 +316,7 @@
               {{-- KOLOM 4: MASUK (+) --}}
               <td class="px-4 py-3 text-right text-success font-semibold">
                 @if($trx->type != 'cost_adjustment' && $trx->qty > 0)
-                  +{{ number_format($trx->qty / $factor, 2, ',', '.') }}
+                  +{{ number_format($trx->qty / $factor, 0, '', '') }}
                 @else
                   <span class="text-carbonSoft">-</span>
                 @endif
@@ -421,7 +325,7 @@
               {{-- KOLOM 5: KELUAR (-) --}}
               <td class="px-4 py-3 text-right text-danger font-semibold"> 
                 @if($trx->type != 'cost_adjustment' && $trx->qty < 0)
-                  {{ number_format(abs($trx->qty) / $factor, 2, ',', '.') }} 
+                  {{ number_format(abs($trx->qty) / $factor, 0, '', '') }} 
                 @else
                   <span class="text-carbonSoft">-</span>
                 @endif
@@ -429,7 +333,7 @@
 
               {{-- KOLOM 6: SALDO FISIK AKHIR (HIGHLIGHTED) --}}
               <td class="px-4 py-3 text-right font-bold text-slate-800 bg-slate-100">
-                {{ number_format($trx->current_stock_balance / $factor, 2, ',', '.') }}
+                {{ number_format($trx->current_stock_balance / $factor, 0, '', '') }}
               </td>
             </tr>
           @empty

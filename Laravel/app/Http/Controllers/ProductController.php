@@ -173,7 +173,7 @@ class ProductController extends Controller
                             // ->orderBy('created_at', 'desc')
                             ->paginate(5); // 10 data per halaman
 
-        $materials = Material::where('is_active', true)->orderBy('name')->get();
+        $materials = Material::where('is_active', true)->orderBy('code')->get();
         return view('products.show', compact('product', 'materials', 'transactions'));
     }
 
