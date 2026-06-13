@@ -299,13 +299,27 @@
           } else if (data.status === 'failed') {
             clearInterval(pollInterval);
             setBtnLoading(false, 'Failed');
-            // Ganti alert JS dengan Alert HTML Custom
-            renderErrorAlert('Forecast generation failed: ' + (data.message || 'Unknown error'));
+            const errorMsg = 'Forecast gagal: Sistem tidak dapat menghasilkan prediksi dan rekomendasi produksi karena ' + (data.message || 'Unknown error');
+            sessionStorage.setItem('pendingForecastError', errorMsg);
+            window.location.reload();
           }
         })
         .catch(error => console.error('Polling Error:', error));
     }, 2000); 
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Cek apakah ada error yang disimpan sebelum refresh
+    const pendingError = sessionStorage.getItem('pendingForecastError');
+    
+    if (pendingError) {
+      // Munculkan alert error
+      renderErrorAlert(pendingError);
+      
+      // Hapus dari storage agar tidak muncul lagi saat user me-refresh manual halaman ini
+      sessionStorage.removeItem('pendingForecastError');
+    }
+  });
 
   // --- MAIN HANDLER ---
   form.addEventListener('submit', function(e) {
