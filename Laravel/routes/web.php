@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/production/show-realization/{productionBatch}', [ProductionController::class, 'showRealization'])->name('production.showRealization'); 
     Route::post('/production/store-batch', [ProductionController::class, 'storeBatch'])->name('production.storeBatch'); // admin, production [DONE]
     Route::post('/production/store-realization', [ProductionController::class, 'storeRealization'])->name('production.storeRealization'); // admin, production [DONE]
+    Route::post('/production/create-current-month-plan/{product}', [ProductionController::class, 'createCurrentMonthProductionPlan'])->name('production.createCurrentMonthProductionPlan'); // admin, purchase, production [DONE]
     
 
     // REPORTS SECTION

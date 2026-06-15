@@ -67,15 +67,28 @@
       </p>
     </div>
 
-     {{-- Sisi Kanan: Tombol Action (Warna konstan, tanpa efek hover) --}}
-    <div class="flex items-center">
-      <a href="{{ route('forecast.show', $product->id) }}" 
-      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-petronas text-blackBase font-bold shadow-lg shadow-petronas/20 border border-petronas cursor-pointer transition-none hover:bg-petronas hover:text-blackBase">
+    {{-- Sisi Kanan: Tombol Action --}}
+    <div class="flex items-center gap-3">
+      
+      {{-- Tombol View Forecast (Link a href) --}}
+      <a href="{{ route('forecast.show', $product->id) }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-carbonSoft text-slate-800 font-bold border border-carbon cursor-pointer hover:bg-carbon transition-colors shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
         </svg>
-        <span>Create New Plan (View Forecast)</span>
+        <span>Create Next Month Plan & Forecast</span>
       </a>
+
+      {{-- Tombol Create Current Month Plan (Form POST) --}}
+      <form action="{{ route('production.createCurrentMonthProductionPlan', $product->id) }}" method="POST" class="inline">
+        @csrf
+        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-petronas text-blackBase font-bold shadow-lg shadow-petronas/20 border border-petronas cursor-pointer transition-none hover:bg-petronas/90 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          <span>Create Current Month Plan</span>
+        </button>
+      </form>
+      
     </div>
     
     <!-- <a href="{{ route('forecast.show', $product->id) }}" class="bg-petronas text-blackBase font-bold px-6 py-2.5 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20 flex items-center justify-center gap-2">

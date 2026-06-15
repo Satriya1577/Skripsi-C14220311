@@ -31,6 +31,80 @@ class ProductionController extends Controller
         return view('production.plan', compact('product', 'productionPlans'));
     }
 
+    public function createCurrentMonthProductionPlan(Request $request, Product $product)
+    {
+        // --- 0. CEK HAK AKSES ---
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'purchase', 'production'])) {
+            $msg = 'Terjadi kesalahan: Anda tidak memiliki akses.';
+            
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg)->withInput();
+        }
+        // Pastikan produk ada
+        $product = Product::findOrFail($product->id);
+
+        // 1. Tentukan Tanggal Target (Selalu 1 Bulan ke Depan dari Sekarang)
+        // Contoh: Sekarang Feb 2026 -> Target Mar 2026
+        $targetDate = Carbon::now()->startOfMonth();
+
+        // 2. CEK STATUS PRODUCTION PLAN
+        // Jangan izinkan generate ulang jika plan bulan tersebut sudah disetujui/selesai
+        $isPlanLocked = ProductionPlan::where('product_id', $product->id)
+            ->where('period', $targetDate->format('Y-m-d'))
+            ->whereIn('status', ['approved', 'completed'])
+            ->exists();
+
+        if ($isPlanLocked) {
+            $msg = 'Cannot regenerate. Plan for ' . $targetDate->format('M Y') . ' is already locked.';
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 422); 
+            }
+            return back()->with('error', $msg);     
+        }
+
+        $params = [
+            $product->order_p ?? 1, $product->order_d ?? 1, $product->order_q ?? 1,
+            $product->seasonal_P ?? 1, $product->seasonal_D ?? 1, $product->seasonal_Q ?? 1, 
+            $product->seasonal_s ?? 12
+        ];
+
+        // Nilai Default jika API Python gagal atau data sales kosong
+        $targetDateStr  = Carbon::parse($targetDate)->format('Y-m-d');
+
+        $forecastVal    = 0;
+        $rmse           = 0;
+        $mape           = 0;
+        $newSafetyStock = $product->safety_stock ?? 0;
+        $recQty         = 0;
+
+        ProductionPlan::updateOrCreate(
+            [
+                'product_id' => $product->id, 
+                'period'     => $targetDateStr
+            ],
+            [
+                'forecast_qty'               => $forecastVal,
+                'current_stock_snapshot'     => $product->current_stock,
+                'safety_stock_snapshot'      => $newSafetyStock,
+                'recommended_production_qty' => $recQty,
+                'rmse'                       => $rmse,
+                'mape'                       => $mape,
+                'order_p'                    => $params[0],
+                'order_d'                    => $params[1],
+                'order_q'                    => $params[2],
+                'seasonal_P'                 => $params[3],
+                'seasonal_D'                 => $params[4],
+                'seasonal_Q'                 => $params[5],
+                'seasonal_s'                 => $params[6],
+                'status'                     => 'draft',
+            ]
+        );
+        return redirect()->back()->with('success', "Plan produksi untuk bulan " . $targetDate->format('M Y') . " berhasil dibuat.");
+    }
+
     public function showPlanDetails(ProductionPlan $productionPlan) 
     {
         $product = $productionPlan->product;
