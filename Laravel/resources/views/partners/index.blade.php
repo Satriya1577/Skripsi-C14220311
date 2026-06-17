@@ -124,8 +124,22 @@
   </section>
 
   {{-- List Section --}}
-  <section class="bg-carbonSoft rounded-xl p-6">
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     <h2 class="text-lg font-bold text-slate-800 mb-4">Partner List</h2>
+    
+    {{-- FRONTEND TABS FILTER --}}
+    <div class="flex space-x-6 border-b border-carbon/50 mb-6 overflow-x-auto" id="frontendTabs">
+      <button type="button" onclick="filterTable('all', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-petronas text-petronas">
+        All Partners
+      </button>
+      <button type="button" onclick="filterTable('supplier', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Supplier
+      </button>
+      <button type="button" onclick="filterTable('distributor', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Distributor
+      </button>
+    </div>
+
     <div class="overflow-x-auto rounded-lg border border-carbon">
       <table class="w-full text-sm">
         <thead class="bg-carbon">
@@ -138,21 +152,22 @@
             <th class="px-3 py-3 text-center text-black text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          @foreach ($partners as $partner)
-            <tr class="border-b border-carbon hover:bg-carbon transition-colors group">
+        <tbody id="tableBody">
+          @forelse ($partners as $partner)
+            {{-- Tambahkan filterable-row dan data-status --}}
+            <tr class="border-b border-carbon hover:bg-carbon transition-colors group filterable-row" data-status="{{ strtolower($partner->type) }}">
               {{-- Company --}}
-              <td class="px-3 py-3 text-left font-semibold text-silver">
+              <td class="px-3 py-3 text-left font-semibold text-silver whitespace-nowrap">
                 {{ $partner->company_name }}
               </td>
               
               {{-- PIC --}}
-              <td class="px-3 py-3 text-left text-muted">
+              <td class="px-3 py-3 text-left text-muted whitespace-nowrap">
                 {{ $partner->person_name ?? '-' }}
               </td>
 
               {{-- Type Badge --}}
-              <td class="px-3 py-3 text-center">
+              <td class="px-3 py-3 text-center whitespace-nowrap">
                 @if($partner->type === 'distributor')
                   <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-bold border border-petronas/20">Distributor</span>
                 @elseif($partner->type === 'supplier')
@@ -163,7 +178,7 @@
               </td>
 
               {{-- Contact Info (Phone/Email) --}}
-              <td class="px-3 py-3 text-left">
+              <td class="px-3 py-3 text-left whitespace-nowrap">
                 <div class="flex flex-col gap-1">
                   @if($partner->phone)
                     <div class="text-xs text-silver flex items-center gap-1">
@@ -187,7 +202,7 @@
               </td>
 
               {{-- Actions --}}
-              <td class="px-3 py-3 text-center space-x-2">
+              <td class="px-3 py-3 text-center space-x-2 whitespace-nowrap">
                 {{-- Edit Icon --}}
                 <button type="button" onclick='editPartner(@json($partner))' 
                   class="inline-flex items-center justify-center w-8 h-8 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition" title="Edit">
@@ -208,18 +223,19 @@
                 </form>
               </td>
             </tr>
-          @endforeach
+          @empty
+            {{-- Sengaja dikosongkan agar ditangani table row fallback --}}
+          @endforelse
           
-          @if ($partners->count() === 0)
-            <tr>
-              <td colspan="6" class="px-3 py-8 text-center text-muted">
-                <div class="flex flex-col items-center justify-center gap-2">
-                  <span class="text-2xl">📭</span>
-                  <span>No partners data available.</span>
-                </div>
-              </td>
-            </tr>
-          @endif
+          {{-- Baris Empty State Filter --}}
+          <tr id="emptyRow" style="{{ count($partners) === 0 ? '' : 'display: none;' }}">
+            <td colspan="6" class="px-3 py-8 text-center text-muted">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <span class="text-2xl">📭</span>
+                <span>No partners found.</span>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -246,6 +262,49 @@
 </div>
 
 <script>
+  /**
+   * Logic Filter Frontend
+   */
+  function filterTable(status, btn) {
+    // 1. Reset gaya semua tombol tab
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+      tab.classList.remove('border-petronas', 'text-petronas');
+      tab.classList.add('border-transparent', 'text-muted');
+    });
+
+    // 2. Terapkan gaya ke tombol yang aktif
+    btn.classList.remove('border-transparent', 'text-muted');
+    btn.classList.add('border-petronas', 'text-petronas');
+
+    // 3. Filter Baris Tabel
+    const rows = document.querySelectorAll('.filterable-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const rowType = row.dataset.status; // Berisi: 'distributor', 'supplier', atau 'both'
+      
+      // Tampilkan jika:
+      // Tab 'all' dipilih, ATAU tipenya cocok persis, ATAU tipenya 'both'
+      if (status === 'all' || rowType === status || rowType === 'both') {
+        row.style.display = ''; 
+        visibleCount++;
+      } else {
+        row.style.display = 'none'; 
+      }
+    });
+
+    // 4. Handle Empty State
+    const emptyRow = document.getElementById('emptyRow');
+    if (emptyRow) {
+      if (visibleCount === 0) {
+        emptyRow.style.display = '';
+      } else {
+        emptyRow.style.display = 'none';
+      }
+    }
+  }
+
   /**
    * Logic Edit Partner
    * Mengisi form dengan data dari JSON row
@@ -294,7 +353,7 @@
     document.getElementById('type').value = 'distributor';
   }
 
-  // --- Modal Logic (Sama seperti product.index) ---
+  // --- Modal Logic ---
   let deleteForm = null;
 
   function openDeleteModal(button) {

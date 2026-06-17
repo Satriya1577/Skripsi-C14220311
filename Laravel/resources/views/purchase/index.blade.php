@@ -149,11 +149,11 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800">Purchase Order List</h2>
       
-      <form action="{{ route('purchases.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
+      <!-- <form action="{{ route('purchases.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
         <input type="text" name="search" placeholder="Search PO No. or Supplier..." value="{{ request('search') }}"
           class="w-full md:w-64 px-4 py-3 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
         <button type="submit" class="px-4 py-3 bg-carbon border border-muted text-xs rounded-lg hover:text-blue-600 transition">Search</button>
-      </form>
+      </form> -->
     </div>
 
     {{-- FRONTEND TABS FILTER (Direvisi Menjadi Ordered) --}}
