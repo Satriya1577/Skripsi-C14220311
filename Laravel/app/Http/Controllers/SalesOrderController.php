@@ -338,6 +338,11 @@ class SalesOrderController extends Controller
                 // kalau lolos semua pengecekan, baru reserve/booking stoknya
                 foreach ($salesOrder->items as $item) {
                     $item->product->increment('committed_stock', $item->quantity);
+
+                    // Update cogs_snapshot untuk setiap item saat konfirmasi, jika belum ada snapshot sebelumnya
+                    $item->update([
+                        'cogs_snapshot' => $item->product->cost_price
+                    ]);
                 }
             }
 
