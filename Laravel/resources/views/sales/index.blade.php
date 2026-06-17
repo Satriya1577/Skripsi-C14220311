@@ -47,13 +47,11 @@
 
   {{-- Form Section --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 shadow-lg shadow-blackBase">
-    {{-- Header Form (Icon dihapus, style disamakan dengan Product Index) --}}
     <h2 class="text-lg font-bold text-slate-800">Create Sales Order (Draft)</h2>
 
     <form action="{{ route('sales.store') }}" method="POST" class="space-y-6">
       @csrf
       
-      {{-- ROW 1: INFORMASI TRANSAKSI (3 Kolom) --}}
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <label class="text-xs text-muted uppercase tracking-wide block mb-1">Kode SO (Opsional)</label>
@@ -74,7 +72,6 @@
         </div>
       </div>
 
-      {{-- ROW 2: DATA DISTRIBUTOR (DALAM 1 KOTAK) --}}
       <div class="bg-carbon/40 p-5 rounded-xl border border-carbon space-y-4">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
@@ -82,7 +79,6 @@
           </h3>
         </div>
 
-        {{-- Partner Select --}}
         <div>
           <label class="text-xs text-muted uppercase tracking-wide mb-1 block">Pilih Partner</label>
           <div class="relative">
@@ -106,10 +102,8 @@
           </div>
         </div>
 
-        {{-- Hidden Snapshot --}}
         <input type="hidden" name="company_name" id="snap_company">
 
-        {{-- Readonly Details --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           <div>
             <label class="text-[10px] text-muted uppercase block mb-1">Contact Person</label>
@@ -134,7 +128,6 @@
         </div>
       </div>
 
-      {{-- Action Buttons (Size disamakan dengan Product Index: px-6 py-2) --}}
       <div class="flex justify-end pt-2">
         <button type="submit" class="bg-petronas text-blackBase font-bold px-6 py-2 rounded-lg hover:bg-petronas/90 transition shadow-lg shadow-petronas/20">
           Save Sales Order
@@ -145,7 +138,7 @@
 
   {{-- List Sales Orders --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800">Order List</h2>
       
       <form action="{{ route('sales.index') }}" method="GET" class="flex gap-2 w-full md:w-auto">
@@ -153,6 +146,25 @@
           class="w-full md:w-64 px-4 py-3 bg-carbon rounded-lg text-xs text-silver focus:outline-none border border-transparent focus:border-petronas">
         <button type="submit" class="px-4 py-3 bg-carbon border border-muted text-xs rounded-lg hover:text-blue-600 transition">Search</button>
       </form>
+    </div>
+
+    {{-- FRONTEND TABS FILTER --}}
+    <div class="flex space-x-6 border-b border-carbon/50 mb-6 overflow-x-auto" id="frontendTabs">
+      <button type="button" onclick="filterTable('all', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-petronas text-petronas">
+        All Orders
+      </button>
+      <button type="button" onclick="filterTable('draft', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Draft
+      </button>
+      <button type="button" onclick="filterTable('confirmed', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Confirmed
+      </button>
+      <button type="button" onclick="filterTable('shipped', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Shipped
+      </button>
+      <button type="button" onclick="filterTable('cancelled', this)" class="tab-btn pb-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors border-transparent text-muted hover:text-silver">
+        Cancelled
+      </button>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-carbon">
@@ -169,22 +181,23 @@
             <th class="px-4 py-3 text-center text-black text-xs uppercase tracking-wide border-b border-carbonSoft">Action</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-carbon/50">
+        <tbody class="divide-y divide-carbon/50" id="tableBody">
           @forelse ($salesOrders as $so)
-            <tr class="hover:bg-carbon transition-colors group">
-              <td class="px-4 py-3 text-silver text-xs">
+            {{-- Atribut data-status ditambahkan di sini --}}
+            <tr class="hover:bg-carbon transition-colors group filterable-row" data-status="{{ strtolower($so->status) }}">
+              <td class="px-4 py-3 text-silver text-xs whitespace-nowrap">
                 {{ \Carbon\Carbon::parse($so->transaction_date)->format('d/m/Y') }}
               </td>
               
-              <td class="px-4 py-3 font-semibold text-slate-800 text-xs">
+              <td class="px-4 py-3 font-semibold text-slate-800 text-xs whitespace-nowrap">
                 {{ $so->so_code }}
               </td>
               
-              <td class="px-4 py-3 text-silver">
+              <td class="px-4 py-3 text-silver whitespace-nowrap">
                 {{ $so->company_name ?? '-' }}
               </td>
               
-              <td class="px-4 py-3 text-center">
+              <td class="px-4 py-3 text-center whitespace-nowrap">
                 @php
                   $statusColor = match($so->status) {
                     'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
@@ -199,7 +212,7 @@
                 </span>
               </td>
 
-              <td class="px-4 py-3 text-center">
+              <td class="px-4 py-3 text-center whitespace-nowrap">
                 @php
                   $payColor = match($so->payment_status) {
                     'paid' => 'text-success bg-success/10 border-success/30',
@@ -213,17 +226,16 @@
                 </span>
               </td>
 
-              <td class="px-4 py-3 text-right font-bold text-silver">
+              <td class="px-4 py-3 text-right font-bold text-silver whitespace-nowrap">
                 Rp {{ number_format($so->grand_total, 2, ',', '.') }}
               </td>
 
-              <td class="px-4 py-3 text-right text-xs {{ $so->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }}">
+              <td class="px-4 py-3 text-right text-xs {{ $so->remaining_balance > 0 ? 'text-red-400' : 'text-muted' }} whitespace-nowrap">
                 Rp {{ number_format($so->remaining_balance, 2, ',', '.') }}
               </td>
 
-              <td class="px-4 py-3 text-center">
+              <td class="px-4 py-3 text-center whitespace-nowrap">
                 <div class="flex justify-center items-center gap-2">
-                  {{-- View / Show Icon --}}
                   <a href="{{ route('sales.show', $so->id) }}" 
                     class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-white hover:bg-blue-700 transition"
                     title="View Details">
@@ -233,7 +245,6 @@
                     </svg>
                   </a>
 
-                  {{-- Payment History Icon --}}
                   <a href="{{ route('sales.showPayments', $so->id) }}" 
                     class="inline-flex items-center justify-center w-8 h-8 rounded bg-green-500 text-white hover:bg-green-600 transition"
                     title="Payment History">
@@ -245,18 +256,21 @@
               </td>
             </tr>
           @empty
-            <tr>
-              <td colspan="8" class="text-center text-muted py-8 italic">
-                No sales orders found.
-              </td>
-            </tr>
+            {{-- Dikosongkan agar ditangani oleh logika Empty Row di bawah --}}
           @endforelse
+          
+          {{-- Baris untuk menampilkan pesan jika filter kosong --}}
+          <tr id="emptyRow" style="{{ count($salesOrders) === 0 ? '' : 'display: none;' }}">
+            <td colspan="8" class="text-center text-muted py-8 italic">
+              No sales orders found for this status.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
     
     <div class="mt-4">
-      {{ $salesOrders->links('pagination::tailwind') }}
+      {{ $salesOrders->appends(request()->query())->links('pagination::tailwind') }}
     </div>
   </section>
 
@@ -273,12 +287,48 @@
     const email  = selectedOption.getAttribute('data-email') || '';
     const address = selectedOption.getAttribute('data-address') || '';
 
-    // Isi Snapshot
     document.getElementById('snap_company').value = company;
     document.getElementById('snap_person').value = person;
     document.getElementById('snap_phone').value  = phone;
     document.getElementById('snap_email').value  = email;
     document.getElementById('snap_address').value = address;
+  }
+
+  // Logika Filter Frontend
+  function filterTable(status, btn) {
+    // 1. Reset gaya semua tombol tab
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+      tab.classList.remove('border-petronas', 'text-petronas');
+      tab.classList.add('border-transparent', 'text-muted');
+    });
+
+    // 2. Terapkan gaya ke tombol yang diklik
+    btn.classList.remove('border-transparent', 'text-muted');
+    btn.classList.add('border-petronas', 'text-petronas');
+
+    // 3. Sembunyikan/Tampilkan baris tabel
+    const rows = document.querySelectorAll('.filterable-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      if (status === 'all' || row.dataset.status === status) {
+        row.style.display = ''; 
+        visibleCount++;
+      } else {
+        row.style.display = 'none'; 
+      }
+    });
+
+    // 4. Tampilkan pesan kosong jika tidak ada baris yang cocok
+    const emptyRow = document.getElementById('emptyRow');
+    if (emptyRow) {
+      if (visibleCount === 0) {
+        emptyRow.style.display = '';
+      } else {
+        emptyRow.style.display = 'none';
+      }
+    }
   }
 </script>
 
