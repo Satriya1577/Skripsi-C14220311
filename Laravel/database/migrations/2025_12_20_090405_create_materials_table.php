@@ -19,7 +19,12 @@ return new class extends Migration
             // --- MANAJEMEN STOK & SATUAN ---
             // Disimpan dalam satuan terkecil (Base Unit)
             $table->decimal('current_stock', 15, 2)->default(0); 
-            $table->integer('ordered_stock')->default(0)->comment('Ordered On The Way Stock');
+
+            // barang otw keluar gudang (OUT) untuk produksi dari batch yang sudah in progress
+            $table->decimal('committed_stock', 15, 2)->default(0)->comment('Reserved Stock'); // Barang yang sudah di-booking SO tapi belum dikirim
+
+            // bahan baku otw masuk gudang (IN) -> Barang yang sudah di-order ke supplier, tapi belum diterima
+            $table->decimal('ordered_stock', 15, 2)->default(0)->comment('Ordered On The Way Stock');
 
             
             // Satuan Dasar (misal: 'gram', 'ml', 'pcs') -> Digunakan di Resep & Stok

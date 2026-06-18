@@ -21,7 +21,12 @@ return new class extends Migration
             // Stok Reserved: Barang yang sudah di-booking SO tapi belum dikirim
             // Kolom ini Baru
             // Dihitung sistem
+
+            // barang otw keluar gudang (OUT)
             $table->integer('committed_stock')->default(0)->comment('Reserved Stock');
+
+            // barang otw masuk gudang (IN)
+            $table->integer('on_production_stock')->default(0)->comment('Stock in Production'); // Stok Barang yang sedang diproduksi di batch produksi, belum masuk gudang
 
             // Dihitung sistem
             $table->integer('safety_stock')->default(0);
