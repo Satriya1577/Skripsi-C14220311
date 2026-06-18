@@ -75,6 +75,7 @@
           <tr>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Code</th>
             <th class="px-3 py-3 text-left text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Product Name</th> 
+            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">On Production Stock</th> 
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">On Hand Stock</th> 
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Reserved Stock</th> 
             <th class="px-3 py-3 text-center text-black border-l border-carbon whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Available Stock</th> 
@@ -104,7 +105,7 @@
                   </div>
                 </div>
               </td>
-
+              <td class="px-3 py-3 text-center whitespace-nowrap">{{ $product->on_production_stock }}</td>
               <td class="px-3 py-3 text-center whitespace-nowrap">{{ $product->current_stock }}</td>
               <td class="px-3 py-3 text-center text-slate-800 font-medium whitespace-nowrap">{{ $product->committed_stock }}</td>
               <td class="px-3 py-3 text-center font-bold text-slate-800 border-l border-carbon whitespace-nowrap">
