@@ -77,9 +77,11 @@
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Code</th>
             <th class="px-3 py-3 text-left text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Material Name</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Status</th> 
-            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">On Hand Stock</th> 
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Ordered Stock</th>
-            <th class="px-3 py-3 text-center text-black border-l border-carbon whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Safety Stock</th>
+            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">On Hand Stock</th> 
+            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Production Reserved Stock</th> 
+            <th class="px-3 py-3 text-center text-black border-l border-carbon whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Available Stock</th>
+            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Safety Stock</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">ROP</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Purchase Unit</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Base Unit</th>
@@ -111,18 +113,28 @@
                 </span>
               </td>
 
-              {{-- ON HAND STOCK --}}
-              <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
-                {{ number_format($material->current_stock / $factor, 0, '', '') }} 
-              </td>
-
               {{-- ORDERED STOCK --}}
               <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
-                {{ number_format($material->ordered_stock / $factor, 0, '', '') }} 
+                {{ number_format($material->ordered_stock / $factor, 0, '', '') }}  
+              </td>
+
+              {{-- ON HAND STOCK --}}
+              <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
+                {{ number_format($material->current_stock / $factor, 0, '', '') }}  
+              </td>
+
+              {{-- PRODUCTION RESERVED STOCK --}}
+              <td class="px-3 py-3 text-center font-semibold text-silver whitespace-nowrap">
+                {{ number_format($material->production_reserved_stock / $factor, 0, '', '') }}  
+              </td>
+
+              {{-- AVAILABLE STOCK --}}
+              <td class="px-3 py-3 text-center text-muted border-l border-carbon whitespace-nowrap">
+                {{ number_format($material->current_stock - $material->production_reserved_stock / $factor, 0, '', '') }}
               </td>
 
               {{-- SAFETY STOCK --}}
-              <td class="px-3 py-3 text-center text-muted border-l border-carbon whitespace-nowrap">
+              <td class="px-3 py-3 text-center text-slate-800 font-bold whitespace-nowrap">
                 {{ number_format($material->safety_stock / $factor, 0, '', '') }}
               </td>
 

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('current_stock', 15, 2)->default(0); 
 
             // barang otw keluar gudang (OUT) untuk produksi dari batch yang sudah in progress
-            $table->decimal('committed_stock', 15, 2)->default(0)->comment('Reserved Stock'); // Barang yang sudah di-booking SO tapi belum dikirim
+            $table->decimal('production_reserved_stock', 15, 2)->default(0)->comment('Reserved Stock'); // Barang yang sudah di-booking SO tapi belum dikirim
 
             // bahan baku otw masuk gudang (IN) -> Barang yang sudah di-order ke supplier, tapi belum diterima
             $table->decimal('ordered_stock', 15, 2)->default(0)->comment('Ordered On The Way Stock');
