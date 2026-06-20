@@ -208,7 +208,22 @@ class RunSarimaJob implements ShouldQueue
 
             $tempPlan = ProductionPlan::firstOrCreate(
                 ['product_id' => $product->id, 'period' => $targetDateStr],
-                ['status' => 'draft']
+                [
+                    'status' => 'draft',
+                    'forecast_qty'               => $forecastVal,
+                    'current_stock_snapshot'     => $product->current_stock,
+                    'safety_stock_snapshot'      => $newSafetyStock,
+                    'recommended_production_qty' => 0,
+                    'rmse'                       => $rmse,
+                    'mape'                       => $mape,
+                    'order_p'                    => $params[0],
+                    'order_d'                    => $params[1],
+                    'order_q'                    => $params[2],
+                    'seasonal_P'                 => $params[3],
+                    'seasonal_D'                 => $params[4],
+                    'seasonal_Q'                 => $params[5],
+                    'seasonal_s'                 => $params[6]
+                ]
             );
 
             ValidationLog::where('production_plan_id', $tempPlan->id)->delete();
