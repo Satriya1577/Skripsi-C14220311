@@ -126,10 +126,62 @@ class PurchaseOrderController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show(PurchaseOrder $purchaseOrder)
     {
-        $materials = Material::where('is_active', true)->get();
         $purchaseOrder = PurchaseOrder::with(['items.material'])->findOrFail($purchaseOrder->id);
+
+        // Mengambil semua material aktif sekaligus menghitung rekomendasi restock
+        $materials = DB::table('materials')
+            ->where('materials.is_active', true)
+            // Join ke BOM (product_materials)
+            ->leftJoin('product_materials', 'materials.id', '=', 'product_materials.material_id')
+            // Join ke Production Plans (Hanya yang draft dan approved)
+            ->leftJoin('production_plans', function($join) {
+                $join->on('product_materials.product_id', '=', 'production_plans.product_id')
+                     ->whereIn('production_plans.status', ['draft', 'approved']);
+            })
+            ->select(
+                'materials.id',
+                'materials.code',
+                'materials.name',
+                'materials.current_stock',
+                'materials.ordered_stock',
+                'materials.conversion_factor',
+                'materials.purchase_unit',
+                'materials.price_per_unit',
+                // Hitung Total Qty Kebutuhan (dalam satuan Base Unit)
+                DB::raw("COALESCE(SUM(
+                    (CASE 
+                        WHEN production_plans.status = 'approved' THEN production_plans.approved_production_qty 
+                        ELSE production_plans.recommended_production_qty 
+                    END) * product_materials.amount_needed
+                ), 0) as total_qty_needed_base")
+            )
+            ->groupBy(
+                'materials.id', 'materials.code', 'materials.name', 
+                'materials.current_stock', 'materials.ordered_stock', 
+                'materials.conversion_factor', 'materials.purchase_unit', 
+                'materials.price_per_unit'
+            )
+            ->get()
+            ->map(function ($material) {
+                // Hitung kekurangan (Shortage) dalam Base Unit
+                // Rumus: Total Kebutuhan - (Stok Gudang + Stok Sedang OTW)
+                $shortage = $material->total_qty_needed_base - ($material->current_stock + $material->ordered_stock);
+                
+                // Pastikan angka tidak negatif (jika stok cukup, rekomendasinya 0)
+                $shortage = max(0, $shortage); 
+
+                // Konversi satuan Base Unit ke Purchase Unit
+                $factor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+                
+                $material->recommended_restock = ceil($shortage / $factor);
+                $material->on_hand_purchase_unit = $material->current_stock / $factor;
+
+                return $material;
+            });
+
         return view('purchase.show', compact('purchaseOrder', 'materials'));
     }
 
