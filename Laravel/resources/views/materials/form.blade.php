@@ -149,7 +149,7 @@
                 <optgroup label="Berat">
                   <option value="kg" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'kg' ? 'selected' : '' }}>KG</option>
                   <option value="gram" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'gram' ? 'selected' : '' }}>Gram</option>
-                  <option value="ons" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'ons' ? 'selected' : '' }}>Ons</option>
+                  {{-- <option value="ons" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'ons' ? 'selected' : '' }}>Ons</option> --}}
                 </optgroup>
                 <optgroup label="Cairan">
                   <option value="liter" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'liter' ? 'selected' : '' }}>Liter</option>
@@ -157,7 +157,7 @@
                 </optgroup>
                 <optgroup label="Lainnya">
                   <option value="pcs" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'pcs' ? 'selected' : '' }}>Pcs</option>
-                  <option value="dozen" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'dozen' ? 'selected' : '' }}>Lusin</option>
+                  {{-- <option value="dozen" {{ old('packaging_unit', $material->packaging_unit ?? '') == 'dozen' ? 'selected' : '' }}>Lusin</option> --}}
                 </optgroup>
               </select>
             </div>
