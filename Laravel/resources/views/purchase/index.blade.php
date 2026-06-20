@@ -213,7 +213,7 @@
                 @php
                   $statusColor = match($po->status) {
                     'draft'   => 'bg-gray-800 text-gray-400 border-gray-600',
-                    'ordered'  => 'bg-blue-900/30 text-blue-400 border-blue-800', 
+                    'ordered'  => 'bg-blue-900/30 text-blue-800 border-blue-800', 
                     'received' => 'bg-blue-200 text-blue-800 border-petronas',
                     'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
                     default   => 'bg-carbon text-slate-800'

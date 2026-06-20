@@ -201,9 +201,9 @@
                 @php
                   $statusColor = match($so->status) {
                     'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
-                    'confirmed' => 'bg-blue-900/30 text-blue-400 border-blue-800',
+                    'confirmed' => 'bg-blue-900/30 text-blue-800 border-blue-800',
                     'shipped' => 'bg-blue-200 text-blue-800 border-petronas',
-                    'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
+                    'cancelled' => 'bg-danger/10 text-danger border-danger/30',
                     default => 'bg-carbon text-slate-800'
                   };
                 @endphp
