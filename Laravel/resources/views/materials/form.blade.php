@@ -134,7 +134,7 @@
             </select>
           </div>
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide">Satuan Pembelian</label>
+            <label class="text-xs text-muted uppercase tracking-wide">Satuan Kemasan Pembelian</label>
             <input type="text" name="purchase_unit" id="purchase_unit" value="{{ old('purchase_unit', $material->purchase_unit ?? '') }}" placeholder="Cth: Karung @50kg"
               class="w-full mt-1 px-4 py-2 rounded-lg bg-carbonSoft border border-carbon text-silver focus:border-petronas focus:outline-none">
           </div>
