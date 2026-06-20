@@ -49,9 +49,9 @@
         <p class="text-xs uppercase tracking-widest text-muted">Procurement Payment</p>
         @php
           $badgeColor = match($purchaseOrder->payment_status) {
-            'paid' => 'bg-green-900/30 text-green-400 border-green-800',
-            'partial' => 'bg-yellow-900/30 text-yellow-400 border-yellow-800',
-            'unpaid' => 'bg-red-900/30 text-red-400 border-red-800',
+            'paid'  => 'text-success bg-success/10 border-success/30',
+            'partial' => 'text-warning bg-warning/10 border-warning/30',
+            'unpaid' => 'text-danger bg-danger/10 border-danger/30',
             default => 'bg-carbon'
           };
         @endphp

@@ -150,7 +150,7 @@
       @if($purchaseOrder->status == 'draft')
         <div class="p-8 text-center border-2 border-dashed border-carbon rounded-xl">
           <p class="text-muted text-sm italic">
-            "Informasi pengiriman dan estimasi kedatangan dapat diinput setelah PO dikonfirmasi ke Supplier (Status: Ordered)."
+            "Informasi pengiriman dan input tanggal kedatangan barang dapat diinput setelah PO dikonfirmasi ke Supplier (Status: Ordered)."
           </p>
         </div>
 
@@ -195,7 +195,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
           {{-- Card Tanggal --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
-            <p class="text-xs text-muted uppercase tracking-wide mb-1">Estimasi Sampai</p>
+            <p class="text-xs text-muted uppercase tracking-wide mb-1">Input tanggal Sampai di gudang</p>
             <p class="text-lg font-bold text-silver">
               {{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('d M Y') : '-' }}
             </p>
