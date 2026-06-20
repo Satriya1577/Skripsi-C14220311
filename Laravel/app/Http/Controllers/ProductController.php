@@ -20,7 +20,7 @@ class ProductController extends Controller
     // tampilkan list produk yang dijual
     public function index()
     {
-        $products = Product::orderBy('id', 'desc')->paginate(10);
+        $products = Product::orderBy('code', 'asc')->paginate(10);
         return view('products.index',compact('products'));
     }
 

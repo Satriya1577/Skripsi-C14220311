@@ -22,7 +22,7 @@ class ForecastController extends Controller
     // tampilin list produk yang bisa diforecasting
     public function index()
     {
-        $products = Product::orderBy('id', 'asc')->paginate(10);
+        $products = Product::orderBy('code', 'asc')->paginate(10);
         return view('forecast.index', compact('products'));
     }
 

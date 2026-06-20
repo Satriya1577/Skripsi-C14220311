@@ -20,7 +20,7 @@ use function Symfony\Component\Clock\now;
 class ProductionController extends Controller
 {
     public function index() {
-        $products = Product::orderBy('id', 'asc')->paginate(10);
+        $products = Product::orderBy('code', 'asc')->paginate(10);
         return view('production.index', compact('products'));
     }
 

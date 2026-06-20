@@ -237,13 +237,18 @@
               <div class="relative">
                 <select id="productSelect" class="w-full appearance-none bg-carbon border border-muted/30 text-silver text-sm rounded-lg focus:ring-petronas focus:border-petronas block p-3 pr-10 hover:border-petronas/50 transition">
                   <option value="" disabled selected>-- Choose Material --</option>
+                  
                   @foreach($materials as $material)
                     <option value="{{ $material->id }}" 
-                      data-price="{{ $material->price_per_unit }}" {{-- Ini HPP Terakhir --}}
+                      data-price="{{ $material->price_per_unit }}" 
                       data-code="{{ $material->code }}" 
                       data-name="{{ $material->name }}"
                       data-unit="{{ $material->purchase_unit }}">
-                      {{ $material->code }} - {{ $material->name }} (On Hand Stok: {{ $material->current_stock / $material->conversion_factor }} {{ $material->purchase_unit }})
+                      
+                      {{ $material->code }} - {{ $material->name }} 
+                      (On Hand: {{ number_format($material->on_hand_purchase_unit, 0, ',', '.') }}
+                      | Rekomendasi re-stok: {{ number_format($material->recommended_restock, 0, ',', '.') }} {{ $material->purchase_unit }})
+                      
                     </option>
                   @endforeach
                 </select>
