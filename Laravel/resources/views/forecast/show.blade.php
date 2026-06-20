@@ -135,8 +135,8 @@
           <tr>
             <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Period</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Forecast</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Stock Snap</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Rec. Prod</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">(Snapshot) On Hand Stock</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Rekomendasi Jumlah Produksi</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Status</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th>
           </tr>
@@ -174,6 +174,7 @@
                   $badgeClass = match($status) {
                     'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
                     'rejected' => 'bg-danger/10 text-danger border-danger/30',
+                    'completed' => 'bg-success/10 text-success border-success/30', 
                     default  => 'bg-warning/10 text-warning border-warning/30',
                   };
                 @endphp
@@ -184,13 +185,16 @@
 
               {{-- Action --}}
               <td class="px-4 py-3 text-center">
-                {{-- Tombol di table dikembalikan hanya berisi chart mata (view details) --}}
                 <a href="{{ route('forecast.chart', $plan) }}" 
-                  class="inline-flex items-center justify-center w-8 h-8 rounded border border-muted/30 text-muted hover:text-blue-600 hover:border-petronas transition shadow-sm"
-                  title="View Forecast Details">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-white hover:bg-blue-700 transition shadow-sm"
+                  title="View Forecast Chart">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    {{-- Sumbu X dan Y --}}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v17a1 1 0 001 1h17" />
+                    {{-- Garis Chart --}}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 14l4-5 4 2 5-6" />
+                    {{-- Titik-titik (Dots) --}}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M7 14h.01M11 9h.01M15 11h.01M20 5h.01" />
                   </svg>
                 </a>
               </td>

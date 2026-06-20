@@ -113,8 +113,8 @@
           <tr>
             <th class="px-4 py-3 text-left text-black uppercase text-xs tracking-wider">Period</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Forecast</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">On Hand Stock Qty (snapshot)</th>
-            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">System Recommendation Production Qty</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">(Snapshot) On Hand Stock</th>
+            <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Rekomendasi Jumlah Produksi</th>
             <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Approved Qty</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Status</th>
             <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th>
@@ -164,6 +164,7 @@
                   $badgeClass = match($status) {
                     'approved' => 'bg-blue-100 text-blue-700 border-petronas/30',
                     'rejected' => 'bg-danger/10 text-danger border-danger/30',
+                    'completed' => 'bg-success/10 text-success border-success/30',
                     default  => 'bg-warning/10 text-warning border-warning/30',
                   };
                 @endphp
