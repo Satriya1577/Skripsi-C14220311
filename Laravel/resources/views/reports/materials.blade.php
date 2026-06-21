@@ -37,7 +37,7 @@
       <li class="opacity-30 select-none">/</li>
       <li><a href="{{ route('reports.index') }}" class="hover:text-blue-600 transition-colors">Reports Center</a></li>
       <li class="opacity-30 select-none">/</li>
-      <li class="text-slate-800 font-bold pointer-events-none" aria-current="page">Material Stock Card</li>
+      <li class="text-slate-800 font-bold pointer-events-none" aria-current="page">Stock Movements</li>
     </ol>
   </nav>
 
