@@ -126,10 +126,62 @@ class PurchaseOrderController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show(PurchaseOrder $purchaseOrder)
     {
-        $materials = Material::where('is_active', true)->get();
         $purchaseOrder = PurchaseOrder::with(['items.material'])->findOrFail($purchaseOrder->id);
+
+        // Mengambil semua material aktif sekaligus menghitung rekomendasi restock
+        $materials = DB::table('materials')
+            ->where('materials.is_active', true)
+            // Join ke BOM (product_materials)
+            ->leftJoin('product_materials', 'materials.id', '=', 'product_materials.material_id')
+            // Join ke Production Plans (Hanya yang draft dan approved)
+            ->leftJoin('production_plans', function($join) {
+                $join->on('product_materials.product_id', '=', 'production_plans.product_id')
+                     ->whereIn('production_plans.status', ['draft', 'approved']);
+            })
+            ->select(
+                'materials.id',
+                'materials.code',
+                'materials.name',
+                'materials.current_stock',
+                'materials.ordered_stock',
+                'materials.conversion_factor',
+                'materials.purchase_unit',
+                'materials.price_per_unit',
+                // Hitung Total Qty Kebutuhan (dalam satuan Base Unit)
+                DB::raw("COALESCE(SUM(
+                    (CASE 
+                        WHEN production_plans.status = 'approved' THEN production_plans.approved_production_qty 
+                        ELSE production_plans.recommended_production_qty 
+                    END) * product_materials.amount_needed
+                ), 0) as total_qty_needed_base")
+            )
+            ->groupBy(
+                'materials.id', 'materials.code', 'materials.name', 
+                'materials.current_stock', 'materials.ordered_stock', 
+                'materials.conversion_factor', 'materials.purchase_unit', 
+                'materials.price_per_unit'
+            )
+            ->get()
+            ->map(function ($material) {
+                // Hitung kekurangan (Shortage) dalam Base Unit
+                // Rumus: Total Kebutuhan - (Stok Gudang + Stok Sedang OTW)
+                $shortage = $material->total_qty_needed_base - ($material->current_stock + $material->ordered_stock);
+                
+                // Pastikan angka tidak negatif (jika stok cukup, rekomendasinya 0)
+                $shortage = max(0, $shortage); 
+
+                // Konversi satuan Base Unit ke Purchase Unit
+                $factor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+                
+                $material->recommended_restock = ceil($shortage / $factor);
+                $material->on_hand_purchase_unit = $material->current_stock / $factor;
+
+                return $material;
+            });
+
         return view('purchase.show', compact('purchaseOrder', 'materials'));
     }
 
@@ -339,8 +391,12 @@ class PurchaseOrderController extends Controller
 
             // Kasus B: Ordered -> Received (BARANG SAMPAI)
             // Pindahkan dari Ordered Stock ke Current Stock
-            // Kasus B: Ordered -> Received (BARANG SAMPAI)
             if ($oldStatus == 'ordered' && $newStatus == 'received') {
+
+                // Hitung alokasi ongkir
+                $totalAllItemsValue = $purchaseOrder->items->sum('subtotal');
+                $shippingToAllocate = ($purchaseOrder->shipping_terms == 'FOB_shipping_point') ? $purchaseOrder->shipping_cost : 0;
+
                 foreach ($purchaseOrder->items as $item) {
                     $material = $item->material;
                     
@@ -352,27 +408,43 @@ class PurchaseOrderController extends Controller
                     $newOrdered = max(0, $material->ordered_stock - $qtyBaseIn);
                     $material->ordered_stock = $newOrdered;
 
-                    // --- 3. HITUNG HPP (WEIGHTED AVERAGE) ---
+                    // --- 3. HITUNG HPP (WEIGHTED AVERAGE) Dengan Onkir ---
+                    // hitung alokasi ongkir per item
+                    // subtotal per item/total sum subtotal
+                    // cth subtotal item 1 = 20 pcs x 20000/pcs = 400000
+                    // cth subtotal item 2 = 2 pcs x 10000/pcs = 20000
+                    // total PO keseluruhan = 400000 + 20000 = 420000
+                    // shipping cost utk item 1 dan 2 = 100000
+                    // proporsi item 1 = 400000 / 420000 = 0.95
+                    // proporsi item 2 = 20000 / 420000 = 0.05
+                    // itemFreightCost item 1 = proporsi item 1 * shipping cost keseluruhan = 0.95 * 100000 = 95000
+                    // itemFreightCost item 2 = proporsi item 2 * shipping cost keseluruhan = 0.05 * 100000 = 5000
+                    
+                    $proportion = ($totalAllItemsValue > 0) ? ($item->subtotal / $totalAllItemsValue) : 0; 
+
+                    // itemfreightcost =  subtotal per item/total sum subtotal * biaya ongkir dalam 1 PO
+                    $itemFreightCost = $proportion * $shippingToAllocate;
+
                     // Ambil stok dan harga saat ini (Sebelum ditambah)
                     $currentStock = $material->current_stock;
                     $currentPrice = $material->price_per_unit;
 
                     // Hitung Valuasi
-                    $oldAssetValue = $currentStock * $currentPrice; // Nilai aset lama
-                    $newAssetValue = $item->subtotal; // Nilai aset baru (Harga Beli - Diskon)
+                    // Nilai aset lama saat ini
+                    $oldAssetValue = $currentStock * $currentPrice;
+                    // Nilai aset baru termasuk biaya ongkir (jika ada)
+                    $newAssetValue = $item->subtotal + $itemFreightCost;
 
-                    $totalStock = $currentStock + $qtyBaseIn;
                     $totalValue = $oldAssetValue + $newAssetValue;
+                    $totalStock = $currentStock + $qtyBaseIn;
 
                     // Hitung Harga Per Unit Baru
                     // Cegah division by zero
-                    $newPricePerUnit = ($totalStock > 0) ? ($totalValue / $totalStock) : $item->unit_price / $conversion;
-
+                    $newPricePerUnit = ($totalStock > 0) ? ($totalValue / $totalStock) : ($newAssetValue / $qtyBaseIn);
                     // Update Master Material (Stok & Harga)
                     $material->current_stock = $totalStock;
                     $material->price_per_unit = $newPricePerUnit;
                     $material->save();
-                    // ----------------------------------------
 
                     // 4. Catat Transaksi Material (History)
                     MaterialTransaction::create([
@@ -382,8 +454,7 @@ class PurchaseOrderController extends Controller
                         'qty' => $qtyBaseIn,
                         
                         // Simpan harga valuasi per unit yang BARU saja dihitung (atau harga beli saat itu)
-                        // Biasanya di history transaksi IN, orang mencatat harga beli aktual saat itu agar bisa ditelusuri
-                        'price_per_unit' => ($qtyBaseIn > 0) ? ($item->subtotal / $qtyBaseIn) : 0, 
+                        'price_per_unit' => ($qtyBaseIn > 0) ? ($newAssetValue / $qtyBaseIn) : 0, 
                         'total_price' => $item->subtotal,
                         
                         'current_stock_balance' => $material->current_stock,

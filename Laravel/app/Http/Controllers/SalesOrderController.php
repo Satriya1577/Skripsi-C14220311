@@ -242,8 +242,6 @@ class SalesOrderController extends Controller
                     ]);
                 }
             }
-
-            // ... (Kode Bagian 4, 5, 6, 7 dst SAMA PERSIS SEPERTI SEBELUMNYA, TIDAK ADA PERUBAHAN) ...
             
             // --- 4. UPDATE INFO PENGIRIMAN ---
             if (in_array($request->status, ['confirmed', 'shipped'])) {
@@ -325,8 +323,26 @@ class SalesOrderController extends Controller
             }
 
             if ($oldStatus == 'draft' && $newStatus == 'confirmed') {
+                // cek apakah semua item yang ada di keranjang stok
+                // yang mau dibeli tidak melebihi available stok (on hand stock - committed stock)
+                foreach ($salesOrder->items as $item) {
+                    $availableStock = $item->product->current_stock - $item->product->committed_stock;
+                    
+                    if ($item->quantity > $availableStock) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'status' => "Gagal Konfirmasi: Stok tersedia untuk produk '{$item->product->name}' tidak mencukupi! (Permintaan: {$item->quantity} Unit, Tersedia: {$availableStock} Unit)."
+                        ]);
+                    }
+                }
+
+                // kalau lolos semua pengecekan, baru reserve/booking stoknya
                 foreach ($salesOrder->items as $item) {
                     $item->product->increment('committed_stock', $item->quantity);
+
+                    // Update cogs_snapshot untuk setiap item saat konfirmasi, jika belum ada snapshot sebelumnya
+                    $item->update([
+                        'cogs_snapshot' => $item->product->cost_price
+                    ]);
                 }
             }
 

@@ -13,32 +13,31 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductionBatch; 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ProductService;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // tampilkan list produk yang dijual
     public function index()
     {
-        $products = Product::orderBy('id', 'desc')->paginate(10);
+        $products = Product::orderBy('code', 'asc')->paginate(10);
         return view('products.index',compact('products'));
     }
 
+    // tampilkan form untuk membuat produk baru
     public function create()
     {
         return view('products.form');
     }
 
+    // tampilkan form untuk edit produk yang sudah ada
     public function edit(Product $product)
     {
         return view('products.form', compact('product'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // simpan data produk ke database 
+    public function store(Request $request, ProductService $productService)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'sales'])) {
@@ -59,9 +58,15 @@ class ProductController extends Controller
             'cost_price'          => 'nullable|numeric|min:0', 
         ]);
 
-        // 2. HITUNG LEAD TIME
-        // Passing null karena produk belum memiliki ID / belum ada di database
-        $leadTime = $this->calculateLeadTime($request, null);
+        // 2. HITUNG LEAD TIME VIA SERVICE
+        // Buat objek dummy Product di memori agar bisa dibaca oleh Service
+        $dummyProduct = new Product();
+        $dummyProduct->is_manual_lead_time = $request->is_manual_lead_time;
+        $dummyProduct->min_lead_time_days  = $request->min_lead_time_days ?? 1;
+        $dummyProduct->max_lead_time_days  = $request->max_lead_time_days ?? 3;
+
+        // Panggil service yang sudah di-inject pada parameter fungsi
+        $leadTime = $productService->calculateLeadTimeStatsFromHistory($dummyProduct);
 
         // 3. PROSES SIMPAN KE DATABASE
         try {
@@ -74,7 +79,7 @@ class ProductController extends Controller
                 'is_manual_lead_time' => $request->is_manual_lead_time,
                 'min_lead_time_days'  => $leadTime['min'],
                 'max_lead_time_days'  => $leadTime['max'],
-                'lead_time_average'   => $leadTime['avg'],
+                'lead_time_average'   => $leadTime['average'], 
                 'batch_size'          => $request->batch_size,
                 'price'               => $request->price ?? 0,
                 'current_stock'       => $request->current_stock ?? 0,
@@ -113,14 +118,14 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $product, ProductService $productService)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'sales'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data produk.')->withInput();
         }
 
-        // 1. VALIDASI INPUT (Abaikan unique code untuk ID produk ini sendiri)
+        // 1. VALIDASI INPUT
         $request->validate([
             'code'                => 'required|string|max:50|unique:products,code,' . $product->id, 
             'name'                => 'required|string|max:255',
@@ -130,13 +135,17 @@ class ProductController extends Controller
             'max_lead_time_days'  => 'nullable|integer|min:1|gte:min_lead_time_days', 
             'batch_size'          => 'required|integer|min:1',
             'price'               => 'nullable|numeric|min:0', 
-            // Note: current_stock & cost_price dihilangkan karena Stock Opname biasanya tidak diizinkan diubah via update produk.
         ]);
 
-        // 2. HITUNG LEAD TIME (Sertakan object product untuk mengecek history batch)
-        $leadTime = $this->calculateLeadTime($request, $product);
+        $product->is_manual_lead_time = $request->is_manual_lead_time;
+        $product->min_lead_time_days  = $request->min_lead_time_days ?? 1;
+        $product->max_lead_time_days  = $request->max_lead_time_days ?? 3;
 
-        // 3. PROSES UPDATE
+        // 3. HITUNG LEAD TIME VIA SERVICE
+        // Panggil service yang sudah di-inject pada parameter fungsi update
+        $leadTime = $productService->calculateLeadTimeStatsFromHistory($product);
+
+        // 4. PROSES UPDATE KE DATABASE
         $product->update([
             'code'                => $request->code,
             'name'                => $request->name,
@@ -144,69 +153,12 @@ class ProductController extends Controller
             'is_manual_lead_time' => $request->is_manual_lead_time,
             'min_lead_time_days'  => $leadTime['min'],
             'max_lead_time_days'  => $leadTime['max'],
-            'lead_time_average'   => $leadTime['avg'],
+            'lead_time_average'   => $leadTime['average'], 
             'batch_size'          => $request->batch_size,
             'price'               => $request->price ?? 0,
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-    }
-
-
-    /**
-     * Helper Method untuk Menghitung Lead Time
-     */
-    private function calculateLeadTime(Request $request, ?Product $product)
-    {
-        // Jika Mode MANUAL
-        if ($request->is_manual_lead_time === 'manual') {
-            $min = $request->min_lead_time_days ?? 1;
-            $max = $request->max_lead_time_days ?? 3;
-            
-            return [
-                'min' => $min,
-                'max' => $max,
-                'avg' => ($min + $max) / 2
-            ];
-        } 
-        
-        // Jika Mode AUTOMATIC
-        else {
-            // Jika product dikirim (Kasus Update)
-            if ($product) {
-                $batches = ProductionBatch::where('product_id', $product->id)
-                    ->whereNotNull('start_date')
-                    ->whereNotNull('end_date')
-                    ->orderBy('end_date', 'desc')
-                    ->take(30)
-                    ->get();
-
-                if ($batches->count() > 0) {
-                    $totalDays = 0;
-                    foreach ($batches as $batch) {
-                        $start = Carbon::parse($batch->start_date);
-                        $end   = Carbon::parse($batch->end_date);
-                        $days  = $start->diffInDays($end); 
-                        $totalDays += ($days == 0 ? 1 : $days);
-                    }
-                    
-                    $avgDays = (float) ($totalDays / $batches->count());
-                    
-                    return [
-                        'min' => (int) round($avgDays),
-                        'max' => (int) round($avgDays),
-                        'avg' => $avgDays
-                    ];
-                }
-            }
-
-            // Fallback: Jika insert produk baru (belum ada histori) ATAU histori 0
-            return [
-                'min' => 1,
-                'max' => 1,
-                'avg' => 1
-            ];
-        }
     }
 
     /**
@@ -221,7 +173,7 @@ class ProductController extends Controller
                             // ->orderBy('created_at', 'desc')
                             ->paginate(5); // 10 data per halaman
 
-        $materials = Material::where('is_active', true)->orderBy('name')->get();
+        $materials = Material::where('is_active', true)->orderBy('code')->get();
         return view('products.show', compact('product', 'materials', 'transactions'));
     }
 
@@ -238,18 +190,63 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 
-    public function storeAdjustment(Request $request)
+
+    public function costAdjustment(Request $request)
+    {
+
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
+        }
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'new_cost'   => 'required|numeric',
+            'reason'     => 'required|string|max:255'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $product = Product::findOrFail($request->product_id);
+            $oldCost = $product->cost_price;
+            $newCost = $request->new_cost;
+
+            // 1. Update Master Product HPP
+            $product->update(['cost_price' => $newCost]);
+
+            // 2. Catat riwayat perubahan harga (Qty = 0, karena fisik barang tidak berubah)
+            ProductTransaction::create([
+                'product_id'            => $product->id,
+                'type'                  => 'cost_adjustment', // Tipe khusus revaluasi
+                'qty'                   => 0, 
+                'cost_price'            => $newCost,
+                'current_stock_balance' => $product->current_stock, // Stok tidak berubah
+                'product_name_snapshot' => $product->name,
+                'description'           => "Revaluasi HPP dari Rp" . number_format($oldCost) . " menjadi Rp" . number_format($newCost) . ". Alasan: " . $request->reason,
+                'transaction_date'      => now(),
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'HPP berhasil direvaluasi/diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal update HPP: ' . $e->getMessage());
+        }
+    }
+
+    public function stockAdjustment(Request $request)
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk mengatur data stok opname.')->withInput();
         }
 
+        // VALIDASI: manual_price sudah dihapus karena fungsi ini murni untuk fisik
         $request->validate([
             'product_id'   => 'required|exists:products,id',
-            'actual_qty'   => 'required|integer|min:0', // Stok fisik (Satuan Unit)
-            'notes'        => 'nullable|string|max:255',
-            'manual_price' => 'nullable|numeric|min:0.01' // Hanya dipakai jika HPP sistem 0
+            'actual_qty'   => 'required|integer|min:0', 
+            'notes'        => 'required|string|max:255', 
         ]);
 
         try {
@@ -258,11 +255,9 @@ class ProductController extends Controller
             $product = Product::findOrFail($request->product_id);
 
             // 1. HITUNG SELISIH (DELTA)
-            // Product tidak punya satuan beli, jadi langsung pakai input user
             $systemQty = $product->current_stock;
             $actualQty = $request->actual_qty;
             
-            // Selisih (+ berarti Surplus, - berarti Loss)
             $deltaQty = $actualQty - $systemQty;
 
             if ($deltaQty == 0) {
@@ -270,27 +265,17 @@ class ProductController extends Controller
             }
 
             // 2. LOGIC HARGA & HPP (COST PRICE)
-            // Gunakan Cost Price (HPP), BUKAN Selling Price
             $transactionCost = $product->cost_price;
 
             if ($deltaQty > 0) {
                 // --- KASUS SURPLUS (+) ---
-                // Jika HPP sistem 0, cek input manual
                 if ($transactionCost == 0) {
-                    if ($request->filled('manual_price')) {
-                        $transactionCost = $request->manual_price;
-                        
-                        // Update Master Product (Initial HPP)
-                        $product->update(['cost_price' => $transactionCost]);
-                    } else {
-                        throw new \Exception("HPP sistem saat ini Rp 0. Wajib mengisi 'Estimasi HPP' untuk mencatat surplus stok.");
-                    }
+                    // Blokir surplus jika HPP 0. Arahkan user untuk set HPP dulu di form Cost Adjustment.
+                    throw new \Exception("HPP sistem saat ini Rp 0. Silakan lakukan 'Cost Adjustment' (Revaluasi HPP) terlebih dahulu sebelum mencatat penambahan stok (Surplus).");
                 }
-                // Jika HPP ada, pakai HPP sistem (Standard Opname tidak mengubah HPP)
-            
             } else {
                 // --- KASUS LOSS (-) ---
-                // WAJIB pakai HPP sistem saat ini.
+                // Jika loss (stok berkurang) dan HPP 0, biarkan saja karena tidak merusak penambahan nilai aset.
                 $transactionCost = $product->cost_price;
             }
 
@@ -304,15 +289,15 @@ class ProductController extends Controller
             $desc      = "Opname: {$typeLabel}. Fisik: {$actualQty} Unit. " . $request->notes;
 
             ProductTransaction::create([
-                'product_id'            => $product->id,
-                'type'                  => 'adjustment',
-                'qty'                   => $deltaQty, // Simpan +/-
-                'cost_price'            => $transactionCost, // HPP saat transaksi
-                'current_stock_balance' => $actualQty, // Saldo akhir setelah adjustment
-                'product_name_snapshot'   => $product->name,
+                'product_id'                 => $product->id,
+                'type'                       => 'adjustment',
+                'qty'                        => $deltaQty, 
+                'cost_price'                 => $transactionCost, 
+                'current_stock_balance'      => $actualQty, 
+                'product_name_snapshot'      => $product->name,
                 'product_packaging_snapshot' => $product->packaging,
-                'transaction_date'      => now(),
-                'description'           => $desc,
+                'transaction_date'           => now(),
+                'description'                => $desc,
             ]);
 
             DB::commit();
@@ -325,125 +310,18 @@ class ProductController extends Controller
         }
     }
 
-    public function updateProductLeadTimeSafetyStock() 
+    public function updateProductLeadTimeSafetyStock(ProductService $productService) 
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses untuk update data lead time dan safety stok.')->withInput();
         }
-        // Ambil semua produk (Bisa juga difilter hanya yang aktif jika ada status aktif)
-        $products = Product::all();
 
-        DB::beginTransaction();
         try {
-            foreach ($products as $product) {
-                
-                // 1. Hitung Statistik Lead Time Produksi (Min, Max, Average)
-                $leadTimeStats = $this->calculateLeadTimeStats($product);
-                $minLeadTime = $leadTimeStats['min'];
-                $maxLeadTime = $leadTimeStats['max'];
-                $avgLeadTime = $leadTimeStats['average'];
-
-                // 2. Hitung Statistik Demand/Penjualan (Daily Average & Max)
-                $demandStats = $this->calculateDemandStats($product);
-                $avgDailyDemand = $demandStats['average'];
-                $maxDailyDemand = $demandStats['max'];
-
-                // 3. Hitung Safety Stock (Kuantitas)
-                // Rumus: (Max Lead Time * Max Daily Demand) - (Average Lead Time * Average Daily Demand)
-                $maxExpectedDemand = $maxLeadTime * $maxDailyDemand;
-                $averageExpectedDemand = $avgLeadTime * $avgDailyDemand;
-
-                $safetyStock = max(0, $maxExpectedDemand - $averageExpectedDemand);
-
-                // 4. Update data produk
-                $product->update([
-                    'min_lead_time_days' => $minLeadTime,
-                    'max_lead_time_days' => $maxLeadTime,
-                    'lead_time_average'  => $avgLeadTime,
-                    'safety_stock'       => ceil($safetyStock), // Dibulatkan ke atas agar aman
-                ]);
-            }
-            
-            DB::commit();
+            $productService->updateAllProductLeadTimeSafetyStock();
             return redirect()->back()->with('success', 'Lead Time dan Safety Stock seluruh produk berhasil diperbarui.');
-            
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
-    }
-
-    private function calculateLeadTimeStats(Product $product) 
-    {
-        // Jika mode manual, gunakan data yang sudah ada di database
-        if ($product->is_manual_lead_time === 'manual') {
-            return [
-                'min'     => $product->min_lead_time_days,
-                'max'     => $product->max_lead_time_days,
-                'average' => ($product->min_lead_time_days + $product->max_lead_time_days) / 2,
-            ];
-        }
-
-        // Jika mode automatic, tarik 30 batch produksi terakhir yang SUDAH SELESAI
-        $recentBatches = ProductionBatch::where('product_id', $product->id)
-            ->whereNotNull('start_date')
-            ->whereNotNull('end_date')
-            ->orderBy('end_date', 'desc')
-            ->take(30)
-            ->get();
-
-        // Fallback jika produk ini belum pernah diproduksi sama sekali
-        if ($recentBatches->isEmpty()) {
-            return [
-                'min'     => $product->min_lead_time_days,
-                'max'     => $product->max_lead_time_days,
-                'average' => ($product->min_lead_time_days + $product->max_lead_time_days) / 2,
-            ];
-        }
-
-        $leadTimes = [];
-        foreach ($recentBatches as $batch) {
-            $start = Carbon::parse($batch->start_date);
-            $end = Carbon::parse($batch->end_date);
-            
-            // Hitung selisih hari. Kita gunakan max(1, ...) agar jika produksi 
-            // selesai di hari yang sama (selisih 0), tetap dihitung butuh waktu minimal 1 hari (proses pabrik)
-            $days = max(1, $start->diffInDays($end));
-            $leadTimes[] = $days;
-        }
-
-        return [
-            'min'     => min($leadTimes),
-            'max'     => max($leadTimes),
-            'average' => array_sum($leadTimes) / count($leadTimes),
-        ];
-    }
-
-    private function calculateDemandStats(Product $product) 
-    {
-        // Ambil data 30 hari ke belakang dari hari ini
-        $thirtyDaysAgo = now()->subDays(30)->format('Y-m-d');
-        
-        // Cari transaksi penjualan barang keluar (sales_out)
-        $transactions = ProductTransaction::where('product_id', $product->id)
-            ->where('type', 'sales_out')
-            ->where('transaction_date', '>=', $thirtyDaysAgo)
-            ->get();
-
-        if ($transactions->isEmpty()) {
-            return ['average' => 0, 'max' => 0];
-        }
-
-        // Kelompokkan kuantitas (absolut) berdasarkan tanggal (Daily Demand)
-        $dailyDemand = $transactions->groupBy('transaction_date')->map(function ($dayTransactions) {
-            return abs($dayTransactions->sum('qty')); // abs() karena barang keluar mungkin minus di DB
-        });
-
-        // Rata-rata harus dibagi 30 hari kalender penuh, BUKAN dibagi jumlah hari yg ada transaksinya.
-        return [
-            'average' => $dailyDemand->sum() / 30,
-            'max'     => $dailyDemand->max()
-        ];
     }
 }

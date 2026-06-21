@@ -39,7 +39,7 @@ class RunGridSearchJob implements ShouldQueue
 
         try {
         
-            Log::info("RunGridSearchJob class");
+            Log::info("[RunGridSearchJob] RunGridSearchJob class");
             $rawSales = SalesOrderItem::where('product_id', $this->productId)
                 ->whereHas('salesOrder', function($query) {
                     $query->whereIn('status', ['confirmed', 'shipped']);
@@ -52,7 +52,7 @@ class RunGridSearchJob implements ShouldQueue
                 ->toArray();
                 
             if (empty($rawSales)) {
-                Log::warning("Grid Search Skipped: No sales data for product ID {$this->productId}");
+                Log::warning("[RunGridSearchJob] Grid Search Skipped: No sales data for product ID {$this->productId}");
                 return;
             }
 
@@ -72,18 +72,30 @@ class RunGridSearchJob implements ShouldQueue
             }
 
             // 3. Kirim ke Python API
-            $response = Http::timeout(3500)->post('http://127.0.0.1:5000/grid-search', [
+            // $response = Http::timeout(3500)->post('http://127.0.0.1:5000/grid-search', [
+            //     'sales_data' => $formattedSalesData,
+            // ]);
+
+            $response = Http::withOptions([
+                'curl' => [
+                    CURLOPT_TCP_KEEPALIVE => 1, // Aktifkan Keep-Alive
+                    CURLOPT_TCP_KEEPIDLE => 120, // Kirim ping setiap 2 menit jika diam
+                    CURLOPT_TCP_KEEPINTVL => 60, // Interval antar ping
+                ]
+            ])
+            ->timeout(3600) // Timeout 1 Jam
+            ->post('http://127.0.0.1:5000/grid-search', [
                 'sales_data' => $formattedSalesData,
             ]);
 
             if ($response->failed()) {
-                throw new \Exception("Python Grid Search Error: " . $response->body());
+                throw new \Exception("[RunGridSearchJob] Python Grid Search Error: " . $response->body());
             }
 
             $output = $response->json();
 
             if(isset($output['error'])) {
-                throw new \Exception($output['error']);
+                throw new \Exception("[RunGridSearchJob] " . $output['error']);
             }
 
             // 4. Simpan Hasil Terbaik ke Tabel Products
@@ -107,11 +119,12 @@ class RunGridSearchJob implements ShouldQueue
                 ]);
             }
 
-            Log::info("Grid Search Success for Product ID {$this->productId}. Method: {$bestPreprocessing}");
+            Log::info("[RunGridSearchJob] Grid Search Success for Product ID {$this->productId}. Method: {$bestPreprocessing}");
 
         } catch (\Exception $e) {
-            Log::error("Grid Search Failed for Product ID {$this->productId}: " . $e->getMessage());
-            throw $e;
+            Log::error("[RunGridSearchJob] Grid Search Failed for Product ID {$this->productId}: " . $e->getMessage());
+            return;
+            //throw $e;
         }
     }
 }

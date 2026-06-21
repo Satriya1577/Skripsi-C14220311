@@ -38,7 +38,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/products/update/{product}', [ProductController::class, 'update'])->name('products.update'); // admin, sales [DONE]
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); // admin, sales [DONE]
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); // admin, sales [DONE]
-    Route::post('/products/adjustment', [ProductController::class, 'storeAdjustment'])->name('products.adjustment.store'); // admin, inventory [DONE]
+    Route::post('/products/cost-adjustment', [ProductController::class, 'costAdjustment'])->name('products.costAdjustment'); // admin, produksi [DONE]
+    Route::post('/products/stock-adjustment', [ProductController::class, 'stockAdjustment'])->name('products.stockAdjustment'); // admin, inventory [DONE]
     Route::get('/products/update-product-lead-time-safety-stock', [ProductController::class, 'updateProductLeadTimeSafetyStock'])->name('products.updateProductLeadTimeSafetyStock'); // admin, inventory, production [DONE]
     // Product Material Routes, 
     Route::post('/product-materials/store', [ProductMaterialController::class, 'store'])->name('product_materials.store'); // admin, production [DONE]
@@ -54,7 +55,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/materials/update/{material}', [MaterialController::class, 'update'])->name('materials.update'); // admin, purchase [DONE]
     Route::post('/materials/store', [MaterialController::class, 'store'])->name('materials.store'); // admin, purchase [DONE]
     Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy'); // admin, purchase [DONE]
-    Route::post('/materials/adjustment', [MaterialController::class, 'storeAdjustment'])->name('materials.adjustment.store'); // admin, inventory [DONE]
+    Route::post('/materials/cost-adjustment', [MaterialController::class, 'costAdjustment'])->name('materials.costAdjustment'); // admin, purchase [DONE]
+    Route::post('/materials/stock-adjustment', [MaterialController::class, 'stockAdjustment'])->name('materials.stockAdjustment'); // admin, inventory [DONE]
     Route::get('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStockROP'])->name('materials.updateMaterialLeadTimeSafetyStockROP'); // admin, inventory, production [DONE]
 
 
@@ -98,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/production/show-realization/{productionBatch}', [ProductionController::class, 'showRealization'])->name('production.showRealization'); 
     Route::post('/production/store-batch', [ProductionController::class, 'storeBatch'])->name('production.storeBatch'); // admin, production [DONE]
     Route::post('/production/store-realization', [ProductionController::class, 'storeRealization'])->name('production.storeRealization'); // admin, production [DONE]
+    Route::post('/production/create-current-month-plan/{product}', [ProductionController::class, 'createCurrentMonthProductionPlan'])->name('production.createCurrentMonthProductionPlan'); // admin, purchase, production [DONE]
     
 
     // REPORTS SECTION
@@ -106,6 +109,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/product-stock-cards', [ReportsController::class, 'showProductReports'])->name('reports.product');
     Route::get('/reports/material-stock-cards', [ReportsController::class, 'showMaterialReports'])->name('reports.material');
     Route::get('/reports/income-statement-report', [ReportsController::class, 'showIncomeStatement'])->name('reports.incomeStatement');
+    Route::get('/reports/product-chart/{product}', [ReportsController::class, 'showProductChart'])->name('reports.productChart');
+    Route::get('/reports/material-chart/{material}', [ReportsController::class, 'showMaterialChart'])->name('reports.materialChart');
+
+
 
     // FORECASTING SECTION
     // Forecasting Routes
@@ -125,6 +132,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/forecasting', [SettingsController::class, 'forecasting'])->name('settings.forecast');
     Route::put('/settings/forecasting/update-sarima', [SettingsController::class, 'updateSarimaParameters'])->name('settings.updateSarima'); // admin [DONE]
     Route::post('/settings/forecasting/grid-search-all', [SettingsController::class, 'runGridSearchAll'])->name('settings.gridSearchAll'); // admin, production [DONE]
+    Route::delete('/settings/evaluations/clear', [SettingsController::class, 'clearEvaluations'])->name('settings.clearEvaluations');
+    Route::delete('/settings/evaluations/{id}', [SettingsController::class, 'deleteEvaluation'])->name('settings.deleteEvaluation');
+    Route::post('/settings/grid-search-all/cancel', [SettingsController::class, 'cancelGridSearch'])->name('settings.cancelGridSearch');
+    
     // Import Routes
     Route::get('/settings/imports', [SettingsController::class, 'import'])->name('settings.import'); 
     Route::post('/settings/import/products', [SettingsController::class, 'importProducts'])->name('products.import.excel'); // admin

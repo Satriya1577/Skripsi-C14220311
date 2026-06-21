@@ -36,22 +36,27 @@ class RunSarimaJob implements ShouldQueue
         $jobLog->update(['status' => 'processing', 'message' => 'Preparing sales data...']);
         $product = $jobLog->product;
 
+        // ==========================================================
+        // 1. DEKLARASI VARIABLE, SIAPKAN PARAMETER MODEL & PREPROCESSING
+        // ==========================================================
+
+        $targetDateStr  = Carbon::parse($jobLog->target_period)->format('Y-m-d');
+        $preProcessing  = $product->pre_processing ?? 'raw';
+        $params         = [
+            $product->order_p ?? 1, $product->order_d ?? 1, $product->order_q ?? 1,
+            $product->seasonal_P ?? 1, $product->seasonal_D ?? 1, $product->seasonal_Q ?? 1, 
+            $product->seasonal_s ?? 12
+        ];
+
+        // Nilai Default jika API Python gagal atau data sales kosong
+        $forecastVal    = 0;
+        $rmse           = 0;
+        $mape           = 0;
+        $newSafetyStock = $product->safety_stock ?? 0;
+        $recQty         = 0;
+
         try {
-            // ==========================================================
-            // 1. SIAPKAN PARAMETER MODEL & PREPROCESSING
-            // ==========================================================
-            $params = [
-                $product->order_p ?? 1, 
-                $product->order_d ?? 1, 
-                $product->order_q ?? 1,
-                $product->seasonal_P ?? 1, 
-                $product->seasonal_D ?? 1, 
-                $product->seasonal_Q ?? 1, 
-                $product->seasonal_s ?? 12
-            ];
-
-            $preProcessing = $product->pre_processing ?? 'raw';
-
+     
             // ==========================================================
             // 2. AMBIL & OLAH DATA SALES (GAP FILLING)
             // ==========================================================
@@ -67,6 +72,7 @@ class RunSarimaJob implements ShouldQueue
                 ->toArray();
 
             if (empty($rawSales)) {
+                print("[RunSarimaJob] No valid sales data (Confirmed/Shipped) found for this product.");
                 throw new \Exception("Tidak ada data penjualan valid (Confirmed/Shipped) untuk produk ini.");
             }
 
@@ -89,7 +95,6 @@ class RunSarimaJob implements ShouldQueue
             // 3. KIRIM KE PYTHON API
             // ==========================================================
             $jobLog->update(['message' => 'Running SARIMA analysis (' . strtoupper($preProcessing) . ')...']);
-            $targetDateStr = Carbon::parse($jobLog->target_period)->format('Y-m-d');
 
             $response = Http::post('http://127.0.0.1:5000/forecast', [
                 'sales_data'     => $formattedSalesData,
@@ -109,8 +114,13 @@ class RunSarimaJob implements ShouldQueue
                 throw new \Exception($output['error']);
             }
 
+            // update variable dari python
+            $forecastVal = (int) $output['forecast']['value'];
+            $rmse = $output['metrics']['rmse'] ?? 0;
+            $mape = $output['metrics']['mape'] ?? 0;
+
             // ==========================================================
-            // 4. HITUNG SAFETY STOCK (FIX LOGIC LEAD TIME)
+            // 4. HITUNG SAFETY STOCK 
             // ==========================================================
             
             // A. Hitung AvgLeadTimeDemand (Hari)
@@ -186,19 +196,81 @@ class RunSarimaJob implements ShouldQueue
             $maxLeadTimeDemandQty = $maxLeadTimeDays * $avgDailySales;
             $newSafetyStock = ceil($maxLeadTimeDemandQty - $leadTimeDemandQty);
             
-            // Pastikan SS tidak negatif
+            // Pastikan Safety Stock tidak negatif
             $newSafetyStock = max(0, $newSafetyStock);
 
             // Update Master Product
             $product->update(['safety_stock' => $newSafetyStock]);
 
             // ==========================================================
-            // 5. SIMPAN PRODUCTION PLAN
+            // 5. SIMPAN VALIDATION LOG 
             // ==========================================================
-            $forecastVal = (int) $output['forecast']['value'];
-            $recQty = max(0, ($forecastVal + $newSafetyStock) - $product->current_stock);
 
-            $productionPlan = ProductionPlan::updateOrCreate(
+            $tempPlan = ProductionPlan::firstOrCreate(
+                ['product_id' => $product->id, 'period' => $targetDateStr],
+                [
+                    'status' => 'draft',
+                    'forecast_qty'               => $forecastVal,
+                    'current_stock_snapshot'     => $product->current_stock,
+                    'safety_stock_snapshot'      => $newSafetyStock,
+                    'recommended_production_qty' => 0,
+                    'rmse'                       => $rmse,
+                    'mape'                       => $mape,
+                    'order_p'                    => $params[0],
+                    'order_d'                    => $params[1],
+                    'order_q'                    => $params[2],
+                    'seasonal_P'                 => $params[3],
+                    'seasonal_D'                 => $params[4],
+                    'seasonal_Q'                 => $params[5],
+                    'seasonal_s'                 => $params[6]
+                ]
+            );
+
+            ValidationLog::where('production_plan_id', $tempPlan->id)->delete();
+
+            $allLogs = collect($output['validation_data']);
+            $recentLogs = $allLogs->sortBy('date')->values()->take(-13);
+
+            foreach ($recentLogs as $log) {
+                ValidationLog::create([
+                    'production_plan_id' => $tempPlan->id,
+                    'period'             => $log['date'],
+                    'actual_qty'         => $log['actual'],
+                    'predicted_qty'      => $log['predicted']
+                ]);
+            }
+
+            $jobLog->update(['status' => 'completed', 'message' => 'Forecast generated successfully with ' . strtoupper($preProcessing) . ' preprocessing.']);
+
+
+            // $productionPlan = ProductionPlan::updateOrCreate(
+            //     [
+            //         'product_id' => $product->id, 
+            //         'period'     => $targetDateStr
+            //     ],
+            //     [
+            //         'forecast_qty'               => $forecastVal,
+            //         'current_stock_snapshot'     => $product->current_stock,
+            //         'safety_stock_snapshot'      => $newSafetyStock,
+            //         'recommended_production_qty' => $recQty,
+            //         'rmse'                       => $output['metrics']['rmse'] ?? 0,
+            //         'mape'                       => $output['metrics']['mape'] ?? 0,
+            //         'order_p'      => $params[0],
+            //         'order_d'      => $params[1],
+            //         'order_q'      => $params[2],
+            //         'seasonal_P'   => $params[3],
+            //         'seasonal_D'   => $params[4],
+            //         'seasonal_Q'   => $params[5],
+            //         'seasonal_s'   => $params[6],
+            //         'status'       => 'draft',
+            //     ]
+            // );
+
+        } catch (\Exception $e) {
+            $jobLog->update(['status' => 'failed', 'message' => substr($e->getMessage(), 0, 1000)]);
+        } finally {
+            $recQty = max(0, ($forecastVal + $newSafetyStock) - $product->current_stock);
+            ProductionPlan::updateOrCreate(
                 [
                     'product_id' => $product->id, 
                     'period'     => $targetDateStr
@@ -208,41 +280,18 @@ class RunSarimaJob implements ShouldQueue
                     'current_stock_snapshot'     => $product->current_stock,
                     'safety_stock_snapshot'      => $newSafetyStock,
                     'recommended_production_qty' => $recQty,
-                    'rmse'                       => $output['metrics']['rmse'] ?? 0,
-                    'mape'                       => $output['metrics']['mape'] ?? 0,
-                    'order_p'      => $params[0],
-                    'order_d'      => $params[1],
-                    'order_q'      => $params[2],
-                    'seasonal_P'   => $params[3],
-                    'seasonal_D'   => $params[4],
-                    'seasonal_Q'   => $params[5],
-                    'seasonal_s'   => $params[6],
-                    'status'       => 'draft',
+                    'rmse'                       => $rmse,
+                    'mape'                       => $mape,
+                    'order_p'                    => $params[0],
+                    'order_d'                    => $params[1],
+                    'order_q'                    => $params[2],
+                    'seasonal_P'                 => $params[3],
+                    'seasonal_D'                 => $params[4],
+                    'seasonal_Q'                 => $params[5],
+                    'seasonal_s'                 => $params[6],
+                    'status'                     => 'draft',
                 ]
             );
-
-            // ==========================================================
-            // 6. SIMPAN VALIDATION LOGS
-            // ==========================================================
-            ValidationLog::where('production_plan_id', $productionPlan->id)->delete();
-
-            $allLogs = collect($output['validation_data']);
-            // Ambil 13 data terakhir agar grafik tidak kepanjangan
-            $recentLogs = $allLogs->sortBy('date')->values()->take(-13);
-
-            foreach ($recentLogs as $log) {
-                ValidationLog::create([
-                    'production_plan_id' => $productionPlan->id,
-                    'period'             => $log['date'],
-                    'actual_qty'         => $log['actual'],
-                    'predicted_qty'      => $log['predicted']
-                ]);
-            }
-
-            $jobLog->update(['status' => 'completed', 'message' => 'Forecast generated successfully with ' . strtoupper($preProcessing) . ' preprocessing.']);
-
-        } catch (\Exception $e) {
-            $jobLog->update(['status' => 'failed', 'message' => substr($e->getMessage(), 0, 1000)]);
         }
     }
 }

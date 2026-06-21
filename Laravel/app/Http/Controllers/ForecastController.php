@@ -18,18 +18,16 @@ use Illuminate\Support\Facades\DB;
 
 class ForecastController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   
+    // tampilin list produk yang bisa diforecasting
     public function index()
     {
-        $products = Product::orderBy('id', 'asc')->paginate(10);
+        $products = Product::orderBy('code', 'asc')->paginate(10);
         return view('forecast.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+   
+    // tampilkan list production plan untuk produk tertentu 
     public function show(Product $product)
     {
         $productionPlans = ProductionPlan::where('product_id', $product->id)
@@ -38,14 +36,13 @@ class ForecastController extends Controller
         return view('forecast.show', compact('product','productionPlans'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    
     public function store(Request $request)
     {
         //
     }
 
+    // tampilkan grafik actual vs forecast untuk sebuah plan produksi tertentu
     public function showChart(ProductionPlan $productionPlan)
     {
         // 1. Ambil Product
@@ -80,7 +77,7 @@ class ForecastController extends Controller
             'forecast' => $forecasts,
         ];
 
-        // 4. Ambil Metrics dari Production Plan
+        // 4. Ambil Metrics dari sebuah Production Plan
         $metrics = [
             'rmse' => $productionPlan->rmse,
             'mape' => $productionPlan->mape,
@@ -90,9 +87,7 @@ class ForecastController extends Controller
     return view('forecast.chart', compact('product', 'productionPlan', 'metrics', 'chartData'));
 }
 
-    /**
-    * Approve a production plan with user-specified quantity
-    */
+    // approve plan produksi dari sebuah forecasting 
     public function approvePlan(Request $request, ProductionPlan $productionPlan)
     {
         // --- 0. CEK HAK AKSES ---
@@ -105,6 +100,14 @@ class ForecastController extends Controller
             'approved_production_qty' => 'required|numeric|min:0',
         ]);
 
+        $batchQty = $productionPlan->product->batch_size; 
+
+        if ($validated['approved_production_qty'] < $batchQty) {
+            return redirect()->back()
+                ->with('error', "Jumlah produksi yang disetujui harus lebih besar dari jumlah produksi per batch untuk produk ini yaitu {$batchQty} per batch")
+                ->withInput();
+        }
+
         $productionPlan->update([
             'approved_production_qty' => $validated['approved_production_qty'],
             'status' => 'approved',
@@ -113,6 +116,10 @@ class ForecastController extends Controller
         return back()->with('success', 'Production plan approved successfully!');
     }
 
+    // generate forecasting untuk produk tertentu
+    // hasil forecasting akan menjadi draft production plan untuk bulan depan
+    // nantinya hasil forecasting ini bisa di approve oleh user apakah mereka setuju
+    // dengan hasil forecast atau tidak approve menggunakan function approvePlan() di atas
     public function generate(Request $request, Product $product)
     {
         // --- 0. CEK HAK AKSES ---
@@ -179,6 +186,10 @@ class ForecastController extends Controller
         return redirect()->back()->with('success', 'Forecasting sedang berjalan untuk periode ' . $targetDate->format('F Y'));
     }
 
+    // check status digunkakan untuk update state halaman apakah masih ada forecasting yang masih berjalan atau tidak
+    // endpoint ini akan dipanggil secara periodik menggunakan AJAX di frontend untuk memeriksa status forecasting
+    // jika masih ada forecasting yang masih berjalan maka button generate akan di disable
+    // jika proses forecasting sudah selesai maka akan otomatis merefresh halaman untuk menampikan hasil forecasting/prodution plan terbaru
     public function checkStatus(Product $product)
     {
         // Ambil job terakhir untuk produk ini

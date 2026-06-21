@@ -35,20 +35,25 @@ class SettingsController extends Controller
        return view ('settings.index');
     }
 
+    
 
     public function forecasting() {
         $user = Auth::user();
         $userEmail = $user->email;
 
+        $isGridSearchRunning = DB::table('jobs')
+            ->where(function($query) {
+                $query->where('payload', 'like', '%RunGridSearchJob%')
+                      ->orWhere('payload', 'like', '%RunGridSearchEvaluationJob%');
+            })
+            ->exists();
+
         if ($userEmail === 'c14220311@john.petra.ac.id'){
             $sarimaProductEvaluations = SarimaProductEvaluation::all();
-            return view('settings.forecast', compact('sarimaProductEvaluations'));
+            return view('settings.forecast', compact('sarimaProductEvaluations', 'isGridSearchRunning'));
         } 
 
         $products = Product::all();
-        $isGridSearchRunning = DB::table('jobs')
-        ->where('payload', 'like', '%RunGridSearchJob%')
-        ->exists();
         return view('settings.forecast', compact('products', 'isGridSearchRunning')); 
     }
 
@@ -181,7 +186,7 @@ class SettingsController extends Controller
 
         foreach ($configs as $config) {
             // Masukkan ke Job Baru
-            Log::info("Dispatching Grid Search Job for Product ID: {$config->id}");
+            Log::info("[SettingsController] Dispatching Grid Search Job for Product ID: {$config->id}");
             // if user->email == c14220311@john.petra.ac.id
             if ($user->email === 'c14220311@john.petra.ac.id') {
                 // jalankan grid search untuk evaluasi sarima menjawab Rumusan Masalah
@@ -314,6 +319,83 @@ class SettingsController extends Controller
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus user: ' . $e->getMessage());
+        }
+    }
+
+    public function clearEvaluations()
+    {
+        $user = Auth::user();
+        
+        // Proteksi Backend: Pastikan hanya email c14220311 yang bisa mengeksekusi
+        if (!$user || !str_contains($user->email, 'c14220311')) {
+            return redirect()->back()->with('error', 'Akses Ditolak: Anda tidak memiliki izin untuk melakukan aksi ini.');
+        }
+
+        try {
+            // truncate() digunakan untuk menghapus semua isi tabel 
+            // sekaligus mereset nomor urut ID auto-increment kembali ke 1
+            SarimaProductEvaluation::truncate();
+
+            return redirect()->back()->with('success', 'Seluruh record evaluasi SARIMA berhasil dibersihkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membersihkan data evaluasi: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteEvaluation($id)
+    {
+        $user = Auth::user();
+        
+        // Proteksi Backend: Pastikan hanya email c14220311 yang bisa mengeksekusi
+        if (!$user || !str_contains($user->email, 'c14220311')) {
+            return redirect()->back()->with('error', 'Akses Ditolak: Anda tidak memiliki izin untuk melakukan aksi ini.');
+        }
+
+        try {
+            // Cari data evaluasi berdasarkan ID
+            $evaluation = SarimaProductEvaluation::findOrFail($id);
+            
+            // Simpan kode produk untuk ditampilkan di pesan sukses
+            $productCode = $evaluation->product_code; 
+            
+            // Hapus data
+            $evaluation->delete();
+
+            return redirect()->back()->with('success', "Record evaluasi untuk produk {$productCode} berhasil dihapus.");
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus data evaluasi: ' . $e->getMessage());
+        }
+    }
+
+    public function cancelGridSearch()
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'production'])) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: Anda tidak memiliki akses.');
+        }
+
+        try {
+            // 1. Batalkan Batch (Agar Job yang sedang antre membatalkan dirinya sendiri)
+            $activeBatches = DB::table('job_batches')
+                ->where('name', 'Grid Search All Products')
+                ->whereNull('finished_at')
+                ->get();
+
+            foreach ($activeBatches as $batchRecord) {
+                $batch = Bus::findBatch($batchRecord->id);
+                if ($batch) {
+                    $batch->cancel();
+                }
+            }
+
+            // 2. Hapus fisik antrean (jobs) dari database agar langsung bersih
+            DB::table('jobs')
+                ->where('payload', 'like', '%RunGridSearch%')
+                ->delete();
+
+            return redirect()->back()->with('success', 'Proses Grid Search berhasil dibatalkan. Sisa antrean telah dibersihkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membatalkan Grid Search: ' . $e->getMessage());
         }
     }
 }
