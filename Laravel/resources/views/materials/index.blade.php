@@ -130,7 +130,7 @@
 
               {{-- AVAILABLE STOCK --}}
               <td class="px-3 py-3 text-center text-muted border-l border-carbon whitespace-nowrap">
-                {{ number_format($material->current_stock - $material->production_reserved_stock / $factor, 0, '', '') }}
+                {{ number_format(($material->current_stock - $material->production_reserved_stock)/ $factor, 0, '', '') }}
               </td>
 
               {{-- SAFETY STOCK --}}
