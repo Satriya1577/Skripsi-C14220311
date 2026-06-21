@@ -179,20 +179,17 @@ class ProductionController extends Controller
             'production_plan_id' => 'required|exists:production_plans,id',
         ]);
 
-        // Ambil data Production Plan beserta relasi Product-nya
-        $plan = ProductionPlan::with('product')->findOrFail($request->production_plan_id);
+        // Ambil data Production Plan beserta relasi Product, BOM, dan Materialnya sekaligus (Eager Loading)
+        $plan = ProductionPlan::with('product.productMaterials.material')->findOrFail($request->production_plan_id);
+        $product = $plan->product;
+        $targetBatchQty = $product->batch_size;
 
         // 1. Pengecekan: Apakah batch dibuat di periode yang benar sesuai dengan plan?
-        // Kenapa kok masih bisa bikin batch walaupun sudah mencapai target plan produksi?
-        // karena bisa aja demand nya meleset dan tidak sesuai dengan plan yang sudah disetujui diawal
-
         $currentPeriod = now()->format('Y-m');
-        //$currentPeriod = '2026-08'; // Example value, replace with actual current period
-        $planPeriod    = Carbon::parse($plan->period)->format('Y-m');
+        $planPeriod    = \Carbon\Carbon::parse($plan->period)->format('Y-m');
 
         if ($currentPeriod !== $planPeriod) {
             $currentMonthName = now()->format('F Y');
-            //$currentMonthName = 'August 2026';
             $planMonthName    = \Carbon\Carbon::parse($plan->period)->format('F Y');
 
             return redirect()->back()->with('error', "GAGAL: Tidak dapat membuat batch baru. Plan ini diperuntukkan untuk periode {$planMonthName}, sedangkan saat ini Anda berada di bulan {$currentMonthName}.");
@@ -209,22 +206,75 @@ class ProductionController extends Controller
                 ->with('error', 'GAGAL: Batch Produksi yang sedang berjalan (In Progress). Selesaikan batch sebelumnya terlebih dahulu.');
         }
 
-        // 3. GENERATE BATCH NUMBER: Format B-ProdukCode-<random>
-        $productCode = $plan->product->code;
-        $randomStr = strtoupper(Str::random(5)); // 5 Karakter acak (Huruf & Angka)
-        $batchNumber = "B-{$productCode}-{$randomStr}";
+        DB::beginTransaction();
 
-        // 4. BUAT BATCH BARU 
-        ProductionBatch::create([
-            'production_plan_id' => $plan->id,
-            'product_id'         => $plan->product_id,
-            'batch_number'       => $batchNumber,
-            'qty_produced'       => $plan->product->batch_size, // Mengambil langsung dari master product
-            'start_date'         => now()->format('Y-m-d'),     // Otomatis tanggal hari ini
-            'end_date'           => null,                       // Null menandakan status "In Progress"
-        ]);
+        try {
+            // 2.1 Pengecekan: apakah stok onhand material -  production_reserved_stock mencukupi untuk produksi sejumlah qty_produced yang diinput
+            $shortageMaterials = [];
+            foreach ($product->productMaterials as $pm) {
+                $material = $pm->material;
+                $totalNeeded = $targetBatchQty * $pm->amount_needed;
+                
+                // Rumus Stok Tersedia = Fisik di gudang dikurangi yang sudah di-booking produksi lain
+                $availableStock = $material->current_stock - $material->production_reserved_stock;
 
-        return redirect()->back()->with('success', "Batch produksi [{$batchNumber}] berhasil dimulai dengan target {$plan->product->batch_size} Pcs.");
+                if ($availableStock < $totalNeeded) {
+                    $shortage = $totalNeeded - $availableStock;
+                    
+                    // Format angka agar rapi di UI sesuai purchase_unit
+                    $conversionFactor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
+                    $formattedShortage = number_format($shortage / $conversionFactor, 2, ',', '.');
+                    $formattedAvailable = number_format($availableStock / $conversionFactor, 2, ',', '.');
+                    $formattedNeeded = number_format($totalNeeded / $conversionFactor, 2, ',', '.');
+                    
+                    $shortageMaterials[] = "- {$material->name}: Tersedia {$formattedAvailable} {$material->purchase_unit}, Butuh {$formattedNeeded} {$material->purchase_unit} (Kurang {$formattedShortage}) \n";
+                }
+            }
+
+            if (!empty($shortageMaterials)) {
+                DB::rollBack();
+                $errorMessage = "Gagal membuat batch! Stok material yang tersedia (Available Stock) tidak mencukupi untuk memproduksi 1 Batch ({$targetBatchQty} pcs). Berikut rinciannya:\n" . implode("\n", $shortageMaterials) . "\n\nSilahkan lakukan penerimaan barang dari PO terlebih dahulu.";
+                return redirect()->back()->with('error', $errorMessage);
+            }
+
+
+            // 3. GENERATE BATCH NUMBER: Format B-ProdukCode-<random>
+            $productCode = $product->code;
+            $randomStr = strtoupper(Str::random(5)); // 5 Karakter acak (Huruf & Angka)
+            $batchNumber = "B-{$productCode}-{$randomStr}";
+
+
+            // 4. BUAT BATCH BARU 
+            ProductionBatch::create([
+                'production_plan_id' => $plan->id,
+                'product_id'         => $plan->product_id,
+                'batch_number'       => $batchNumber,
+                'qty_produced'       => $targetBatchQty, // Mengambil langsung dari master product
+                'start_date'         => now()->format('Y-m-d'),     // Otomatis tanggal hari ini
+                'end_date'           => null,                       // Null menandakan status "In Progress"
+            ]);
+
+            // 5. TAMBAH on_production_stock DI TABEL PRODUK
+            $product->on_production_stock += $targetBatchQty;
+            $product->save();
+
+            // 6. TAMBAH production_reserved_stock UNTUK PRODUKSI DI TABEL MATERIAL
+            foreach ($product->productMaterials as $pm) {
+                $material = $pm->material;
+                $totalNeeded = $targetBatchQty * $pm->amount_needed;
+
+                $material->production_reserved_stock += $totalNeeded;
+                $material->save();
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "Batch produksi [{$batchNumber}] berhasil dimulai dengan target {$plan->product->batch_size} Pcs.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan sistem saat membuat batch: ' . $e->getMessage());
+        }
     }
 
     public function showRealization(ProductionBatch $productionBatch) 
@@ -247,10 +297,12 @@ class ProductionController extends Controller
 
     public function storeRealization(Request $request) 
     {
-        // Cek apakah input realisasi produksi lebih besar dari plan dan jumlah material mencukupi untuk produksi sejumlah qty_produced yang diinput
-        // Kurangi qty material sejumlah qty * qty_need_bom untuk setiap material yang terlibat di produk ini (back-flushing)
+        // Cek apakah input realisasi produksi lebih besar dari plan dan jumlah material yang tersedia mencukupi untuk produksi sejumlah qty_produced yang diinput
+        // (MATERIAL --) Kurangi qty material sejumlah qty * qty_need_bom untuk setiap material yang terlibat di produk ini (back-flushing)
+        // (MATERIAL --)Kurangi production_reserved_stock di tabel material
         // Masukkan data material transaction untuk setiap material yang terlibat di produk ini
-        // Tambahkan stok produk jadi
+        // (PRODUK ++) Tambahkan stok produk jadi di tabel produk
+        // (PRODUK ++) Kurangi stok on produksi di tabel produk
         // Masukkan data product transaction untuk produksi ini
         // Update harga hpp produk menggunakan moving average
         // Cek apakah batch sudah selesai (qty_produced >= target), jika ya update end_date di batch menjadi hari ini, jika belum biarkan end_date tetap null (In Progress)
@@ -285,7 +337,7 @@ class ProductionController extends Controller
                 return redirect()->back()->with('error', "Gagal: Qty Produksi ({$qtyProduced} pcs) melebihi sisa batch ({$remainingBatchQty} pcs).")->withInput();
             }
 
-            // Cek Ketersediaan Material
+            // Cek Ketersediaan Material (ketersediaan material: current_stock - production_reserved_stock)
             $shortageMaterials = [];
             foreach ($product->productMaterials as $pm) {
                 $material = $pm->material;
@@ -327,8 +379,14 @@ class ProductionController extends Controller
                 // 2. Hitung kebutuhan material: (Qty Produksi * Kebutuhan BOM per produk)
                 $totalNeeded = $qtyProduced * $pm->amount_needed;
                 
-                // Kurangi stok material (Back-flushing)
+                // (MATERIAL --) Kurangi stok fisik material (Back-flushing)
                 $material->current_stock -= $totalNeeded;
+                
+                // (MATERIAL --) Kurangi production_reserved_stock
+                // Karena barangnya sudah benar-benar dipakai, status booking/reserved nya harus dilepas
+                $material->production_reserved_stock -= $totalNeeded;
+                $material->production_reserved_stock = max(0, $material->production_reserved_stock); // Safeguard nilai negatif
+                
                 $material->save();
 
                 // Kalkulasi biaya untuk material ini
@@ -373,8 +431,15 @@ class ProductionController extends Controller
                 $newMovingAverageHPP = ($oldInventoryValue + $newInventoryValue) / $newTotalStock;
             }
             
-            // 5. Tambahkan Stok Produk Jadi & Update Harga
+            // 5. Update Master Produk
+            // (PRODUK ++) Tambahkan stok produk jadi
             $product->current_stock += $qtyProduced;
+            // (PRODUK --) Kurangi stok on production
+            // Karena barang sudah jadi, status "sedang diproduksi" harus dikurangi
+            $product->on_production_stock -= $qtyProduced;
+            $product->on_production_stock = max(0, $product->on_production_stock); // Safeguard nilai negatif
+            
+            // Update harga moving average
             $product->cost_price = $newMovingAverageHPP;
             $product->save();
 
