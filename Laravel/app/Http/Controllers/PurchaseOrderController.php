@@ -391,8 +391,12 @@ class PurchaseOrderController extends Controller
 
             // Kasus B: Ordered -> Received (BARANG SAMPAI)
             // Pindahkan dari Ordered Stock ke Current Stock
-            // Kasus B: Ordered -> Received (BARANG SAMPAI)
             if ($oldStatus == 'ordered' && $newStatus == 'received') {
+
+                // Hitung alokasi ongkir
+                $totalAllItemsValue = $purchaseOrder->items->sum('subtotal');
+                $shippingToAllocate = ($purchaseOrder->shipping_terms == 'FOB_shipping_point') ? $purchaseOrder->shipping_cost : 0;
+
                 foreach ($purchaseOrder->items as $item) {
                     $material = $item->material;
                     
@@ -404,27 +408,34 @@ class PurchaseOrderController extends Controller
                     $newOrdered = max(0, $material->ordered_stock - $qtyBaseIn);
                     $material->ordered_stock = $newOrdered;
 
-                    // --- 3. HITUNG HPP (WEIGHTED AVERAGE) ---
+                    // --- 3. HITUNG HPP (WEIGHTED AVERAGE) Dengan Onkir ---
+                    // hitung alokasi ongkir per item
+                    // subtotal per item/total sum subtotal
+                    $proportion = ($totalAllItemsValue > 0) ? ($item->subtotal / $totalAllItemsValue) : 0;
+                    
+                    // itemfreightcost =  subtotal per item/total sum subtotal * biaya ongkir dalam 1 PO
+                    $itemFreightCost = $proportion * $shippingToAllocate;
+
                     // Ambil stok dan harga saat ini (Sebelum ditambah)
                     $currentStock = $material->current_stock;
                     $currentPrice = $material->price_per_unit;
 
                     // Hitung Valuasi
-                    $oldAssetValue = $currentStock * $currentPrice; // Nilai aset lama
-                    $newAssetValue = $item->subtotal; // Nilai aset baru (Harga Beli - Diskon)
+                    // Nilai aset lama saat ini
+                    $oldAssetValue = $currentStock * $currentPrice;
+                    // Nilai aset baru termasuk biaya ongkir (jika ada)
+                    $newAssetValue = $item->subtotal + $itemFreightCost;
 
-                    $totalStock = $currentStock + $qtyBaseIn;
                     $totalValue = $oldAssetValue + $newAssetValue;
+                    $totalStock = $currentStock + $qtyBaseIn;
 
                     // Hitung Harga Per Unit Baru
                     // Cegah division by zero
-                    $newPricePerUnit = ($totalStock > 0) ? ($totalValue / $totalStock) : $item->unit_price / $conversion;
-
+                    $newPricePerUnit = ($totalStock > 0) ? ($totalValue / $totalStock) : ($newAssetValue / $qtyBaseIn);
                     // Update Master Material (Stok & Harga)
                     $material->current_stock = $totalStock;
                     $material->price_per_unit = $newPricePerUnit;
                     $material->save();
-                    // ----------------------------------------
 
                     // 4. Catat Transaksi Material (History)
                     MaterialTransaction::create([
@@ -435,7 +446,7 @@ class PurchaseOrderController extends Controller
                         
                         // Simpan harga valuasi per unit yang BARU saja dihitung (atau harga beli saat itu)
                         // Biasanya di history transaksi IN, orang mencatat harga beli aktual saat itu agar bisa ditelusuri
-                        'price_per_unit' => ($qtyBaseIn > 0) ? ($item->subtotal / $qtyBaseIn) : 0, 
+                        'price_per_unit' => ($qtyBaseIn > 0) ? ($newAssetValue / $qtyBaseIn) : 0, 
                         'total_price' => $item->subtotal,
                         
                         'current_stock_balance' => $material->current_stock,
