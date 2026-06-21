@@ -109,6 +109,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/product-stock-cards', [ReportsController::class, 'showProductReports'])->name('reports.product');
     Route::get('/reports/material-stock-cards', [ReportsController::class, 'showMaterialReports'])->name('reports.material');
     Route::get('/reports/income-statement-report', [ReportsController::class, 'showIncomeStatement'])->name('reports.incomeStatement');
+    Route::get('/reports/product-chart/{product}', [ReportsController::class, 'showProductChart'])->name('reports.productChart');
+    Route::get('/reports/material-chart/{material}', [ReportsController::class, 'showMaterialChart'])->name('reports.materialChart');
+
+
 
     // FORECASTING SECTION
     // Forecasting Routes
