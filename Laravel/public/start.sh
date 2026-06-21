@@ -11,6 +11,5 @@ osascript -e "tell application \"Terminal\" to do script \"cd '$DIR' && php arti
 # Window 2: PHP Artisan Queue
 osascript -e "tell application \"Terminal\" to do script \"cd '$DIR' && php artisan queue:work --timeout=3700 --tries=1\""
 
-
 # Window 3: Python API Server
 osascript -e "tell application \"Terminal\" to do script \"cd '$DIR' && python3 python_scripts/api_server.py\""
