@@ -47,11 +47,11 @@
         <p class="text-xs uppercase tracking-widest text-muted">Sales Transaction</p>
         @php
           $badgeColor = match($salesOrder->status) {
-            'draft' => 'bg-gray-800 text-gray-400 border-gray-600',
-            'confirmed' => 'bg-blue-900/30 text-blue-400 border-blue-800',
-            'shipped' => 'bg-blue-200 text-blue-800 border-petronas',
-            'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
-            default => 'bg-carbon'
+            'draft'     => 'bg-gray-100 text-gray-700 border-gray-300',
+            'confirmed' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            'shipped'   => 'bg-green-100 text-green-700 border-green-300',
+            'cancelled' => 'bg-red-100 text-red-700 border-red-300',
+            default     => 'bg-gray-100 text-gray-700 border-gray-300'
           };
         @endphp
         <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border {{ $badgeColor }}">

@@ -49,11 +49,11 @@
         <p class="text-xs uppercase tracking-widest text-muted">Purchase Transaction</p>
         @php
           $badgeColor = match($purchaseOrder->status) {
-            'draft'   => 'bg-gray-800 text-gray-400 border-gray-600',
-            'ordered'  => 'bg-blue-900/30 text-blue-400 border-blue-800',
-            'received' => 'bg-blue-200 text-blue-800 border-petronas',
-            'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
-            default   => 'bg-carbon'
+            'draft'   => 'bg-gray-100 text-gray-700 border-gray-300',
+            'ordered'  => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            'received' => 'bg-green-100 text-green-700 border-green-300',
+            'cancelled' => 'bg-red-100 text-red-700 border-red-300',
+            default   => 'bg-gray-100 text-gray-700 border-gray-300'
           };
         @endphp
         <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border {{ $badgeColor }}">
@@ -159,9 +159,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           {{-- 1. ESTIMASI TANGGAL --}}
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Estimasi Barang Sampai</label>
+            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Input Tanggal Penerimaan Barang</label>
             <input type="date" name="expected_arrival_date" 
-              value="{{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('Y-m-d') : '' }}"
+              value="{{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('Y-m-d') : date('Y-m-d') }}"
               class="w-full px-4 py-2.5 rounded-lg bg-carbon border border-petronas/50 text-silver focus:outline-none focus:border-petronas transition"
               required>
           </div>

@@ -48,14 +48,14 @@
       <div class="flex items-center gap-3">
         <p class="text-xs uppercase tracking-widest text-muted">Procurement Payment</p>
         @php
-          $badgeColor = match($purchaseOrder->payment_status) {
-            'paid'  => 'text-success bg-success/10 border-success/30',
-            'partial' => 'text-warning bg-warning/10 border-warning/30',
-            'unpaid' => 'text-danger bg-danger/10 border-danger/30',
-            default => 'bg-carbon'
-          };
+          $payColor = match($purchaseOrder->payment_status) {
+            'paid'    => 'bg-green-100 text-green-700 border-green-300',
+            'partial' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            'unpaid'  => 'bg-red-100 text-red-700 border-red-300',
+            default   => 'bg-gray-100 text-gray-700 border-gray-300'
+          }; 
         @endphp
-        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border {{ $badgeColor }}">
+        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border {{ $payColor }}">
           {{ $purchaseOrder->payment_status }}
         </span>
       </div>
