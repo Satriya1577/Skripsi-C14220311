@@ -212,11 +212,11 @@
               <td class="px-4 py-3 text-center whitespace-nowrap">
                 @php
                   $statusColor = match($po->status) {
-                    'draft'   => 'bg-gray-800 text-gray-400 border-gray-600',
-                    'ordered'  => 'bg-blue-900/30 text-blue-800 border-blue-800', 
-                    'received' => 'bg-blue-200 text-blue-800 border-petronas',
-                    'cancelled' => 'bg-red-900/30 text-red-400 border-red-800',
-                    default   => 'bg-carbon text-slate-800'
+                    'draft'   => 'bg-gray-100 text-gray-700 border-gray-300',
+                    'ordered'  => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                    'received' => 'bg-green-100 text-green-700 border-green-300',
+                    'cancelled' => 'bg-red-100 text-red-700 border-red-300',
+                    default   => 'bg-gray-100 text-gray-700 border-gray-300'
                   };
                 @endphp
                 <span class="px-2 py-1 rounded text-[10px] font-bold uppercase border {{ $statusColor }}">
@@ -228,10 +228,10 @@
               <td class="px-4 py-3 text-center whitespace-nowrap">
                 @php
                   $payColor = match($po->payment_status) {
-                    'paid'  => 'text-success bg-success/10 border-success/30',
-                    'partial' => 'text-warning bg-warning/10 border-warning/30',
-                    'unpaid' => 'text-danger bg-danger/10 border-danger/30',
-                    default  => 'text-muted'
+                    'paid'    => 'bg-green-100 text-green-700 border-green-300',
+                    'partial' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                    'unpaid'  => 'bg-red-100 text-red-700 border-red-300',
+                    default   => 'bg-gray-100 text-gray-700 border-gray-300'
                   };
                 @endphp
                 <span class="px-2 py-1 rounded text-[10px] font-bold uppercase border {{ $payColor }}">
