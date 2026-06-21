@@ -117,118 +117,47 @@
     </div>
   </section>
 
-  <div class="border-t border-carbon my-2"></div>
+  {{-- MENU SETTINGS CARD LAYOUT --}}
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-1 h-6 bg-silver rounded-full"></span>
-        <h2 class="text-xl font-bold text-silver">Data Management</h2>
+    {{-- 1. Import Data Excel --}}
+    <a href="{{ route('settings.import') }}" 
+      class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center transform transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 group">
+      <div class="text-blue-500 group-hover:text-slate-800 transition-colors mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+        </svg>
       </div>
+      <h5 class="text-lg font-bold text-silver mb-1">Import Data Excel</h5>
+      <p class="text-xs text-muted">Upload massal data Produk (Barang Jadi) dan Resep (BOM).</p>
+    </a>
 
-      <a href="{{ route('settings.import') }}" 
-        class="group block bg-carbonSoft rounded-xl p-6 border border-carbon hover:border-petronas transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,161,155,0.1)] relative overflow-hidden h-40">
-        
-        <div class="absolute -right-6 -top-6 w-32 h-32 bg-silver/5 rounded-full blur-2xl group-hover:bg-petronas/10 transition"></div>
-
-        <div class="flex flex-col h-full justify-between relative z-10">
-          <div class="flex items-start justify-between">
-            <div class="p-3 bg-carbon rounded-lg text-silver group-hover:text-blue-600 border border-carbon transition">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-              </svg>
-            </div>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
-               class="w-6 h-6 text-muted group-hover:text-blue-600 group-hover:translate-x-2 transition transform">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold text-silver group-hover:text-blue-600 transition">Import Data Excel</h3>
-            <p class="text-xs text-muted mt-1">
-              Upload massal data Produk (Barang Jadi) dan Resep (BOM).
-            </p>
-          </div>
-        </div>
-      </a>
-    </section>
-
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-1 h-6 bg-petronas rounded-full"></span>
-        <h2 class="text-xl font-bold text-slate-800">Model Configuration</h2>
+    {{-- 2. SARIMA Config --}}
+    <a href="{{ route('settings.forecast') }}" 
+      class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center transform transition-all duration-300 hover:-translate-y-1 hover:border-petronas hover:shadow-lg hover:shadow-petronas/20 group">
+      <div class="text-petronas group-hover:text-slate-800 transition-colors mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+        </svg>               
       </div>
+      <h5 class="text-lg font-bold text-silver mb-1">SARIMA Config</h5>
+      <p class="text-xs text-muted">Atur parameter (p,d,q)(P,D,Q)s dan monitoring akurasi (RMSE/MAPE).</p>
+    </a>
 
-      <a href="{{ route('settings.forecast') }}" 
-        class="group block bg-carbonSoft rounded-xl p-6 border border-carbon hover:border-petronas transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,161,155,0.1)] relative overflow-hidden h-40">
-        
-        <div class="absolute -right-6 -top-6 w-32 h-32 bg-petronas/5 rounded-full blur-2xl group-hover:bg-petronas/15 transition"></div>
-
-        <div class="flex flex-col h-full justify-between relative z-10">
-          <div class="flex items-start justify-between">
-            <div class="p-3 bg-carbon rounded-lg text-slate-800 border border-carbon transition">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
-              </svg>               
-            </div>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
-               class="w-6 h-6 text-muted group-hover:text-blue-600 group-hover:translate-x-2 transition transform">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold text-silver group-hover:text-blue-600 transition">SARIMA Config</h3>
-            <p class="text-xs text-muted mt-1">
-              Atur parameter (p,d,q)(P,D,Q)s dan monitoring akurasi (RMSE/MAPE).
-            </p>
-          </div>
-        </div>
-      </a>
-    </section>
-
-    {{-- SECTION BARU: USER MANAGEMENT --}}
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-1 h-6 bg-silver rounded-full"></span>
-        <h2 class="text-xl font-bold text-silver">Access Control</h2>
+    {{-- 3. User Management --}}
+    <a href="{{ route('settings.userManagement') }}" 
+      class="text-center p-6 bg-carbonSoft rounded-xl border border-transparent flex flex-col justify-center items-center transform transition-all duration-300 hover:-translate-y-1 hover:border-slate-500 hover:shadow-lg hover:shadow-slate-500/20 group">
+      <div class="text-slate-500 group-hover:text-slate-800 transition-colors mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+        </svg>
       </div>
+      <h5 class="text-lg font-bold text-silver mb-1">User Management</h5>
+      <p class="text-xs text-muted">Kelola akun pengguna, role, dan hak akses aplikasi.</p>
+    </a>
 
-      <a href="{{ route('settings.userManagement') }}" 
-        class="group block bg-carbonSoft rounded-xl p-6 border border-carbon hover:border-petronas transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,161,155,0.1)] relative overflow-hidden h-40">
-        
-        <div class="absolute -right-6 -top-6 w-32 h-32 bg-silver/5 rounded-full blur-2xl group-hover:bg-petronas/10 transition"></div>
-
-        <div class="flex flex-col h-full justify-between relative z-10">
-          <div class="flex items-start justify-between">
-            <div class="p-3 bg-carbon rounded-lg text-silver group-hover:text-blue-600 border border-carbon transition">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-              </svg>
-            </div>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
-               class="w-6 h-6 text-muted group-hover:text-blue-600 group-hover:translate-x-2 transition transform">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold text-silver group-hover:text-blue-600 transition">User Management</h3>
-            <p class="text-xs text-muted mt-1">
-              Kelola akun pengguna, role, dan hak akses aplikasi.
-            </p>
-          </div>
-        </div>
-      </a>
-    </section>
-
-  </div>
+  </section>
 
 </main>
 

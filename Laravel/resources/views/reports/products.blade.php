@@ -48,7 +48,8 @@
     </ol>
   </nav>
 
-  <header class="border-b border-carbon pb-6">
+  {{-- Garis border-b dihapus, pb-6 tetap dipertahankan untuk spacing --}}
+  <header class="pb-6">
     <div class="flex items-center gap-3">
       <p class="text-xs uppercase tracking-widest text-muted">Inventory Report</p>
     </div>
@@ -60,7 +61,6 @@
     
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <h2 class="text-lg font-bold text-slate-800">Akumulasi Transaksi</h2>
-      {{-- Filter tanggal telah dihapus dari sini --}}
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-carbon">
@@ -71,6 +71,7 @@
             <th class="px-4 py-3 text-center text-black border-b border-carbonSoft">Kemasan</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Total Masuk</th>
             <th class="px-4 py-3 text-right text-black border-b border-carbonSoft">Total Keluar</th>
+            <th class="px-4 py-3 text-center text-black border-b border-carbonSoft">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-carbon/50">
@@ -82,7 +83,6 @@
                 <div class="text-[10px] text-slate-800 ">{{ $report->product->code ?? '-' }}</div>
               </td>
 
-              {{-- Kolom Kemasan Baru --}}
               <td class="px-4 py-3 text-center text-silver text-xs">
                 {{ $report->product->packaging ?? '-' }}
               </td>
@@ -95,10 +95,23 @@
                 -{{ number_format(abs($report->Keluar), 0, ',', '.') }}
               </td>
 
+              {{-- Tombol Action Baru --}}
+              <td class="px-4 py-3 text-center">
+                <a href="#" 
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-petronas text-white hover:bg-blue-700 transition"
+                  title="View Details">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                </a>
+              </td>
+
             </tr>
           @empty
             <tr>
-              <td colspan="4" class="px-6 py-12 text-center text-muted italic bg-slate-100">
+              {{-- Colspan diubah menjadi 5 --}}
+              <td colspan="5" class="px-6 py-12 text-center text-muted italic bg-slate-100">
                 Belum ada data mutasi stok.
               </td>
             </tr>
