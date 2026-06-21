@@ -35,7 +35,7 @@
     <ol class="flex items-center space-x-2">
       <li><a href="{{ route('home.index') }}" class="hover:text-blue-600 transition-colors">Home</a></li>
       <li class="opacity-40">/</li>
-      <li>Settings</li>
+      <li><a href="{{ route('settings.index') }}" class="hover:text-blue-600 transition-colors">Settings</a></li>
       <li class="opacity-40">/</li>
       <li class="text-slate-800 font-semibold">User Management</li>
     </ol>
@@ -62,7 +62,7 @@
 
       {{-- Name --}}
       <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Full Name</label>
+        <label class="text-xs text-muted uppercase tracking-wide block">Full Name</label>
         <input id="name" type="text" name="name" required
           value="{{ old('name') }}"
           class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas transition placeholder-muted/50"
@@ -72,7 +72,7 @@
 
       {{-- Email --}}
       <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Email Address</label>
+        <label class="text-xs text-muted uppercase tracking-wide block">Email Address</label>
         <input id="email" type="email" name="email" required
           value="{{ old('email') }}"
           class="w-full mt-1 px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas transition placeholder-muted/50"
@@ -82,7 +82,7 @@
 
       {{-- Role Selection --}}
       <div>
-        <label class="text-xs text-muted uppercase tracking-wide">Role / Division</label>
+        <label class="text-xs text-muted uppercase tracking-wide block">Role / Division</label>
         <div class="relative mt-1">
           <select id="role" name="role" required
             class="w-full px-4 py-2 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas focus:ring-1 focus:ring-petronas transition appearance-none cursor-pointer">
@@ -103,8 +103,8 @@
 
       {{-- Password --}}
       <div>
-        <label class="text-xs text-muted uppercase tracking-wide flex justify-between">
-          Password 
+        <label class="text-xs text-muted uppercase tracking-wide flex items-center justify-between">
+          <span>Password</span>
           <span id="passwordHint" class="text-[10px] text-slate-800 hidden italic">* Leave blank to keep current</span>
         </label>
         <input id="password" type="password" name="password" required
@@ -114,7 +114,7 @@
       </div>
 
       {{-- Action Buttons --}}
-      <div class="md:col-span-2 flex justify-end gap-3 pt-2 border-t border-carbon mt-2">
+      <div class="md:col-span-2 flex justify-end gap-3 pt-2 mt-2">
         <button type="button" id="cancelBtn" onclick="resetForm()"
           class="hidden px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">
           Cancel
@@ -130,15 +130,8 @@
 
   {{-- User List --}}
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
-    <div class="flex justify-between items-center mb-4">
+    <div class="mb-4">
       <h2 class="text-lg font-bold text-slate-800">Registered Users</h2>
-      
-      {{-- Search Bar Optional --}}
-      <div class="relative">
-        <input type="text" placeholder="Search users..." 
-          class="bg-carbon border border-carbonSoft text-xs rounded-full px-4 py-1.5 text-silver focus:outline-none focus:border-petronas w-64 placeholder-muted">
-        <i class="bi bi-search absolute right-3 top-1.5 text-muted text-xs"></i>
-      </div>
     </div>
 
     <div class="overflow-x-auto rounded-lg border border-carbon">
@@ -276,13 +269,9 @@
 
     // 4. Update UI Elements
     document.getElementById('formTitle').innerText = 'Edit User: ' + user.name;
-    document.getElementById('formTitle').classList.add('text-warning'); // Visual feedback
-    document.getElementById('formTitle').classList.remove('text-slate-800');
 
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.innerHTML = '<i class="bi bi-save mr-2"></i> Update User';
-    submitBtn.classList.remove('bg-petronas', 'text-blackBase'); // Ganti style tombol
-    submitBtn.classList.add('bg-warning', 'text-blackBase');
     
     document.getElementById('cancelBtn').classList.remove('hidden');
 
@@ -303,13 +292,9 @@
 
     // 3. Reset UI Elements
     document.getElementById('formTitle').innerText = 'Add New User';
-    document.getElementById('formTitle').classList.remove('text-warning');
-    document.getElementById('formTitle').classList.add('text-slate-800');
 
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.innerHTML = '<i class="bi bi-person-plus-fill mr-2"></i> Save User';
-    submitBtn.classList.remove('bg-warning');
-    submitBtn.classList.add('bg-petronas');
 
     document.getElementById('cancelBtn').classList.add('hidden');
   }
