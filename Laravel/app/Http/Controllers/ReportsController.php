@@ -8,6 +8,8 @@ use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Models\Material;
 
 class ReportsController extends Controller
 {
@@ -90,5 +92,98 @@ class ReportsController extends Controller
             'salesDetails', 'totalRevenue', 'totalCogs', 'grossProfit', 
             'profitMargin', 'startDate', 'endDate'
         ));
+    }
+
+   public function showProductChart(Request $request, Product $product)
+    {
+        $item = \App\Models\Product::findOrFail($product->id);
+        $endDate = Carbon::today();
+        $startDate = Carbon::today()->subDays(30);
+
+        $transactions = DB::table('product_transactions')
+            ->select(
+                DB::raw('DATE(transaction_date) as date'),
+                DB::raw('SUM(CASE WHEN qty > 0 THEN qty ELSE 0 END) as masuk'),
+                DB::raw('SUM(CASE WHEN qty < 0 THEN ABS(qty) ELSE 0 END) as keluar')
+            )
+            ->where('product_id', $product->id)
+            ->whereBetween('transaction_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy(DB::raw('DATE(transaction_date)'))
+            ->get()
+            ->keyBy('date');
+
+        $labels = [];
+        $dataIn = [];
+        $dataOut = [];
+
+        for ($i = 30; $i >= 0; $i--) {
+            $dateStr = Carbon::today()->subDays($i)->format('Y-m-d');
+            $labels[] = Carbon::parse($dateStr)->format('d M');
+            $dataIn[] = $transactions->has($dateStr) ? $transactions[$dateStr]->masuk : 0;
+            $dataOut[] = $transactions->has($dateStr) ? $transactions[$dateStr]->keluar : 0;
+        }
+
+        $chartData = [
+            'labels'  => $labels,
+            'dataIn'  => $dataIn,
+            'dataOut' => $dataOut,
+        ];
+
+        $pageData = [
+            'type' => 'Product',
+            'backRoute' => route('reports.product'),
+            'unitLabel' => 'Kemasan: ' . ($item->packaging ?? '-'),
+            'stockFormat' => number_format($item->current_stock, 0, ',', '.'),
+        ];
+
+        return view('reports.chart', compact('item', 'chartData', 'startDate', 'endDate', 'pageData'));
+    }
+
+    public function showMaterialChart(Request $request, Material $material)
+    {
+        $item = \App\Models\Material::findOrFail($material->id);
+        $endDate = Carbon::today();
+        $startDate = Carbon::today()->subDays(30);
+
+        $transactions = DB::table('material_transactions')
+            ->select(
+                DB::raw('DATE(transaction_date) as date'),
+                DB::raw('SUM(CASE WHEN qty > 0 THEN qty/material_conversion_factor_snapshot ELSE 0 END) as masuk'),
+                DB::raw('SUM(CASE WHEN qty < 0 THEN ABS(qty/material_conversion_factor_snapshot) ELSE 0 END) as keluar')
+            )
+            ->where('material_id', $material->id)
+            ->whereBetween('transaction_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->groupBy(DB::raw('DATE(transaction_date)'))
+            ->get()
+            ->keyBy('date');
+
+        $labels = [];
+        $dataIn = [];
+        $dataOut = [];
+
+        for ($i = 30; $i >= 0; $i--) {
+            $dateStr = Carbon::today()->subDays($i)->format('Y-m-d');
+            $labels[] = Carbon::parse($dateStr)->format('d M');
+            $dataIn[] = $transactions->has($dateStr) ? $transactions[$dateStr]->masuk : 0;
+            $dataOut[] = $transactions->has($dateStr) ? $transactions[$dateStr]->keluar : 0;
+        }
+
+        $chartData = [
+            'labels'  => $labels,
+            'dataIn'  => $dataIn,
+            'dataOut' => $dataOut,
+        ];
+
+        $factor = $item->conversion_factor > 0 ? $item->conversion_factor : 1;
+        $currentStockPurchasing = $item->current_stock / $factor;
+
+        $pageData = [
+            'type' => 'Material',
+            'backRoute' => route('reports.material'),
+            'unitLabel' => 'Satuan Beli: ' . ($item->purchase_unit ?? '-'),
+            'stockFormat' => number_format($currentStockPurchasing, 2, ',', '.'),
+        ];
+
+        return view('reports.chart', compact('item', 'chartData', 'startDate', 'endDate', 'pageData'));
     }
 }

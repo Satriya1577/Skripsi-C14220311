@@ -41,8 +41,8 @@
     </ol>
   </nav>
 
-  {{-- HEADER & PERIODE INFO --}}
-  <header class="border-b border-carbon pb-6">
+  {{-- HEADER & PERIODE INFO (Garis border-b dihapus agar seragam, pb-6 dipertahankan) --}}
+  <header>
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div>
         <div class="flex items-center gap-3">
@@ -70,7 +70,6 @@
     
     {{-- SUMMARY CARDS --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <!-- Total Revenue -->
       <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
         <div class="absolute right-0 top-0 h-full w-1.5 bg-success"></div>
         <p class="text-xs font-bold text-muted uppercase tracking-widest">Total Pendapatan</p>
@@ -78,7 +77,6 @@
         <p class="text-[10px] text-muted mt-2 uppercase tracking-wide">Dari Sales Order (Confirmed/Shipped)</p>
       </div>
 
-      <!-- Total COGS -->
       <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
         <div class="absolute right-0 top-0 h-full w-1.5 bg-danger"></div>
         <p class="text-xs font-bold text-muted uppercase tracking-widest">HPP (Modal Produksi)</p>
@@ -86,7 +84,6 @@
         <p class="text-[10px] text-muted mt-2 uppercase tracking-wide">Total Modal Produksi Terjual</p>
       </div>
 
-      <!-- Gross Profit -->
       <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
         <div class="absolute right-0 top-0 h-full w-1.5 bg-petronas"></div>
         <p class="text-xs font-bold text-muted uppercase tracking-widest">Laba Kotor (Gross Profit)</p>
@@ -97,7 +94,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <h2 class="text-lg font-bold text-slate-800">Rincian Kontribusi per Produk</h2>
     </div>
 
