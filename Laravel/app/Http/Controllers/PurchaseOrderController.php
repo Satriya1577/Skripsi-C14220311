@@ -411,8 +411,17 @@ class PurchaseOrderController extends Controller
                     // --- 3. HITUNG HPP (WEIGHTED AVERAGE) Dengan Onkir ---
                     // hitung alokasi ongkir per item
                     // subtotal per item/total sum subtotal
-                    $proportion = ($totalAllItemsValue > 0) ? ($item->subtotal / $totalAllItemsValue) : 0;
+                    // cth subtotal item 1 = 20 pcs x 20000/pcs = 400000
+                    // cth subtotal item 2 = 2 pcs x 10000/pcs = 20000
+                    // total PO keseluruhan = 400000 + 20000 = 420000
+                    // shipping cost utk item 1 dan 2 = 100000
+                    // proporsi item 1 = 400000 / 420000 = 0.95
+                    // proporsi item 2 = 20000 / 420000 = 0.05
+                    // itemFreightCost item 1 = proporsi item 1 * shipping cost keseluruhan = 0.95 * 100000 = 95000
+                    // itemFreightCost item 2 = proporsi item 2 * shipping cost keseluruhan = 0.05 * 100000 = 5000
                     
+                    $proportion = ($totalAllItemsValue > 0) ? ($item->subtotal / $totalAllItemsValue) : 0; 
+
                     // itemfreightcost =  subtotal per item/total sum subtotal * biaya ongkir dalam 1 PO
                     $itemFreightCost = $proportion * $shippingToAllocate;
 
@@ -445,7 +454,6 @@ class PurchaseOrderController extends Controller
                         'qty' => $qtyBaseIn,
                         
                         // Simpan harga valuasi per unit yang BARU saja dihitung (atau harga beli saat itu)
-                        // Biasanya di history transaksi IN, orang mencatat harga beli aktual saat itu agar bisa ditelusuri
                         'price_per_unit' => ($qtyBaseIn > 0) ? ($newAssetValue / $qtyBaseIn) : 0, 
                         'total_price' => $item->subtotal,
                         
