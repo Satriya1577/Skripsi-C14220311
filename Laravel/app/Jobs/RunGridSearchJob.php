@@ -39,7 +39,7 @@ class RunGridSearchJob implements ShouldQueue
 
         try {
         
-            Log::info("[RunGridSearchJob]RunGridSearchJob class");
+            Log::info("[RunGridSearchJob] RunGridSearchJob class");
             $rawSales = SalesOrderItem::where('product_id', $this->productId)
                 ->whereHas('salesOrder', function($query) {
                     $query->whereIn('status', ['confirmed', 'shipped']);
