@@ -41,15 +41,15 @@
     </ol>
   </nav>
 
-  {{-- HEADER & PERIODE INFO (Garis border-b dihapus agar seragam, pb-6 dipertahankan) --}}
-  <header>
+  {{-- HEADER & PERIODE INFO --}}
+  <header class="pb-6">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div>
         <div class="flex items-center gap-3">
           <p class="text-xs uppercase tracking-widest text-muted">Financial Report</p>
         </div>
-        <h1 class="text-3xl font-extrabold text-slate-800 mt-1">Laporan Laba Rugi (Kotor)</h1>
-        <p class="text-sm text-muted mt-1">Laporan pendapatan penjualan dan harga pokok penjualan dalam 30 hari terakhir.</p>
+        <h1 class="text-3xl font-extrabold text-slate-800 mt-1">Laporan Laba Rugi</h1>
+        <p class="text-sm text-muted mt-1">Laporan pendapatan penjualan, harga pokok penjualan, dan beban pengiriman dalam 30 hari terakhir.</p>
       </div>
       
       {{-- INDIKATOR PERIODE --}}
@@ -68,8 +68,8 @@
 
   <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
     
-    {{-- SUMMARY CARDS --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    {{-- SUMMARY CARDS (Grid diubah menjadi 4 kolom untuk menampung Laba Bersih) --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
         <div class="absolute right-0 top-0 h-full w-1.5 bg-success"></div>
         <p class="text-xs font-bold text-muted uppercase tracking-widest">Total Pendapatan</p>
@@ -85,12 +85,22 @@
       </div>
 
       <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
-        <div class="absolute right-0 top-0 h-full w-1.5 bg-petronas"></div>
+        <div class="absolute right-0 top-0 h-full w-1.5 bg-warning"></div>
         <p class="text-xs font-bold text-muted uppercase tracking-widest">Laba Kotor (Gross Profit)</p>
-        <h3 class="text-3xl font-bold text-slate-800 mt-2 ">Rp {{ number_format($grossProfit, 2, ',', '.') }}</h3>
-        <p class="text-xs font-bold mt-2 tracking-wide {{ $profitMargin > 0 ? 'text-success' : 'text-danger' }}">
-          Margin Keuntungan: {{ number_format($profitMargin, 2) }}%
-        </p>
+        <h3 class="text-3xl font-bold text-slate-800 mt-2 ">Rp {{ number_format($grossProfit, 0, ',', '.') }}</h3>
+        <p class="text-[10px] text-muted mt-2 uppercase tracking-wide">Pendapatan &mdash; HPP</p>
+      </div>
+
+      <div class="bg-carbon p-6 rounded-lg border border-carbonSoft relative overflow-hidden shadow-lg">
+        <div class="absolute right-0 top-0 h-full w-1.5 bg-petronas"></div>
+        <p class="text-xs font-bold text-muted uppercase tracking-widest">Laba Bersih (Net Profit)</p>
+        <h3 class="text-3xl font-bold text-slate-800 mt-2 ">Rp {{ number_format($netProfit, 0, ',', '.') }}</h3>
+        <div class="mt-2 flex flex-col gap-0.5">
+          <p class="text-xs font-bold tracking-wide {{ $profitMargin > 0 ? 'text-success' : 'text-danger' }}">
+            Margin Bersih: {{ number_format($profitMargin, 2) }}%
+          </p>
+          <p class="text-[10px] text-muted uppercase tracking-wide">Beban Ongkir Perusahaan: Rp {{ number_format($totalShippingExpense, 0, ',', '.') }}</p>
+        </div>
       </div>
     </div>
 
