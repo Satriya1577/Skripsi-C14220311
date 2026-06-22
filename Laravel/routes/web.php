@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); // admin, sales [DONE]
     Route::post('/products/cost-adjustment', [ProductController::class, 'costAdjustment'])->name('products.costAdjustment'); // admin, produksi [DONE]
     Route::post('/products/stock-adjustment', [ProductController::class, 'stockAdjustment'])->name('products.stockAdjustment'); // admin, inventory [DONE]
-    Route::get('/products/update-product-lead-time-safety-stock', [ProductController::class, 'updateProductLeadTimeSafetyStock'])->name('products.updateProductLeadTimeSafetyStock'); // admin, inventory, production [DONE]
+    Route::post('/products/update-product-lead-time-safety-stock', [ProductController::class, 'updateProductLeadTimeSafetyStock'])->name('products.updateProductLeadTimeSafetyStock'); // admin, inventory, production [DONE]
     // Product Material Routes, 
     Route::post('/product-materials/store', [ProductMaterialController::class, 'store'])->name('product_materials.store'); // admin, production [DONE]
     Route::delete('/product-materials/{product_material}', [ProductMaterialController::class, 'destroy'])->name('product_materials.destroy'); // admin, production [DONE]
