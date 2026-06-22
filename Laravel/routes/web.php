@@ -75,11 +75,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/sales/store', [SalesOrderController::class, 'store'])->name('sales.store'); // admin, sales [DONE]
     Route::patch('/sales/update/{salesOrder}', [SalesOrderController::class, 'updateStatus'])->name('sales.updateStatus'); // admin, sales, inventory [DONE]
     Route::get('/sales/print/{salesOrder}', [SalesOrderController::class, 'print'])->name('sales.print'); // admin, sales, inventory [DONE]
+     Route::patch('/sales/shipping/{salesOrder}', [SalesOrderController::class, 'updateShippingInfo'])->name('sales.updateShippingInfo'); // admin, inventory [DONE]
+    Route::patch('/sales/verify-shipping/{salesOrder}', [SalesOrderController::class, 'verifyShippingPayment'])->name('sales.verifyShippingPayment'); // admin, accounting [DONE]
     // Sales Payment Routes
     Route::post('/sales/payments/store', [SalesPaymentController::class, 'store'])->name('sales_payments.store'); // admin, accounting [DONE]
     Route::delete('/sales/payments/{salesPayment}', [SalesPaymentController::class, 'destroy'])->name('sales_payments.destroy'); // admin, accounting [DONE]
-    Route::patch('/sales/shipping/{salesOrder}', [SalesOrderController::class, 'updateShippingInfo'])->name('sales.updateShippingInfo'); // admin, inventory [DONE]
-    Route::patch('/sales/verify-shipping/{salesOrder}', [SalesOrderController::class, 'verifyShippingPayment'])->name('sales.verifyShippingPayment'); // admin, accounting [DONE]
+   
 
     // PURCHASE SECTION
     // Purchase Routes
@@ -89,6 +90,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/purchases/store', [PurchaseOrderController::class, 'store'])->name('purchases.store'); // admin, purchase [DONE]
     Route::patch('/purchases/update/{purchaseOrder}', [PurchaseOrderController::class, 'updateStatus'])->name('purchases.updateStatus'); // admin, purchase, inventory [DONE]
     Route::get('/purchases/print/{purchaseOrder}', [PurchaseOrderController::class, 'print'])->name('purchases.print'); // admin, purchase [DONE]
+    Route::patch('/purchases/shipping/{purchaseOrder}', [PurchaseOrderController::class, 'updateShippingInfo'])->name('purchases.updateShippingInfo'); // admin, inventory [DONE]
+    Route::patch('/purchases/verify-shipping/{purchaseOrder}', [PurchaseOrderController::class, 'verifyShippingPayment'])->name('purchases.verifyShippingPayment'); // admin, accounting [DONE]
     // Purchase Payment Routes
     Route::post('/purchases/payments/store', [PurchasePaymentController::class, 'store'])->name('purchase_payments.store'); // admin, accounting [DONE]
     Route::delete('/purchases/payments/{purchasePayment}', [PurchasePaymentController::class, 'destroy'])->name('purchase_payments.destroy'); // admin, accounting [DONE]

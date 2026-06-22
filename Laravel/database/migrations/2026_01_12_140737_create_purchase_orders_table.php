@@ -36,6 +36,9 @@ return new class extends Migration
             // Status Pembayaran Hutang
             $table->enum('payment_status', ['unpaid', 'partial', 'paid'])->default('unpaid');
 
+            // Status pembayaran ongkir
+            $table->boolean('is_shipping_paid')->default(false); // Penanda verifikasi Accounting
+
             // --- RELASI SUPPLIER ---
             $table->foreignId('partner_id')->constrained('partners')->onDelete('cascade');
             
