@@ -82,15 +82,23 @@ class ReportsController extends Controller
             ->orderByDesc('total_revenue')
             ->get();
 
+        // Hitung total shipping expense
+        $totalShippingExpense = DB::table('sales_orders')
+            ->whereIn('status', ['confirmed', 'shipped'])
+            ->where('shipping_payment_type', 'borne_by_company')
+            ->whereBetween('transaction_date', [$startDate, $endDate])
+            ->sum('shipping_cost');
+
         // Hitung Grand Total
         $totalRevenue = $salesDetails->sum('total_revenue');
         $totalCogs = $salesDetails->sum('total_cogs');
         $grossProfit = $totalRevenue - $totalCogs;
+        $netProfit = $grossProfit - $totalShippingExpense;
         $profitMargin = $totalRevenue > 0 ? ($grossProfit / $totalRevenue) * 100 : 0;
 
         return view('reports.incomestatement', compact(
             'salesDetails', 'totalRevenue', 'totalCogs', 'grossProfit', 
-            'profitMargin', 'startDate', 'endDate'
+            'totalShippingExpense', 'netProfit', 'profitMargin', 'startDate', 'endDate'
         ));
     }
 
