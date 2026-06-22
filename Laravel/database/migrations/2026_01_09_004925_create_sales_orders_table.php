@@ -39,6 +39,9 @@ return new class extends Migration
             // 'paid'   : Lunas (remaining_balance = 0)
             $table->enum('payment_status', ['unpaid', 'partial', 'paid'])->default('unpaid');
 
+            // Status pembayaran ongkir
+            $table->boolean('is_shipping_paid')->default(false); // Penanda verifikasi Accounting
+
             $table->foreignId('partner_id')->constrained('partners')->onDelete('cascade');
             // Customer Snapshot
             $table->string('company_name');

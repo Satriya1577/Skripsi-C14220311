@@ -78,7 +78,8 @@ Route::middleware(['auth'])->group(function () {
     // Sales Payment Routes
     Route::post('/sales/payments/store', [SalesPaymentController::class, 'store'])->name('sales_payments.store'); // admin, accounting [DONE]
     Route::delete('/sales/payments/{salesPayment}', [SalesPaymentController::class, 'destroy'])->name('sales_payments.destroy'); // admin, accounting [DONE]
-    
+    Route::patch('/sales/shipping/{salesOrder}', [SalesOrderController::class, 'updateShippingInfo'])->name('sales.updateShippingInfo'); // admin, inventory [DONE]
+    Route::patch('/sales/verify-shipping/{salesOrder}', [SalesOrderController::class, 'verifyShippingPayment'])->name('sales.verifyShippingPayment'); // admin, accounting [DONE]
 
     // PURCHASE SECTION
     // Purchase Routes

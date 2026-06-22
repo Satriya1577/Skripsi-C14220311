@@ -125,15 +125,22 @@
       </div>
     </section>
 
-    {{-- SECTION: SHIPPING INFORMATION --}}
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 mt-6">
-      <div class="flex justify-between items-center">
+    {{-- SECTION: SHIPPING INFORMATION DENGAN LOGIKA ACCOUNTING --}}
+    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 mt-6 relative overflow-hidden">
+      <div class="flex justify-between items-center relative z-10">
         <h2 class="text-lg font-bold text-slate-800">Shipping Information</h2>
         
         @if($salesOrder->status == 'confirmed')
-          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
-            Input Mode Active
-          </span>
+          @if($salesOrder->is_shipping_paid)
+            <span class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-full border border-green-300 font-bold flex items-center gap-1 shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Verified by Accounting
+            </span>
+          @else
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
+              Input Mode Active
+            </span>
+          @endif
         @elseif($salesOrder->status == 'shipped')
           <span class="text-xs bg-carbon text-silver px-2 py-1 rounded border border-carbon">
             Locked (Shipped)
@@ -148,10 +155,11 @@
           </p>
         </div>
 
-      @elseif($salesOrder->status == 'confirmed')
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      @elseif($salesOrder->status == 'confirmed' && !$salesOrder->is_shipping_paid)
+        {{-- MODE EDIT UNTUK GUDANG (BELUM VERIFIKASI) --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Tanggal Pengiriman</label>
+            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Estimasi Tanggal Pengiriman</label>
             <input type="date" name="shipping_date" 
               value="{{ $salesOrder->shipping_date ? \Carbon\Carbon::parse($salesOrder->shipping_date)->format('Y-m-d') : date('Y-m-d') }}"
               class="w-full px-4 py-2.5 rounded-lg bg-carbon border border-petronas/50 text-silver focus:outline-none focus:border-petronas transition"
@@ -168,7 +176,7 @@
           </div>
 
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Nominal Biaya</label>
+            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Nominal Biaya Ekspedisi</label>
             <div class="relative">
               <span class="absolute left-3 top-2.5 text-muted text-sm">Rp</span>
               <input type="number" name="shipping_cost" id="shippingCostInput" step="0.01" 
@@ -179,11 +187,31 @@
             <p id="shippingHint" class="text-[10px] text-muted mt-1 italic"></p>
           </div>
         </div>
+        
+        {{-- TOMBOL ACTION KHUSUS SHIPPING (Garis pembatas dihapus di sini) --}}
+        <div class="flex justify-end gap-3 mt-4 pt-4 relative z-10">
+          <button type="submit" formaction="{{ route('sales.updateShippingInfo', $salesOrder->id) }}" formmethod="POST" class="bg-carbon text-silver border border-muted/50 font-bold px-5 py-2 rounded-lg hover:bg-slate-300 transition text-sm">
+            Save Shipping Info
+          </button>
+          
+          {{-- Tombol Verifikasi Hanya Muncul Jika Ditanggung Perusahaan, Ada Biaya, dan User adalah Accounting/Admin --}}
+          @if(in_array(Auth::user()->role, ['admin', 'accounting']) && $salesOrder->shipping_payment_type == 'borne_by_company' && $salesOrder->shipping_cost > 0)
+            <button type="submit" formaction="{{ route('sales.verifyShippingPayment', $salesOrder->id) }}" formmethod="POST" onclick="return confirm('Verifikasi pembayaran? Ongkir tidak akan bisa diedit lagi dan SO ini tidak bisa dicancel.')" class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg hover:bg-green-500 transition text-sm shadow-lg shadow-green-600/20">
+              Verify & Pay Shipping
+            </button>
+          @endif
+        </div>
 
       @else
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        {{-- MODE LOCKED (SUDAH DIVERIFIKASI / SUDAH SHIPPED) --}}
+        @if($salesOrder->is_shipping_paid)
+          <div class="absolute -right-8 -top-8 w-32 h-32 bg-green-500/5 rounded-full blur-3xl"></div>
+        @endif
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm relative z-10">
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
-            <p class="text-xs text-muted uppercase tracking-wide mb-1">Tanggal Pengiriman</p>
+            <p class="text-xs text-muted uppercase tracking-wide mb-1">
+              {{ $salesOrder->status == 'shipped' ? 'Tanggal Pengiriman Aktual' : 'Estimasi Tanggal Pengiriman' }}
+            </p>
             <p class="text-lg font-bold text-silver">
               {{ $salesOrder->shipping_date ? \Carbon\Carbon::parse($salesOrder->shipping_date)->format('d M Y') : '-' }}
             </p>
@@ -241,7 +269,6 @@
               <input type="number" id="qtyInput" placeholder="1" min="1" value="1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
             </div>
 
-            {{-- DIGANTI MENJADI INPUT HARGA JUAL --}}
             <div class="w-full md:w-1/4">
               <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Harga Jual / Unit</label>
               <div class="relative">
@@ -364,7 +391,13 @@
           <button type="submit" name="status" value="draft" class="bg-yellow-50 text-yellow-600 border border-yellow-500 font-bold px-6 py-2 rounded-lg hover:bg-yellow-500 hover:text-white transition">Save Draft</button>
           <button type="submit" name="status" value="confirmed" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/20" onclick="return confirm('Konfirmasi order?')">Confirm Order</button>
         @elseif($salesOrder->status == 'confirmed')
-          <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Yakin ingin membatalkan order yang sudah dikonfirmasi? Stok reserved akan dikembalikan.')">Cancel Order</button>
+          {{-- TOMBOL CANCEL DILINDUNGI JIKA ONGKIR SUDAH DIBAYAR --}}
+          @if($salesOrder->is_shipping_paid)
+            <button type="button" class="border border-muted text-muted font-bold px-6 py-2 rounded-lg cursor-not-allowed" title="Tidak dapat dibatalkan karena ongkir sudah dibayar Accounting">Cancel Order (Locked)</button>
+          @else
+            <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Yakin ingin membatalkan order yang sudah dikonfirmasi? Stok reserved akan dikembalikan.')">Cancel Order</button>
+          @endif
+          
           <button type="submit" name="status" value="shipped" class="bg-green-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600/90 transition shadow-lg shadow-green-600/20" onclick="return confirm('Kirim Barang?')">Ship Order</button>
         @endif
       </div>
@@ -398,7 +431,6 @@
     }
   }
 
-  // EVENT LISTENER HARGA AUTO-FILL
   document.addEventListener('DOMContentLoaded', function() {
     toggleShippingInput();
     
@@ -435,7 +467,7 @@
   function addItemToTable() {
     const productSelect = document.getElementById('productSelect');
     const qtyInput = document.getElementById('qtyInput');
-    const priceInput = document.getElementById('priceInput'); // Mengambil input harga jual
+    const priceInput = document.getElementById('priceInput'); 
     const tableBody = document.getElementById('itemsTableBody');
     const itemsContainer = document.getElementById('newItemsContainer');
 
@@ -451,14 +483,13 @@
     
     const qty = parseInt(qtyInput.value);
     const price = parseFloat(priceInput.value);
-    const discount = 0; // Set default diskon 0 di form atas
+    const discount = 0; 
 
     const grossTotal = price * qty;
-    const subtotal = grossTotal; // Karena diskon 0
+    const subtotal = grossTotal; 
 
     const uniqueId = Date.now() + '_' + addedItemsCount; 
 
-    // BAGIAN TABEL BAWAH TETAP SAMA SEPERTI KODE ASLI ANDA
     const row = document.createElement('tr');
     row.id = 'row_' + uniqueId;
     row.className = 'hover:bg-carbon transition-colors bg-petronas/5'; 
@@ -496,8 +527,6 @@
     `;
     tableBody.appendChild(row);
 
-    // Menyisipkan hidden input tambahan untuk `unit_price` yang didapat dari form `Harga Jual`
-    // sehingga form tetap tersubmit tanpa mengubah struktur tabel
     const inputDiv = document.createElement('div');
     inputDiv.id = 'input_' + uniqueId;
     inputDiv.innerHTML = `
@@ -508,7 +537,7 @@
     
     productSelect.value = "";
     qtyInput.value = 1;
-    priceInput.value = ""; // Bersihkan nilai harga
+    priceInput.value = ""; 
     addedItemsCount++;
   }
 
