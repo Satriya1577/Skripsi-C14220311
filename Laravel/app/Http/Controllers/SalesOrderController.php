@@ -195,6 +195,11 @@ class SalesOrderController extends Controller
             return redirect()->back()->with('error', 'AKSES DITOLAK: Tim Inventory tidak memiliki hak untuk membatalkan pesanan.');
         }
 
+        // CEK KEAMANAN: Jangan izinkan Cancel jika ongkir sudah dibayar Accounting
+        if ($newStatus == 'cancelled' && $salesOrder->is_shipping_paid) {
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Sales Order tidak dapat dibatalkan karena uang biaya pengiriman sudah dikeluarkan oleh Accounting.');
+        }
+
         return DB::transaction(function () use ($request, $salesOrder) {
             
             // 1. HAPUS ITEM
@@ -347,8 +352,16 @@ class SalesOrderController extends Controller
             }
 
             if ($oldStatus == 'confirmed' && $newStatus == 'shipped') {
-                if (!$salesOrder->shipping_date) {
-                    throw new \Exception("Tanggal pengiriman wajib diisi.");
+                // Ambil tanggal aktual yang ada di form saat tombol Ship diklik
+                $actualShippingDate = $request->shipping_date ?? $salesOrder->shipping_date ?? now()->format('Y-m-d');
+                
+                // Update SO dengan tanggal pengiriman yang aktual
+                $salesOrder->shipping_date = $actualShippingDate;
+
+                if ($salesOrder->shipping_payment_type == 'borne_by_company' && $salesOrder->shipping_cost > 0 && !$salesOrder->is_shipping_paid) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'status' => 'Akses Ditolak: Biaya ongkir (Ditanggung Perusahaan) harus diverifikasi dan dibayar oleh tim Accounting terlebih dahulu sebelum pesanan dapat dikirim!'
+                    ]);
                 }
 
                 foreach ($salesOrder->items as $item) {
@@ -411,6 +424,56 @@ class SalesOrderController extends Controller
             // Stream (Buka di browser) atau Download
             return $pdf->stream($docType . '-' . $salesOrder->so_code . '.pdf');
         }
+    }
+
+    /**
+     * Menyimpan data pengiriman (Oleh Gudang/Admin)
+     */
+    public function updateShippingInfo(Request $request, SalesOrder $salesOrder)
+    {
+        $user = Auth::user();
+        // Cek hak akses
+        if (!in_array($user->role, ['admin', 'inventory'])) {
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Accounting atau Admin yang dapat memverifikasi pembayaran ongkir.');
+        }
+
+        $salesOrder = SalesOrder::findOrFail($salesOrder->id);
+
+        if ($salesOrder->is_shipping_paid) {
+            return redirect()->back()->with('error', 'Ongkir sudah dibayar/diverifikasi oleh Accounting. Data tidak bisa diubah.');
+        }
+
+        $request->validate([
+            'shipping_date' => 'required|date',
+            'shipping_payment_type' => 'required|in:bill_to_customer,borne_by_company',
+            'shipping_cost' => 'required|numeric|min:0'
+        ]);
+
+        $salesOrder->update([
+            'shipping_date' => $request->shipping_date,
+            'shipping_payment_type' => $request->shipping_payment_type,
+            'shipping_cost' => $request->shipping_cost,
+        ]);
+
+        return redirect()->back()->with('success', 'Informasi pengiriman berhasil disimpan dan menunggu verifikasi (jika ditanggung perusahaan).');
+    }
+
+    /**
+     * Memverifikasi pembayaran ongkir (Oleh Accounting/Admin)
+     */
+    public function verifyShippingPayment(Request $request, SalesOrder $salesOrder)
+    {
+        $user = Auth::user();
+        // Cek hak akses
+        if (!in_array($user->role, ['admin', 'accounting'])) {
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Accounting atau Admin yang dapat memverifikasi pembayaran ongkir.');
+        }
+
+        $salesOrder = SalesOrder::findOrFail($salesOrder->id);
+        
+        $salesOrder->update(['is_shipping_paid' => true]);
+
+        return redirect()->back()->with('success', 'Pembayaran ongkir berhasil diverifikasi. Sales Order ini sekarang dikunci dari pembatalan.');
     }
 
     /**
