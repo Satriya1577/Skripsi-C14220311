@@ -360,14 +360,11 @@ class PurchaseOrderController extends Controller
             $itemsTotal = $purchaseOrder->items->sum('subtotal');
             
             // Logika Ongkir: 
-            // Jika FOB Shipping Point (Kita tanggung), maka ongkir menambah hutang ke supplier 
+            // Jika FOB Shipping Point (Kita tanggung), maka ongkir dibayar ke pihak ketiga ekspedisi
             // (Asumsi supplier menalangi atau menagih ongkir di invoice yang sama).
             // Jika FOB Destination (Supplier tanggung), ongkir tidak menambah tagihan kita.
-            // *Catatan: Jika ongkir dibayar ke pihak ketiga (ekspedisi), logic ini perlu disesuaikan.*
-            // Disini saya asumsi ongkir masuk ke tagihan PO supplier.
-            $shippingToAdd = ($purchaseOrder->shipping_terms == 'FOB_shipping_point') ? $purchaseOrder->shipping_cost : 0;
             
-            $newGrandTotal = $itemsTotal + $shippingToAdd;
+            $newGrandTotal = $itemsTotal;
 
             $purchaseOrder->grand_total = $newGrandTotal;
             $purchaseOrder->remaining_balance = $newGrandTotal - $purchaseOrder->paid_amount;
