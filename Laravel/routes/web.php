@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy'); // admin, purchase [DONE]
     Route::post('/materials/cost-adjustment', [MaterialController::class, 'costAdjustment'])->name('materials.costAdjustment'); // admin, purchase [DONE]
     Route::post('/materials/stock-adjustment', [MaterialController::class, 'stockAdjustment'])->name('materials.stockAdjustment'); // admin, inventory [DONE]
-    Route::get('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStockROP'])->name('materials.updateMaterialLeadTimeSafetyStockROP'); // admin, inventory, production [DONE]
+    Route::post('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStockROP'])->name('materials.updateMaterialLeadTimeSafetyStockROP'); // admin, inventory, production [DONE]
 
 
     // PARTNER SECTION
