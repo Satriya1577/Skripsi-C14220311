@@ -70,7 +70,6 @@
     </div>
 
     @if($purchaseOrder->status != 'draft' && $purchaseOrder->status != 'cancelled')
-      {{-- TOMBOL PRINT --}}
       <div>
         <a href="{{ route('purchases.print', $purchaseOrder->id) }}" target="_blank" 
         class="flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-white bg-silver hover:bg-white transition shadow-lg">
@@ -129,16 +128,22 @@
       </div>
     </section>
 
-    {{-- SECTION 2: SHIPPING & ARRIVAL (LOGIKA BARU SESUAI SALES) --}}
-    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 mt-6">
-      <div class="flex justify-between items-center">
+    {{-- SECTION 2: SHIPPING DENGAN LOGIKA ACCOUNTING --}}
+    <section class="bg-carbonSoft rounded-xl p-6 border border-carbon space-y-6 mt-6 relative overflow-hidden">
+      <div class="flex justify-between items-center relative z-10">
         <h2 class="text-lg font-bold text-slate-800">Shipping & Arrival</h2>
         
-        {{-- Badge Indikator --}}
         @if($purchaseOrder->status == 'ordered')
-          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
-            Input Mode Active
-          </span>
+          @if($purchaseOrder->is_shipping_paid)
+            <span class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-full border border-green-300 font-bold flex items-center gap-1 shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Verified by Accounting
+            </span>
+          @else
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded border border-petronas/20 animate-pulse">
+              Input Mode Active
+            </span>
+          @endif
         @elseif($purchaseOrder->status == 'received')
           <span class="text-xs bg-carbon text-silver px-2 py-1 rounded border border-carbon">
             Locked (Received)
@@ -146,39 +151,35 @@
         @endif
       </div>
 
-      {{-- KONDISI 1: DRAFT (Hidden) --}}
       @if($purchaseOrder->status == 'draft')
         <div class="p-8 text-center border-2 border-dashed border-carbon rounded-xl">
           <p class="text-muted text-sm italic">
-            "Informasi pengiriman dan input tanggal kedatangan barang dapat diinput setelah PO dikonfirmasi ke Supplier (Status: Ordered)."
+            "Informasi pengiriman dan tanggal kedatangan dapat diinput setelah PO dikonfirmasi ke Supplier (Status: Ordered)."
           </p>
         </div>
 
-      {{-- KONDISI 2: ORDERED (Form Input Mode) --}}
-      @elseif($purchaseOrder->status == 'ordered')
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {{-- 1. ESTIMASI TANGGAL --}}
+      @elseif($purchaseOrder->status == 'ordered' && !$purchaseOrder->is_shipping_paid)
+        {{-- MODE EDIT UNTUK GUDANG (BELUM VERIFIKASI) --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Input Tanggal Penerimaan Barang</label>
+            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Estimasi Tanggal Kedatangan</label>
             <input type="date" name="expected_arrival_date" 
               value="{{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('Y-m-d') : date('Y-m-d') }}"
               class="w-full px-4 py-2.5 rounded-lg bg-carbon border border-petronas/50 text-silver focus:outline-none focus:border-petronas transition"
               required>
           </div>
 
-          {{-- 2. SYARAT PENGIRIMAN --}}
           <div>
             <label class="text-xs text-muted uppercase tracking-wide block mb-1">Syarat Pengiriman</label>
             <select name="shipping_terms" id="shippingTypeSelect" onchange="toggleShippingInput()"
               class="w-full px-4 py-2.5 rounded-lg bg-carbon border border-petronas/50 text-silver focus:outline-none focus:border-petronas transition appearance-none cursor-pointer">
               <option value="FOB_destination" {{ $purchaseOrder->shipping_terms == 'FOB_destination' ? 'selected' : '' }}>FOB Destination (Ditanggung Supplier)</option>
-              <option value="FOB_shipping_point" {{ $purchaseOrder->shipping_terms == 'FOB_shipping_point' ? 'selected' : '' }}>FOB Shipping Point (Ditanggung Kita)</option>
+              <option value="FOB_shipping_point" {{ $purchaseOrder->shipping_terms == 'FOB_shipping_point' ? 'selected' : '' }}>FOB Shipping Point (Ditanggung Perusahaan)</option>
             </select>
           </div>
 
-          {{-- 3. BIAYA PENGIRIMAN --}}
           <div>
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Biaya Pengiriman</label>
+            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Nominal Biaya Ekspedisi</label>
             <div class="relative">
               <span class="absolute left-3 top-2.5 text-muted text-sm">Rp</span>
               <input type="number" name="shipping_cost" id="shippingCostInput" step="0.01" 
@@ -189,31 +190,47 @@
             <p id="shippingHint" class="text-[10px] text-muted mt-1 italic"></p>
           </div>
         </div>
+        
+        {{-- TOMBOL ACTION KHUSUS SHIPPING --}}
+        <div class="flex justify-end gap-3 mt-4 pt-4 relative z-10">
+          <button type="submit" formaction="{{ route('purchases.updateShippingInfo', $purchaseOrder->id) }}" formmethod="POST" class="bg-carbon text-silver border border-muted/50 font-bold px-5 py-2 rounded-lg hover:bg-slate-300 transition text-sm">
+            Save Shipping Info
+          </button>
+          
+          {{-- Tombol Verifikasi Hanya Muncul Jika FOB Shipping Point (Ditanggung Perusahaan) --}}
+          @if(in_array(Auth::user()->role, ['admin', 'accounting']) && $purchaseOrder->shipping_terms == 'FOB_shipping_point' && $purchaseOrder->shipping_cost > 0)
+            <button type="submit" formaction="{{ route('purchases.verifyShippingPayment', $purchaseOrder->id) }}" formmethod="POST" onclick="return confirm('Verifikasi pembayaran? Ongkir tidak akan bisa diedit lagi dan PO ini tidak bisa dicancel.')" class="bg-green-600 text-white font-bold px-5 py-2 rounded-lg hover:bg-green-500 transition text-sm shadow-lg shadow-green-600/20">
+              Verify & Pay Shipping
+            </button>
+          @endif
+        </div>
 
-      {{-- KONDISI 3: RECEIVED / CANCELLED (Card View Mode) --}}
       @else
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-          {{-- Card Tanggal --}}
+        {{-- MODE LOCKED (SUDAH DIVERIFIKASI / SUDAH RECEIVED) --}}
+        @if($purchaseOrder->is_shipping_paid)
+          <div class="absolute -right-8 -top-8 w-32 h-32 bg-green-500/5 rounded-full blur-3xl"></div>
+        @endif
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm relative z-10">
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
-            <p class="text-xs text-muted uppercase tracking-wide mb-1">Input tanggal Sampai di gudang</p>
+            <p class="text-xs text-muted uppercase tracking-wide mb-1">
+              {{ $purchaseOrder->status == 'received' ? 'Tanggal Aktual Kedatangan' : 'Estimasi Tanggal Kedatangan' }}
+            </p>
             <p class="text-lg font-bold text-silver">
               {{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('d M Y') : '-' }}
             </p>
           </div>
 
-          {{-- Card Tipe Ongkir --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Syarat Pengiriman</p>
             <p class="text-lg font-bold text-silver">
               @if($purchaseOrder->shipping_terms == 'FOB_shipping_point')
-                <span class="text-warning">FOB Shipping Point (Kita)</span>
+                <span class="text-warning">FOB Shipping Point (Perusahaan)</span>
               @else
                 <span class="text-slate-800">FOB Destination (Supplier)</span>
               @endif
             </p>
           </div>
 
-          {{-- Card Biaya --}}
           <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
             <p class="text-xs text-muted uppercase tracking-wide mb-1">Biaya Realisasi</p>
             <p class="text-lg font-bold text-silver">
@@ -261,13 +278,10 @@
               <input type="number" id="qtyInput" placeholder="1" min="1" value="1" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
             </div>
 
-            {{-- COST INPUT --}}
             <div class="w-full md:w-1/5">
               <label class="text-xs text-silver font-semibold uppercase tracking-wide mb-2 block">Harga Beli Per Satuan (Rp)</label>
               <input type="number" id="priceInput" placeholder="0" class="block w-full p-3 bg-carbon border border-muted/30 rounded-lg text-slate-800 placeholder-muted/50 focus:ring-1 focus:ring-petronas focus:border-petronas hover:border-petronas/50 transition">
             </div>
-
-            {{-- HAPUS INPUT DISKON DI SINI --}}
 
             <div class="w-full md:w-auto">
               <button type="button" onclick="addItemToTable()" class="w-full md:w-auto bg-green-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-green-600/90 transition shadow-lg shadow-green-600/20 flex items-center justify-center gap-2"><span>+ Add</span></button>
@@ -292,7 +306,6 @@
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Satuan</th>
               <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Qty</th>
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Harga Beli Per Satuan</th>
-              {{-- HAPUS COLUMN DISC DI SINI --}}
               <th class="px-4 py-3 text-right text-black uppercase text-xs tracking-wider">Subtotal</th>
               @if($purchaseOrder->status == 'draft') <th class="px-4 py-3 text-center text-black uppercase text-xs tracking-wider">Action</th> @endif
             </tr>
@@ -307,7 +320,6 @@
               </td>
               <td class="px-4 py-3 text-center text-silver text-xs">{{ $item->unit_snapshot ?? $item->material->purchase_unit }}</td>
               
-              {{-- KOLOM QTY --}}
               <td class="px-4 py-3 text-center">
                 @if($purchaseOrder->status == 'draft')
                   <input type="number" name="items[{{$item->id}}][quantity]" value="{{ $item->quantity + 0 }}" min="1" class="w-16 p-1 bg-blackBase border border-muted/30 rounded text-center text-silver text-xs focus:ring-1 focus:ring-petronas">
@@ -316,11 +328,7 @@
                 @endif
               </td>
 
-              {{-- KOLOM COST --}}
               <td class="px-4 py-3 text-right text-muted ">Rp {{ number_format($item->unit_price, 2, ',', '.') }}</td>
-              
-              {{-- HAPUS CELL DISC DI SINI --}}
-
               <td class="px-4 py-3 text-right text-slate-800 font-bold ">Rp {{ number_format($item->subtotal, 2, ',', '.') }}</td>
               
               @if($purchaseOrder->status == 'draft')
@@ -342,12 +350,12 @@
               @if($purchaseOrder->status == 'draft') <td></td> @endif
             </tr>
             <tr>
-              <td colspan="4" class="px-4 py-2 text-right text-muted text-xs uppercase">Shipping Cost <span class="text-[10px] text-slate-800 ml-1">({{ $purchaseOrder->shipping_terms == 'FOB_shipping_point' ? 'Kita Tanggung' : 'Supplier' }})</span></td>
+              <td colspan="4" class="px-4 py-2 text-right text-muted text-xs uppercase">Shipping Cost <span class="text-[10px] text-slate-800 ml-1">({{ $purchaseOrder->shipping_terms == 'FOB_shipping_point' ? 'Perusahaan' : 'Supplier' }})</span></td>
               <td class="px-4 py-2 text-right text-silver text-sm">
                 @if($purchaseOrder->shipping_terms == 'FOB_shipping_point') 
                   Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}
                 @else 
-                  <span class=" text-muted line-through">Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}</span> <span class=" text-[10px] text-slate-800 block">Free</span> 
+                  <span class=" text-muted line-through">Rp {{ number_format($purchaseOrder->shipping_cost, 2, ',', '.') }}</span> <span class=" text-[10px] text-slate-800 block">Gratis Ongkir</span> 
                 @endif
               </td>
               @if($purchaseOrder->status == 'draft') <td></td> @endif
@@ -363,14 +371,19 @@
       
       <div id="newItemsContainer"></div>
 
-      {{-- ACTION BUTTONS --}}
       <div class="mt-6 pt-4 border-t border-carbon flex justify-end gap-3">
         @if($purchaseOrder->status == 'draft')
           <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Batalkan PO?')">Cancel PO</button>
           <button type="submit" name="status" value="draft" class="bg-yellow-50 text-yellow-600 border border-yellow-500 font-bold px-6 py-2 rounded-lg hover:bg-yellow-500 hover:text-white transition">Save Draft</button>
           <button type="submit" name="status" value="ordered" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/20" onclick="return confirm('Konfirmasi pesanan ke Supplier?')">Place Order</button>
         @elseif($purchaseOrder->status == 'ordered')
-          <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Batalkan order?')">Cancel PO</button>
+          {{-- TOMBOL CANCEL DILINDUNGI JIKA ONGKIR SUDAH DIBAYAR --}}
+          @if($purchaseOrder->is_shipping_paid)
+            <button type="button" class="border border-muted text-muted font-bold px-6 py-2 rounded-lg cursor-not-allowed" title="Tidak dapat dibatalkan karena ongkir sudah dibayar Accounting">Cancel PO (Locked)</button>
+          @else
+            <button type="submit" name="status" value="cancelled" class="border border-danger text-danger font-bold px-6 py-2 rounded-lg hover:bg-danger hover:text-white transition" onclick="return confirm('Batalkan order?')">Cancel PO</button>
+          @endif
+          
           <button type="submit" name="status" value="received" class="bg-green-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-green-600/90 transition shadow-lg shadow-green-600/20" onclick="return confirm('Barang sudah diterima lengkap dan masuk stok?')">Receive Goods</button>
         @endif
       </div>
@@ -380,7 +393,6 @@
 </main>
 
 <script>
-  // --- Logic Shipping Input ---
   function toggleShippingInput() {
     const typeSelect = document.getElementById('shippingTypeSelect');
     const costInput = document.getElementById('shippingCostInput');
@@ -388,7 +400,6 @@
     
     if (!typeSelect || !costInput) return;
 
-    // FOB Destination = Supplier Tanggung (Biaya kita 0)
     const isDestination = typeSelect.value === 'FOB_destination';
 
     if (isDestination) {
@@ -402,11 +413,10 @@
       costInput.required = true;
       costInput.classList.remove('bg-blackBase/50', 'text-muted', 'cursor-not-allowed');
       costInput.classList.add('bg-carbon', 'text-silver');
-      hintText.innerText = "* Masukkan biaya pengiriman yang kita bayar.";
+      hintText.innerText = "* Masukkan nominal real yang dibayar perusahaan ke kurir.";
     }
   }
 
-  // --- Logic Add/Remove Item ---
   let addedItemsCount = 0;
 
   function deleteExistingItem(btn, itemId, subtotal) {
@@ -424,8 +434,7 @@
   function addItemToTable() {
     const productSelect = document.getElementById('productSelect');
     const qtyInput = document.getElementById('qtyInput');
-    const priceInput = document.getElementById('priceInput'); // Input Manual Cost
-    // const discInput = document.getElementById('discInput'); // HAPUS INI
+    const priceInput = document.getElementById('priceInput'); 
     const tableBody = document.getElementById('itemsTableBody');
     const itemsContainer = document.getElementById('newItemsContainer');
 
@@ -439,14 +448,12 @@
     const materialCode = selectedOption.getAttribute('data-code');
     const materialUnit = selectedOption.getAttribute('data-unit');
     
-    // Prioritas harga: Input user > Data Master
     let cost = parseFloat(priceInput.value);
     if(!cost) cost = parseFloat(selectedOption.getAttribute('data-price')) || 0;
 
     const qty = parseInt(qtyInput.value);
-    // const discount = parseFloat(discInput.value) || 0; // HAPUS INI
 
-    const subtotal = cost * qty; // HITUNG SUBTOTAL SEDERHANA
+    const subtotal = cost * qty;
 
     const uniqueId = Date.now() + '_' + addedItemsCount; 
 
@@ -466,7 +473,6 @@
       </td>
 
       <td class="px-4 py-3 text-right text-muted ">Rp ${formatRupiah(cost)}</td>
-      
       <td class="px-4 py-3 text-right text-slate-800 font-bold ">Rp ${formatRupiah(subtotal)}</td>
       <td class="px-4 py-3 text-center text-xs text-muted">
         <button type="button" onclick="removeNewItem('${uniqueId}', ${subtotal})" class="text-red-400 hover:text-red-600 font-bold px-2 py-1">✕</button>
@@ -474,7 +480,6 @@
     `;
     tableBody.appendChild(row);
 
-    // Input Hidden yang dikirim ke controller
     const inputDiv = document.createElement('div');
     inputDiv.id = 'input_' + uniqueId;
     inputDiv.innerHTML = `
@@ -485,7 +490,6 @@
     
     productSelect.value = "";
     qtyInput.value = 1;
-    // discInput.value = 0; // HAPUS INI
     priceInput.value = ""; 
     addedItemsCount++;
   }

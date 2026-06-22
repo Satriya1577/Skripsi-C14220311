@@ -390,6 +390,17 @@ class PurchaseOrderController extends Controller
             // Pindahkan dari Ordered Stock ke Current Stock
             if ($oldStatus == 'ordered' && $newStatus == 'received') {
 
+                // Ambil tanggal aktual dari input (atau biarkan default hari ini)
+                $actualArrivalDate = $request->expected_arrival_date ?? $purchaseOrder->expected_arrival_date ?? now()->format('Y-m-d');
+                $purchaseOrder->expected_arrival_date = $actualArrivalDate;
+
+                // --- PENGECEKAN VERIFIKASI ACCOUNTING ---
+                if ($purchaseOrder->shipping_terms == 'FOB_shipping_point' && $purchaseOrder->shipping_cost > 0 && !$purchaseOrder->is_shipping_paid) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'status' => 'Akses Ditolak: Biaya ongkir (Ditanggung Perusahaan) harus diverifikasi dan dibayar oleh tim Accounting terlebih dahulu sebelum barang dapat diterima masuk ke gudang (Received)!'
+                    ]);
+                }
+                
                 // Hitung alokasi ongkir
                 $totalAllItemsValue = $purchaseOrder->items->sum('subtotal');
                 $shippingToAllocate = ($purchaseOrder->shipping_terms == 'FOB_shipping_point') ? $purchaseOrder->shipping_cost : 0;
@@ -473,6 +484,13 @@ class PurchaseOrderController extends Controller
             // Kasus C: Ordered -> Cancelled (BATAL PESAN)
             // Kembalikan Ordered Stock
             if ($oldStatus == 'ordered' && $newStatus == 'cancelled') {
+
+                if ($purchaseOrder->is_shipping_paid) {
+                     throw \Illuminate\Validation\ValidationException::withMessages([
+                        'status' => 'Gagal: PO tidak dapat dibatalkan karena biaya ekspedisi sudah dibayar oleh tim Accounting.'
+                    ]);
+                }
+                    
                 foreach ($purchaseOrder->items as $item) {
                     $material = $item->material;
                     $conversion = $item->conversion_factor_snapshot ?? 1;
@@ -524,5 +542,52 @@ class PurchaseOrderController extends Controller
 
             return $pdf->stream('PO-' . $purchaseOrder->po_number . '.pdf');
         }
+    }
+
+    /**
+     * Menyimpan data pengiriman (Oleh Gudang/Admin)
+     */
+    public function updateShippingInfo(Request $request, PurchaseOrder $purchaseOrder)
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'inventory'])) {
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Accounting atau Admin yang dapat memverifikasi pembayaran ongkir.');
+        }
+
+        $purchaseOrder = PurchaseOrder::findOrFail($purchaseOrder->id);
+
+        if ($purchaseOrder->is_shipping_paid) {
+            return redirect()->back()->with('error', 'Ongkir sudah dibayar/diverifikasi oleh Accounting. Data tidak bisa diubah.');
+        }
+
+        $request->validate([
+            'expected_arrival_date' => 'nullable|date',
+            'shipping_terms' => 'required|in:FOB_shipping_point,FOB_destination',
+            'shipping_cost' => 'required|numeric|min:0'
+        ]);
+
+        $purchaseOrder->update([
+            'expected_arrival_date' => $request->expected_arrival_date,
+            'shipping_terms' => $request->shipping_terms,
+            'shipping_cost' => $request->shipping_cost,
+        ]);
+
+        return redirect()->back()->with('success', 'Informasi pengiriman berhasil disimpan.');
+    }
+
+    /**
+     * Memverifikasi pembayaran ongkir (Oleh Accounting/Admin)
+     */
+    public function verifyShippingPayment(Request $request, PurchaseOrder $purchaseOrder)
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'accounting'])) {
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Accounting atau Admin yang dapat memverifikasi pembayaran ongkir.');
+        }
+
+        $purchaseOrder = PurchaseOrder::findOrFail($purchaseOrder->id);
+        $purchaseOrder->update(['is_shipping_paid' => true]);
+
+        return redirect()->back()->with('success', 'Pembayaran ongkir berhasil diverifikasi. Barang sekarang dapat diterima oleh gudang (Received).');
     }
 }
