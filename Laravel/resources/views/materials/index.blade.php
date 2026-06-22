@@ -61,13 +61,16 @@
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
       <h2 class="text-lg font-bold text-slate-800 whitespace-nowrap">Material List</h2>
       
-      {{-- Tombol Update Dipindahkan Ke Sini --}}
-      <a href="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-3 rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-        </svg>
-        <span>Update Lead Time, Safety Stock & ROP</span>
-      </a>
+
+      <form action="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" method="POST" onsubmit="return confirm('Kalkulasi ulang Lead Time & Safety Stock seluruh produk?');">
+        @csrf
+        <button type="submit" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-3 rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          <span class="whitespace-nowrap">Update Lead Time, Safety Stock & ROP</span>
+        </button>
+      </form>
     </div>
     
     <div class="overflow-x-auto rounded-lg border border-carbon">
