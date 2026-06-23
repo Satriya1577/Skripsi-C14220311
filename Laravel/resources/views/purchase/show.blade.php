@@ -392,7 +392,7 @@
 
 </main>
 
-<script>
+<<script>
   function toggleShippingInput() {
     const typeSelect = document.getElementById('shippingTypeSelect');
     const costInput = document.getElementById('shippingCostInput');
@@ -508,6 +508,27 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     toggleShippingInput();
+
+    // --- TAMBAHAN LOGIKA AUTO-FILL HARGA DARI PRICELIST ---
+    const productSelect = document.getElementById('productSelect');
+    const priceInput = document.getElementById('priceInput');
+
+    if (productSelect && priceInput) {
+        productSelect.addEventListener('change', function() {
+            // Ambil opsi yang sedang dipilih oleh user
+            const selectedOption = this.options[this.selectedIndex];
+            
+            // Ambil atribut data-price yang sudah dikirim dari Controller
+            const defaultPrice = selectedOption.getAttribute('data-price');
+            
+            // Jika ada harganya, otomatis isi ke kotak input
+            if (defaultPrice) {
+                priceInput.value = parseFloat(defaultPrice);
+            } else {
+                priceInput.value = ""; // Kosongkan jika tidak ada
+            }
+        });
+    }
   });
 </script>
 

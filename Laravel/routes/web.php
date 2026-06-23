@@ -66,7 +66,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/partners/show/{partner}', [PartnerController::class, 'show'])->name('partners.show');
     Route::post('/partners/store', [PartnerController::class, 'store'])->name('partners.store'); // admin, sales, purchase [DONE]
     Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy'); // admin, sales, purchase [DONE]
-
+    Route::get('partners/pricelist/{partner}', [PartnerController::class, 'showPricelist'])->name('partners.pricelist');
+    Route::post('/partners/store-pricelist/{partner}', [PartnerController::class, 'storePricelist'])->name('partners.storePricelist');
+    Route::delete('/partners/{partner}/pricelist/{id}', [PartnerController::class, 'destroyPricelist'])->name('partners.destroyPricelist');
+   
+   
     // SALES SECTION
     // Sales Routes
     Route::get('/sales', [SalesOrderController::class, 'index'])->name('sales.index');

@@ -126,20 +126,20 @@ class PurchaseOrderController extends Controller
     /**
      * Display the specified resource.
      */
-
     public function show(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder = PurchaseOrder::with(['items.material'])->findOrFail($purchaseOrder->id);
 
-        // Mengambil semua material aktif sekaligus menghitung rekomendasi restock
         $materials = DB::table('materials')
             ->where('materials.is_active', true)
-            // Join ke BOM (product_materials)
+            ->join('partner_pricelists', function($join) use ($purchaseOrder) {
+                $join->on('materials.id', '=', 'partner_pricelists.material_id')
+                        ->where('partner_pricelists.partner_id', '=', $purchaseOrder->partner_id);
+                })
             ->leftJoin('product_materials', 'materials.id', '=', 'product_materials.material_id')
-            // Join ke Production Plans (Hanya yang draft dan approved)
             ->leftJoin('production_plans', function($join) {
                 $join->on('product_materials.product_id', '=', 'production_plans.product_id')
-                     ->whereIn('production_plans.status', ['draft', 'approved']);
+                        ->whereIn('production_plans.status', ['draft', 'approved']);
             })
             ->select(
                 'materials.id',
@@ -149,8 +149,10 @@ class PurchaseOrderController extends Controller
                 'materials.ordered_stock',
                 'materials.conversion_factor',
                 'materials.purchase_unit',
-                'materials.price_per_unit',
-                // Hitung Total Qty Kebutuhan (dalam satuan Base Unit)
+                
+                // DI SINI LETAKNYA: Ganti materials.price_per_unit menjadi ini
+                'partner_pricelists.price as price_per_unit',
+                
                 DB::raw("COALESCE(SUM(
                     (CASE 
                         WHEN production_plans.status = 'approved' THEN production_plans.approved_production_qty 
@@ -162,18 +164,15 @@ class PurchaseOrderController extends Controller
                 'materials.id', 'materials.code', 'materials.name', 
                 'materials.current_stock', 'materials.ordered_stock', 
                 'materials.conversion_factor', 'materials.purchase_unit', 
-                'materials.price_per_unit'
+                
+                // DI SINI JUGA DIUBAH: Harus sesuai dengan kolom aslinya di tabel
+                'partner_pricelists.price' 
             )
             ->get()
             ->map(function ($material) {
-                // Hitung kekurangan (Shortage) dalam Base Unit
-                // Rumus: Total Kebutuhan - (Stok Gudang + Stok Sedang OTW)
                 $shortage = $material->total_qty_needed_base - ($material->current_stock + $material->ordered_stock);
-                
-                // Pastikan angka tidak negatif (jika stok cukup, rekomendasinya 0)
                 $shortage = max(0, $shortage); 
 
-                // Konversi satuan Base Unit ke Purchase Unit
                 $factor = $material->conversion_factor > 0 ? $material->conversion_factor : 1;
                 
                 $material->recommended_restock = ceil($shortage / $factor);
