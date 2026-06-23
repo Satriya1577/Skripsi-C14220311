@@ -550,8 +550,9 @@ class PurchaseOrderController extends Controller
     public function updateShippingInfo(Request $request, PurchaseOrder $purchaseOrder)
     {
         $user = Auth::user();
+        // Cek hak akses
         if (!in_array($user->role, ['admin', 'inventory'])) {
-            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Accounting atau Admin yang dapat memverifikasi pembayaran ongkir.');
+            return redirect()->back()->with('error', 'AKSES DITOLAK: Hanya tim Inventory atau Admin yang dapat mengubah informasi pengiriman.');
         }
 
         $purchaseOrder = PurchaseOrder::findOrFail($purchaseOrder->id);
