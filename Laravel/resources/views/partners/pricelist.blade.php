@@ -48,53 +48,57 @@
     </div>
   </header>
 
-  {{-- Form Tambah Pricelist --}}
-  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon">
-    <h2 class="text-lg font-bold text-slate-800 mb-4">Add / Update Material Price</h2>
+  {{-- Form Tambah/Edit Pricelist --}}
+  <section class="bg-carbonSoft rounded-xl p-6 border border-carbon" id="formSection">
+    <h2 class="text-lg font-bold text-slate-800 mb-4" id="formHeader">Add New Material Price</h2>
     
-    <form action="{{ route('partners.storePricelist', $partner->id) }}" method="POST">
+    {{-- UBAH: Gunakan grid layout persis seperti di partner.index --}}
+    <form action="{{ route('partners.storePricelist', $partner->id) }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6">
       @csrf
-      <div class="flex flex-col md:flex-row gap-4 items-end">
-        
-        {{-- Dropdown Material --}}
-        <div class="grow w-full md:w-1/2">
-          <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Pilih Material</label>
-          <div class="relative">
-            <select name="material_id" required
-              class="w-full appearance-none px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas cursor-pointer">
-              <option value="" disabled selected>-- Pilih Material --</option>
-              @foreach($materials as $material)
-                <option value="{{ $material->id }}">
-                  {{ $material->code }} - {{ $material->name }} (Satuan Beli: {{ $material->purchase_unit }})
-                </option>
-              @endforeach
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-800">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-            </div>
+      
+      {{-- Dropdown Material (Span 2) --}}
+      <div class="md:col-span-2">
+        <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Pilih Material</label>
+        <div class="relative">
+          <select name="material_id" id="materialSelect" required
+            class="w-full appearance-none px-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas cursor-pointer transition">
+            <option value="" disabled selected>-- Pilih Material --</option>
+            @foreach($materials as $material)
+              <option value="{{ $material->id }}">
+                {{ $material->code }} - {{ $material->name }} (Satuan Beli: {{ $material->purchase_unit }})
+              </option>
+            @endforeach
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-800" id="dropdownIcon">
+            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
           </div>
         </div>
-        
-        {{-- Input Harga --}}
-        <div class="w-full md:w-1/3">
-          <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Harga Beli Per Satuan</label>
-          <div class="relative">
-            <span class="absolute left-3 top-3 text-muted text-sm font-bold">Rp</span>
-            <input type="number" name="price" step="0.01" min="0" required
-              class="w-full pl-10 pr-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas font-bold"
-              placeholder="0">
-          </div>
-        </div>
-
-        {{-- Tombol Add --}}
-        <div class="w-full md:w-auto">
-          <button type="submit" 
-            class="w-full bg-petronas text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-600 transition shadow-lg shadow-petronas/20 flex items-center justify-center gap-2">
-            <span>+ Save Price</span>
-          </button>
-        </div>
-
       </div>
+      
+      {{-- Input Harga --}}
+      <div>
+        <label class="text-xs text-muted font-bold uppercase tracking-wide block mb-1">Harga Beli Per Satuan</label>
+        <div class="relative">
+          <span class="absolute left-3 top-3 text-muted text-sm font-bold">Rp</span>
+          <input type="number" name="price" id="priceInput" step="0.01" min="0" required
+            class="w-full pl-10 pr-4 py-3 rounded-lg bg-carbon border border-carbon text-silver focus:outline-none focus:border-petronas font-bold transition"
+            placeholder="0">
+        </div>
+      </div>
+
+      {{-- Action Buttons ditaruh di bawah dengan justify-end --}}
+      <div class="md:col-span-3 flex flex-wrap justify-end gap-3 pt-2">
+        <button type="button" id="cancelBtn" onclick="cancelEdit()"
+          class="hidden px-6 py-2 rounded-lg border border-muted text-slate-800 hover:bg-carbon transition">
+          Cancel
+        </button>
+        
+        <button type="submit" id="submitBtn"
+          class="bg-petronas text-white font-bold px-6 py-2 rounded-lg hover:bg-blue-600 transition shadow-lg shadow-petronas/20">
+          <span id="submitBtnText">Save Price</span>
+        </button>
+      </div>
+
     </form>
   </section>
 
@@ -129,8 +133,17 @@
               <td class="px-4 py-3 text-center text-xs text-muted">
                 {{ $list->updated_at->diffForHumans() }}
               </td>
-              <td class="px-4 py-3 text-center">
-                {{-- Parameter route sudah diperbaiki menjadi ['partner' => ..., 'id' => ...] --}}
+              <td class="px-4 py-3 text-center space-x-2 whitespace-nowrap">
+                
+                {{-- Edit Button --}}
+                <button type="button" onclick="editPricelist('{{ $list->material_id }}', {{ $list->price }})" 
+                  class="inline-flex items-center justify-center w-8 h-8 rounded bg-yellow-500 text-white hover:bg-yellow-600 transition" title="Edit Price">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg>
+                </button>
+
+                {{-- Delete Form --}}
                 <form action="{{ route('partners.destroyPricelist', ['partner' => $partner->id, 'id' => $list->id]) }}" method="POST" class="inline">
                   @csrf
                   @method('DELETE')
@@ -159,6 +172,60 @@
   </section>
 
 </main>
+
+<script>
+  function editPricelist(materialId, currentPrice) {
+    const select = document.getElementById('materialSelect');
+    const priceInput = document.getElementById('priceInput');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const formHeader = document.getElementById('formHeader');
+    const dropdownIcon = document.getElementById('dropdownIcon');
+
+    // Set Data
+    select.value = materialId;
+    priceInput.value = currentPrice;
+
+    // Kunci Select agar tidak bisa diubah (Hanya bisa ganti harga)
+    select.classList.add('pointer-events-none', 'bg-blackBase/50', 'text-muted');
+    select.classList.remove('bg-carbon', 'text-silver');
+    dropdownIcon.classList.add('hidden'); // Sembunyikan panah dropdown
+
+    // Ubah UI Form
+    formHeader.innerText = "Update Material Price";
+    submitBtnText.innerText = "Update Price";
+    cancelBtn.classList.remove('hidden');
+
+    // Scroll otomatis ke form
+    document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+    
+    // Focus otomatis ke input harga
+    setTimeout(() => priceInput.focus(), 300);
+  }
+
+  function cancelEdit() {
+    const select = document.getElementById('materialSelect');
+    const priceInput = document.getElementById('priceInput');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const formHeader = document.getElementById('formHeader');
+    const dropdownIcon = document.getElementById('dropdownIcon');
+
+    // Reset Data
+    select.value = "";
+    priceInput.value = "";
+
+    // Buka kembali Select
+    select.classList.remove('pointer-events-none', 'bg-blackBase/50', 'text-muted');
+    select.classList.add('bg-carbon', 'text-silver');
+    dropdownIcon.classList.remove('hidden');
+
+    // Kembalikan UI Form seperti semula
+    formHeader.innerText = "Add New Material Price";
+    submitBtnText.innerText = "Save Price";
+    cancelBtn.classList.add('hidden');
+  }
+</script>
 
 </body>
 </html>
