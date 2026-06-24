@@ -130,7 +130,7 @@
           <i class="bi bi-people-fill"></i>
         </div>
         <h5 class="text-lg font-bold text-silver mb-1">Partners</h5>
-        <p class="text-xs text-muted">Distributor & Supplier</p>
+        <p class="text-xs text-muted">Distributor & Supplier Pricelist</p>
       </a>
 
       {{-- 4. Sales --}}

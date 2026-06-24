@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/sales/store', [SalesOrderController::class, 'store'])->name('sales.store'); // admin, sales [DONE]
     Route::patch('/sales/update/{salesOrder}', [SalesOrderController::class, 'updateStatus'])->name('sales.updateStatus'); // admin, sales, inventory [DONE]
     Route::get('/sales/print/{salesOrder}', [SalesOrderController::class, 'print'])->name('sales.print'); // admin, sales, inventory [DONE]
-     Route::patch('/sales/shipping/{salesOrder}', [SalesOrderController::class, 'updateShippingInfo'])->name('sales.updateShippingInfo'); // admin, inventory [DONE]
+    Route::patch('/sales/shipping/{salesOrder}', [SalesOrderController::class, 'updateShippingInfo'])->name('sales.updateShippingInfo'); // admin, inventory [DONE]
     Route::patch('/sales/verify-shipping/{salesOrder}', [SalesOrderController::class, 'verifyShippingPayment'])->name('sales.verifyShippingPayment'); // admin, accounting [DONE]
     // Sales Payment Routes
     Route::post('/sales/payments/store', [SalesPaymentController::class, 'store'])->name('sales_payments.store'); // admin, accounting [DONE]

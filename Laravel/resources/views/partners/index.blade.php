@@ -41,7 +41,7 @@
   <header>
     <p class="text-xs uppercase tracking-widest text-muted">Master Data</p>
     <h1 class="text-3xl font-extrabold text-slate-800">Partner Management</h1>
-    <p class="text-sm text-muted mt-1">Kelola data Distributor, Supplier, dan Mitra Bisnis</p>
+    <p class="text-sm text-muted mt-1">Kelola data Distributor, Supplier, dan Pricelist Bahan Baku</p>
   </header>
 
   {{-- Form Section --}}
