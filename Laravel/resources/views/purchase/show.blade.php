@@ -162,11 +162,7 @@
         {{-- MODE EDIT UNTUK GUDANG (BELUM VERIFIKASI) --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           <div>
-<<<<<<< HEAD
-            <label class="text-xs text-muted uppercase tracking-wide block mb-1">Estimasi Tanggal Kedatangan</label>
-=======
             <label class="text-xs text-muted uppercase tracking-wide block mb-1">Input Tanggal Penerimaan Barang</label>
->>>>>>> 0039bec (feat:improve status label color in sales and purchase page)
             <input type="date" name="expected_arrival_date" 
               value="{{ $purchaseOrder->expected_arrival_date ? \Carbon\Carbon::parse($purchaseOrder->expected_arrival_date)->format('Y-m-d') : date('Y-m-d') }}"
               class="w-full px-4 py-2.5 rounded-lg bg-carbon border border-petronas/50 text-silver focus:outline-none focus:border-petronas transition"
