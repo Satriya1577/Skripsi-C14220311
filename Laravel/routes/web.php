@@ -130,7 +130,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/forecast/chart/{productionPlan}', [ForecastController::class, 'showChart'])->name('forecast.chart');
     Route::post('/forecast/generate/{product}', [ForecastController::class, 'generate'])->name('forecast.generate'); // admin, purchase, production [DONE]
     Route::patch('/forecast/approve/{productionPlan}', [ForecastController::class, 'approvePlan'])->name('forecast.approvePlan'); // admin, production [DONE]
-    
+    Route::post('/forecast/generate-all', [ForecastController::class, 'generateAllForecasts'])->name('forecast.generateAllForecasts');
     // Production Plan Routes
     // Route::get('/production-plans/{production_plan}', [ProductionPlanController::class, 'show'])->name('production_plans.show');
 

@@ -10,7 +10,6 @@ use App\Models\ForecastingJob;
 use App\Models\Product;
 use App\Models\ProductionPlan;
 use App\Models\Sales;
-use App\Models\SarimaConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -141,12 +140,16 @@ class ForecastController extends Controller
 
         // 2. CEK STATUS PRODUCTION PLAN
         // Jangan izinkan generate ulang jika plan bulan tersebut sudah disetujui/selesai
-        $isPlanLocked = ProductionPlan::where('product_id', $product->id)
+        // $isPlanLocked = ProductionPlan::where('product_id', $product->id)
+        //     ->where('period', $targetDate->format('Y-m-d'))
+        //     ->whereIn('status', ['approved', 'completed'])
+        //     ->exists();
+
+        $planExists = ProductionPlan::where('product_id', $product->id)
             ->where('period', $targetDate->format('Y-m-d'))
-            ->whereIn('status', ['approved', 'completed'])
             ->exists();
 
-        if ($isPlanLocked) {
+        if ($planExists) {
             $msg = 'Cannot regenerate. Plan for ' . $targetDate->format('M Y') . ' is already locked.';
             if ($request->wantsJson()) {
                 return response()->json(['error' => $msg], 422); 
@@ -205,5 +208,73 @@ class ForecastController extends Controller
             'status' => $job->status, // pending, processing, completed, atau failed
             'message' => $job->message
         ]);
+    }
+
+    // REVISI NOMOR 1 : TOMBOL UNTUK GENERATE FORECAST SEMUA PRODUK
+    public function generateAllForecasts(Request $request)
+    {
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'purchase', 'production'])) {
+            $msg = 'Terjadi kesalahan: Anda tidak memiliki akses.';
+            
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg)->withInput();
+        }
+
+        // 1. Ambil target periode (misal bulan depan)
+        $targetDate = Carbon::now()->addMonth()->startOfMonth();
+        
+        // 2. Ambil semua produk biskuit yang aktif
+        $products = Product::all();
+
+        $queuedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($products as $product) {
+            // 1. CEK PRODUCTION PLAN
+            // Jika produk ini sudah ada plan-nya, lewati (SKIP)
+            $planExists = ProductionPlan::where('product_id', $product->id)
+                ->where('period', $targetDate->format('Y-m-d'))
+                ->exists();
+
+            if ($planExists) {
+                $skippedCount++;
+                continue; // Skip dan lanjut ke produk berikutnya
+            }
+
+            // 2. CEK ANTRIAN JOB
+            // Jika produk ini masih diantrekan, lewati (SKIP)
+            $isBusy = ForecastingJob::where('product_id', $product->id)
+                ->whereIn('status', ['pending', 'processing'])
+                ->exists();
+
+            if ($isBusy) {
+                $skippedCount++;
+                continue; 
+            }
+
+            // 3. BUAT JOB BARU & DISPATCH (Tembak ke Background)
+            $job = ForecastingJob::create([
+                'product_id' => $product->id,
+                'target_period' => $targetDate,
+                'status' => 'pending',
+                'message' => 'Queued via Web UI (Batch)'
+            ]);
+
+            RunSarimaJob::dispatch($job->id);
+            $queuedCount++;
+        }
+
+        // Pesan Report Akhir
+        $msg = "Batch process selesai. {$queuedCount} produk berhasil masuk antrean forecasting. {$skippedCount} produk dilewati (plan sudah ada / sedang diproses).";
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => $msg, 'queued' => $queuedCount, 'skipped' => $skippedCount]);
+        }
+
+        // Anda bisa arahkan kembali ke halaman index produk/forecast
+        return redirect()->back()->with('success', $msg);
     }
 }
