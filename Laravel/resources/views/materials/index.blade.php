@@ -62,13 +62,14 @@
       <h2 class="text-lg font-bold text-slate-800 whitespace-nowrap">Material List</h2>
       
 
-      <form action="{{ route('materials.updateMaterialLeadTimeSafetyStockROP') }}" method="POST" onsubmit="return confirm('Kalkulasi ulang Lead Time & Safety Stock seluruh produk?');">
+      <form action="{{ route('materials.updateMaterialLeadTimeSafetyStock') }}" method="POST" onsubmit="return confirm('Kalkulasi ulang Lead Time & Safety Stock seluruh produk?');">
         @csrf
         <button type="submit" class="bg-carbonSoft border border-blue-600 text-blue-600 text-sm font-bold px-4 py-3 rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
           </svg>
-          <span class="whitespace-nowrap">Update Lead Time, Safety Stock & ROP</span>
+          {{-- REVISI NOMOR 2: HAPUS ROP --}}
+          <span class="whitespace-nowrap">Update Lead Time & Safety Stock</span>
         </button>
       </form>
     </div>
@@ -85,7 +86,8 @@
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Production Reserved Stock</th> 
             <th class="px-3 py-3 text-center text-black border-l border-carbon whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Available Stock</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Safety Stock</th>
-            <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">ROP</th>
+            {{-- REVISI NOMOR 2: HAPUS ROP --}}
+            {{-- <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">ROP</th> --}}
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Purchase Unit</th>
             <th class="px-3 py-3 text-center text-black whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Base Unit</th>
             <th class="px-3 py-3 text-center text-black border-l border-carbon whitespace-nowrap text-xs uppercase tracking-wide font-bold border-b border-carbonSoft">Buy Price / Unit</th> 
@@ -141,10 +143,11 @@
                 {{ number_format($material->safety_stock / $factor, 0, '', '') }}
               </td>
 
-              {{-- ROP --}}
-              <td class="px-3 py-3 text-center text-slate-800 font-bold whitespace-nowrap">
+              {{-- REVISI NOMOR 2: HAPUS ROP --}}
+              {{-- ROP --}} 
+              {{-- <td class="px-3 py-3 text-center text-slate-800 font-bold whitespace-nowrap">
                 {{ number_format($material->reorder_point / $factor, 0, '', '') }}
-              </td>
+              </td> --}}
 
               <td class="px-3 py-3 text-center text-muted whitespace-nowrap">{{ $material->purchase_unit }}</td>
 

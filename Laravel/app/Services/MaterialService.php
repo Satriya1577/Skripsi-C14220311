@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class MaterialService
 {
-    public function updateAllMaterialLeadTimeSafetyStockROP() 
+    // REVISI NOMOR 2: HAPUS ROP
+    public function updateAllMaterialLeadTimeSafetyStock() 
     {
         // hanya menghitung material yang statusnya aktif saja
         $materials = Material::where('is_active', true)->get();
@@ -38,9 +39,10 @@ class MaterialService
 
                 $safetyStock = max(0, $maxDemand - $averageLeadTimeDemand);
 
+                // REVISI NOMOR 2: HAPUS ROP
                 // 4. Hitung ROP (Kuantitas)
                 // averageLeadTimeDemand + safetyStock
-                $rop = $averageLeadTimeDemand + $safetyStock;
+                // $rop = $averageLeadTimeDemand + $safetyStock;
 
                 // 5. Update data material termasuk Min dan Max Lead Time
                 $material->update([
@@ -48,7 +50,8 @@ class MaterialService
                     'min_lead_time_days' => $minLeadTimeDays,
                     'max_lead_time_days' => $maxLeadTimeDays,
                     'safety_stock'       => $safetyStock,
-                    'reorder_point'      => $rop
+                    // REVISI NOMOR 2: HAPUS ROP
+                    // 'reorder_point'      => $rop
                 ]);
             }
             DB::commit();

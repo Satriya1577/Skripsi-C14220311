@@ -100,6 +100,12 @@
 
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Safety Stock</p>
+        <p class=" text-2xl font-bold text-silver">{{ number_format($material->safety_stock / $factor, 0, '', '') }} <span class=" text-xs text-muted font-normal">{{ $pUnit }}</span></p>
+      </div>
+
+      {{-- REVISI NOMOR 2: HAPUS ROP --}}
+      {{-- <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
+        <p class="text-xs text-muted uppercase tracking-wide mb-1">Safety Stock</p>
         <div class="flex items-end gap-1">
           <p class=" text-lg font-bold text-silver">{{ number_format($material->safety_stock / $factor, 0, '', '') }}</p>
           <span class="text-xs text-muted mb-1">{{ $pUnit }}</span>
@@ -107,7 +113,7 @@
         <p class="text-[10px] text-muted border-t border-white/10 mt-1 pt-1">
           ROP: {{ number_format($material->reorder_point / $factor, 0, '', '') }} {{ $pUnit }}
         </p>
-      </div>
+      </div> --}}
 
       <div class="bg-carbon rounded-lg p-4 border border-carbonSoft">
         <p class="text-xs text-muted uppercase tracking-wide mb-1">Estimasi Harga / {{ $pUnit }}</p>
