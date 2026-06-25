@@ -501,7 +501,8 @@ class MaterialController extends Controller
     // function ini dijalankan secara manual oleh user untuk mengupdate lead time, safety stock dan ROP
     // untuk semua bahan baku
     // tombol update ini ada di halaman material.index
-    public function updateMaterialLeadTimeSafetyStockROP(MaterialService $materialService) 
+    // REVISI NOMOR 2: HAPUS ROP
+    public function updateMaterialLeadTimeSafetyStock(MaterialService $materialService) 
     {
         $user = Auth::user();
         if (!in_array($user->role, ['admin', 'inventory', 'production'])) {
@@ -509,8 +510,11 @@ class MaterialController extends Controller
         }
         try {
             // Panggil proses utama yang ada di service
-            $materialService->updateAllMaterialLeadTimeSafetyStockROP();
-            return redirect()->back()->with('success', 'Lead Time, Safety Stock, dan ROP seluruh material berhasil diperbarui.');
+            $materialService->updateAllMaterialLeadTimeSafetyStock();
+            // REVISI NOMOR 2: HAPUS ROP
+            return redirect()->back()->with('success', 'Lead Time dan Safety Stock seluruh material berhasil diperbarui.');
+
+            // return redirect()->back()->with('success', 'Lead Time, Safety Stock, dan ROP seluruh material berhasil diperbarui.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }

@@ -6,7 +6,6 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductionController;
-use App\Http\Controllers\ProductionPlanController;
 use App\Http\Controllers\ProductMaterialController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PurchasePaymentController;
@@ -57,7 +56,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy'); // admin, purchase [DONE]
     Route::post('/materials/cost-adjustment', [MaterialController::class, 'costAdjustment'])->name('materials.costAdjustment'); // admin, purchase [DONE]
     Route::post('/materials/stock-adjustment', [MaterialController::class, 'stockAdjustment'])->name('materials.stockAdjustment'); // admin, inventory [DONE]
-    Route::post('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStockROP'])->name('materials.updateMaterialLeadTimeSafetyStockROP'); // admin, inventory, production [DONE]
+    // REVISI NOMOR 2: HAPUS ROP
+    Route::post('/materials/update-material-lead-time-safety-stock-rop', [MaterialController::class, 'updateMaterialLeadTimeSafetyStock'])->name('materials.updateMaterialLeadTimeSafetyStock'); // admin, inventory, production [DONE]
 
 
     // PARTNER SECTION
