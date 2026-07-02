@@ -195,7 +195,7 @@ class RunSarimaJob implements ShouldQueue
         } catch (\Exception $e) {
             $jobLog->update(['status' => 'failed', 'message' => substr($e->getMessage(), 0, 1000)]);
         } finally {
-            $recQty = max(0, ($forecastVal + $newSafetyStock) - $product->current_stock);
+            $recQty = max(0, ($forecastVal + $newSafetyStock) - ($product->on_production_stock + $product->current_stock));
             ProductionPlan::updateOrCreate(
                 [
                     'product_id' => $product->id, 
